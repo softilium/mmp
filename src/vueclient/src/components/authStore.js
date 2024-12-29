@@ -1,4 +1,4 @@
-import { reactive, ref } from 'vue'
+import { reactive } from 'vue'
 
 const rbUrl = "http://localhost:5078";
 
@@ -9,10 +9,12 @@ export const authStore = reactive({
 
   SetAccessToken(newToken) {
     this.accessToken = newToken;
+    localStorage.setItem("accessToken", newToken);
   },
 
   SetRefreshToken(newToken) {
     this.refreshToken = newToken;
+    localStorage.setItem("refreshToken", this.refreshToken);
   },
 
   async CheckLogged() {
@@ -20,6 +22,24 @@ export const authStore = reactive({
       let response = await fetch(rbUrl + "/identity/manage/info", {
         method: "GET",
         headers: { "Authorization": "Bearer " + this.accessToken }
+      }).catch(async () => {
+        this.SetAccessToken("");
+        //try to use refresh token
+        if (this.refreshToken != "") {
+          await fetch(rbUrl + "/identity/refresh",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ "refreshToken": this.refreshToken })
+            })
+            .then(async res => {
+              let obj = await res.json();
+              this.SetAccessToken(obj.accessToken);
+              this.SetRefreshToken(obj.refreshToken);
+              console.log('tokens was refreshed');
+            })
+            .catch(err => console.log(err));
+        }
       });
       if (response.ok) {
         let res = await response.json();
@@ -28,7 +48,7 @@ export const authStore = reactive({
     }
   },
 
-  async Login (emailString, passwordString) {
+  async Login(emailString, passwordString) {
     let request = { email: emailString, password: passwordString };
     let response = await fetch(rbUrl + "/identity/login", {
       method: "POST",
@@ -40,6 +60,20 @@ export const authStore = reactive({
       this.SetAccessToken(res.accessToken);
       this.SetRefreshToken(res.refreshToken);
       this.loggedEmail = emailString;
+      this.CheckLogged();
+    } else alert(await response.text()); //todo handle errors, don't show
+
+  },
+
+  async Logout() {
+    let response = await fetch(rbUrl + "/identity/logout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" }
+    });
+    if (response.ok) {
+      this.SetAccessToken("");
+      this.SetRefreshToken("");
+      this.loggedEmail = "";
       localStorage.setItem("accessToken", this.accessToken);
       localStorage.setItem("refreshToken", this.refreshToken);
       this.CheckLogged();
@@ -47,7 +81,7 @@ export const authStore = reactive({
 
   },
 
-  async Register (emailString, passwordString) {
+  async Register(emailString, passwordString) {
     let request = { email: emailString, password: passwordString };
     let response = await fetch(rbUrl + "/identity/register", {
       method: "POST",

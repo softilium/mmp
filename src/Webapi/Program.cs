@@ -1,9 +1,9 @@
-//using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using mmp.DbCtx;
 using mmp.Models;
 using mmp.Api;
+using Microsoft.AspNetCore.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,7 +51,8 @@ app.UseAuthorization();
 
 app.UseCors("MyPolicy");
 
-app.MapGroup("identity").MapIdentityApi<User>();    
+app.MapGroup("identity").MapIdentityApi<User>();
+app.MapPost("/identity/logout", ctx => ctx.SignOutAsync()); // std. MapIdentityApi doesn't contains logout endpoint
 
 if (app.Environment.IsDevelopment())
     app.MapOpenApi();

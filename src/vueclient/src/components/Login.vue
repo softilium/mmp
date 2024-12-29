@@ -19,7 +19,7 @@
     User email: <input v-model="emailString" />
     Password: <input v-model="passwordString" />
 
-    <button @click="authStore.Login(emailString, passwordString)">Login</button>
+    <button @click="authStore.Login(emailString, passwordString); $router.push('/');">Login</button>
 
   </div>
 
