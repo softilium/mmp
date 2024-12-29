@@ -1,0 +1,26 @@
+@Webapi_HostAddress = http://localhost:5078
+
+GET {{Webapi_HostAddress}}/confirmEmail
+
+###
+GET {{Webapi_HostAddress}}/openapi/v1.json
+
+###
+GET {{Webapi_HostAddress}}/api/shops
+
+###
+
+
+### identity std endpoints
+https://learn.microsoft.com/en-us/aspnet/core/security/authentication/identity-api-authorization?view=aspnetcore-9.0#the-mapidentityapituser-endpoints
+
+POST /register
+POST /login
+POST /refresh
+GET /confirmEmail
+POST /resendConfirmationEmail
+POST /forgotPassword
+POST /resetPassword
+POST /manage/2fa
+GET /manage/info
+POST /manage/info
