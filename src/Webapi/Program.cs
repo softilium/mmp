@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using mmp.DbCtx;
 using mmp.Models;
-using mmp.Api;
 using Microsoft.AspNetCore.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,7 +22,7 @@ builder.Services.AddIdentityApiEndpoints<User>(opt =>
 })
         .AddEntityFrameworkStores<ApplicationDbContext>()
         .AddRoles<IdentityRole<long>>()
-        .AddEntityFrameworkStores<ApplicationDbContext>();
+    .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddAuthentication();
 
@@ -34,22 +33,26 @@ builder.Services.AddOpenApi();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: "MyPolicy",
-        builder =>
+        b =>
         {
             //This is how you tell your app to allow cors
-            builder.WithOrigins("*")
-                    .WithMethods("POST", "DELETE", "GET")
-                    .AllowAnyHeader();
+            b
+                .WithOrigins("*")
+                //.WithMethods("POST", "DELETE", "GET", "OPTIONS")
+                .AllowAnyMethod()
+                .AllowAnyOrigin()
+                .AllowAnyHeader();
         });
 });
 
+builder.Services.AddControllers();
+
 var app = builder.Build();
 
+app.UseCors("MyPolicy");
 app.UseAuthentication();
-
 app.UseAuthorization();
 
-app.UseCors("MyPolicy");
 
 app.MapGroup("identity").MapIdentityApi<User>();
 app.MapPost("/identity/logout", ctx => ctx.SignOutAsync()); // std. MapIdentityApi doesn't contains logout endpoint
@@ -59,12 +62,11 @@ if (app.Environment.IsDevelopment())
 else
     app.UseHttpsRedirection();
 
+app.MapControllers();
+
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     db.Database.Migrate();
 }
-
-app.MapShopEndpoints();
-
 app.Run();

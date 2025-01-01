@@ -12,8 +12,8 @@ using mmp.DbCtx;
 namespace WebApi.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241228183927_MIG-241228-1939")]
-    partial class MIG2412281939
+    [Migration("20250101231251_MIG-250102-0012")]
+    partial class MIG2501020012
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

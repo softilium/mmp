@@ -5,7 +5,7 @@
 namespace WebApi.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class MIG2412281939 : Migration
+    public partial class MIG2501020012 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

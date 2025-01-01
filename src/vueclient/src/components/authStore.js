@@ -1,8 +1,7 @@
 import { reactive } from 'vue'
 
-const rbUrl = "http://localhost:5078";
-
 export const authStore = reactive({
+  rbUrl: () => "http://localhost:5078",
   loggedEmail: "",
   accessToken: "",
   refreshToken: "",
@@ -19,14 +18,17 @@ export const authStore = reactive({
 
   async CheckLogged() {
     if (this.accessToken != "") {
-      let response = await fetch(rbUrl + "/identity/manage/info", {
+      await fetch(this.rbUrl() + "/identity/manage/info", {
         method: "GET",
         headers: { "Authorization": "Bearer " + this.accessToken }
+      }).then(async res => {
+        let obj = await res.json();
+        this.loggedEmail = obj.email;
       }).catch(async () => {
         this.SetAccessToken("");
         //try to use refresh token
         if (this.refreshToken != "") {
-          await fetch(rbUrl + "/identity/refresh",
+          await fetch(this.rbUrl + "/identity/refresh",
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -34,6 +36,7 @@ export const authStore = reactive({
             })
             .then(async res => {
               let obj = await res.json();
+              this.loggedEmail = res.email;
               this.SetAccessToken(obj.accessToken);
               this.SetRefreshToken(obj.refreshToken);
               console.log('tokens was refreshed');
@@ -41,16 +44,12 @@ export const authStore = reactive({
             .catch(err => console.log(err));
         }
       });
-      if (response.ok) {
-        let res = await response.json();
-        this.loggedEmail = res.email;
-      }
     }
   },
 
   async Login(emailString, passwordString) {
     let request = { email: emailString, password: passwordString };
-    let response = await fetch(rbUrl + "/identity/login", {
+    let response = await fetch(this.rbUrl() + "/identity/login", {
       method: "POST",
       body: JSON.stringify(request),
       headers: { "Content-Type": "application/json" }
@@ -66,7 +65,7 @@ export const authStore = reactive({
   },
 
   async Logout() {
-    let response = await fetch(rbUrl + "/identity/logout", {
+    let response = await fetch(this.rbUrl() + "/identity/logout", {
       method: "POST",
       headers: { "Content-Type": "application/json" }
     });
@@ -74,8 +73,6 @@ export const authStore = reactive({
       this.SetAccessToken("");
       this.SetRefreshToken("");
       this.loggedEmail = "";
-      localStorage.setItem("accessToken", this.accessToken);
-      localStorage.setItem("refreshToken", this.refreshToken);
       this.CheckLogged();
     } else alert(await response.text()); //todo handle errors, don't show
 
@@ -83,7 +80,7 @@ export const authStore = reactive({
 
   async Register(emailString, passwordString) {
     let request = { email: emailString, password: passwordString };
-    let response = await fetch(rbUrl + "/identity/register", {
+    let response = await fetch(this.rbUrl() + "/identity/register", {
       method: "POST",
       body: JSON.stringify(request),
       headers: {
