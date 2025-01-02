@@ -6,12 +6,9 @@
   let shops = ref([]);
 
   onMounted(async () => {
-
-    let res = await fetch(authStore.rbUrl() + "/api/shops");
-    if (res.ok) {
-      shops.value = await res.json();
-    }
-
+    await fetch(authStore.rbUrl() + "/api/shops")
+      .then(async res => { shops.value = await res.json(); })
+      .catch(err => { console.log(err); });
   });
       
 </script>
