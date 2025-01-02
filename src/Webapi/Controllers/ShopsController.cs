@@ -19,19 +19,22 @@ namespace Webapi.Controllers
             req = RequestCtx;
         }
 
-        // GET: api/Shops
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Shop>>> GetShops()
         {
-            return await db.Shops.Where(_ => _.IsDeleted == false).ToListAsync();
+            return await db.Shops
+                .Where(_ => _.IsDeleted == false)
+                .Include(_=>_.CreatedBy)
+                .AsNoTracking()
+                .ToListAsync();
         }
 
-        // GET: api/Shops/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Shop>> GetShop(long id)
         {
             var shop = await db.Shops
                 .Where(_ => _.IsDeleted == false && _.ID == id)
+                .AsNoTracking()
                 .FirstOrDefaultAsync();
 
             if (shop == null) return NotFound();
@@ -39,14 +42,18 @@ namespace Webapi.Controllers
             return shop;
         }
 
-        // PUT: api/Shops/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> PutShop(long id, Shop shop)
         {
 
+            var cu = db.CurrentUser();
+            if (cu == null) return Unauthorized();
+
             var dbobj = db.Shops.First(_ => _.ID == id && _.IsDeleted == false);
             if (dbobj == null) return NotFound();
+
+            if (dbobj.CreatedBy.Id != cu.Id) return Unauthorized();
 
             dbobj.Caption = shop.Caption;
             dbobj.Comment = shop.Comment;
@@ -63,10 +70,7 @@ namespace Webapi.Controllers
             var cu = db.CurrentUser();
             if (cu == null) return Unauthorized();
 
-            var dbobj = new Shop
-            {
-                Caption = shop.Caption
-            };
+            var dbobj = new Shop { Caption = shop.Caption, Comment = shop.Comment };
 
             db.Shops.Add(dbobj);
             await db.SaveChangesAsync();
@@ -76,13 +80,15 @@ namespace Webapi.Controllers
 
         // DELETE: api/Shops/5
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteShop(long id)
         {
+            var cu = db.CurrentUser();
+            if (cu == null) return Unauthorized();
+
             var shop = await db.Shops.FirstOrDefaultAsync(_ => _.IsDeleted == false && _.ID == id);
-            if (shop == null)
-            {
-                return NotFound();
-            }
+            if (shop == null) return NotFound();
+            if (shop.CreatedBy.Id == cu.Id) return Unauthorized();
 
             db.Shops.Remove(shop);
             await db.SaveChangesAsync();

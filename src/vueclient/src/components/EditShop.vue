@@ -1,5 +1,6 @@
 <script setup lang="ts">
 
+  import { onMounted, ref } from 'vue';
   import { useRoute, useRouter } from 'vue-router'
   import { authStore } from './authStore.js';
 
@@ -9,26 +10,55 @@
   let title = "New shop";
   if (route.params.id) title = "Edit shop";
 
-  let captionField = "";
+  let captionField = ref("");
+  let shopId = null;
+
+  onMounted(async () => {
+    shopId = route.params.id;
+    if (shopId != null) {
+      try {
+        let res = await fetch(authStore.rbUrl() + "/api/shops/" + shopId, {
+          method: "GET"
+        });
+        if (res.ok) {
+          res = await res.json();
+          captionField.value = res.caption;
+        }
+      } catch (err) { console.log(err); };
+    }
+  });
 
   const Save = async () => {
 
     if (!authStore.loggedEmail) return;
 
-    await fetch(authStore.rbUrl() + "/api/shops", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + authStore.accessToken
-      },
-      body: JSON.stringify({ caption: captionField })
-    }).then(async res => {
-      if (res.ok) {
-        router.push("/");
-      }
-    }).catch(err => {
-      console.log(err);
-    });
+    if (shopId == null)
+      try {
+        let res = await fetch(authStore.rbUrl() + "/api/shops", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + authStore.accessToken
+          },
+          body: JSON.stringify({ caption: captionField.value, createdBy: {} })
+        });
+
+        if (res.ok) router.push("/");
+      } catch (err) { console.log(err); }
+    else
+      try {
+        let res = await fetch(authStore.rbUrl() + "/api/shops/" + shopId, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + authStore.accessToken
+          },
+          body: JSON.stringify({ caption: captionField.value, createdBy: {} })
+        });
+
+        if (res.ok) router.push("/");
+      } catch (err) { console.log(err); }
+
   }
 
 </script>

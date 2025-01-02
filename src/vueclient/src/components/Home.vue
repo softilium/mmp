@@ -18,13 +18,13 @@
 
 <template>
 
-  <h1>Home</h1>
+  <h1>Shops</h1>
 
-  <h2>Shops</h2>
   <table>
     <tr v-for="item in shops">
-      <td>{{ item.name }}</td>
       <td>{{ item.caption }}</td>
+      <td>{{ item.createdBy.userName }}</td>
+      <td><RouterLink v-if="item.createdBy.email==authStore.loggedEmail" v-bind:to="`/edit-shop/${item.id}`">[edit]</RouterLink></td>
     </tr>
   </table>
 

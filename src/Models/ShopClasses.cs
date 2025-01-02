@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 namespace mmp.Models
 {
     public class User : IdentityUser<long> { }
@@ -8,14 +10,14 @@ namespace mmp.Models
     {
         [Key] public long ID { get; set; }
 
-        [Required] public long CreatedByID { get; set; }
+        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public User CreatedBy { get; set; } = new();
         [Required] public DateTime CreatedOn { get; set; }
 
-        [Required] public long ModifiedByID { get; set; }
-        [Required] public DateTime ModifiedOn { get; set; }
+        [DeleteBehavior(DeleteBehavior.Restrict)] public User? ModifiedBy { get; set; }
+        public DateTime ModifiedOn { get; set; }
 
         public bool IsDeleted { get; set; } = false;
-        public long? DeletedByID { get; set; }
+        public User? DeletedBy { get; set; }
         public DateTime? DeletedOn { get; set; }
 
         public string? Comment { get; set; }
@@ -31,7 +33,7 @@ namespace mmp.Models
 
     public class Good : BaseObject
     {
-        [Required] public long OwnerShopID { get; set; }
+        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public Shop? OwnerShop { get; set; }
         [Required] public string Caption { get; set; } = "";
         public string? Description { get; set; }
     }
@@ -46,17 +48,17 @@ namespace mmp.Models
 
     public class Order : BaseObject
     {
-        [Required] public long ShopID { get; set; }
-        [Required] public long BuyerID { get; set; }
+        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public Shop? Shop { get; set; }
+        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public User? Buyer { get; set; }
         [Required] public OrderStatuses Status { get; set; }
     }
 
     public class OrderLine : BaseObject
     {
-        [Required] public long WhoID { get; set; }
-        [Required] public long ShopID { get; set; }     
-        public long? OrderID { get; set; } //when empty it is basket
-        [Required] public long GoodID { get; set; }
+        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public User? Who { get; set; }
+        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public Shop? Shop { get; set; }
+        public Order? Order { get; set; } //when empty it is basket
+        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public Good? Good { get; set; }
         [Required] public long Qty { get; set; }
     }
 }

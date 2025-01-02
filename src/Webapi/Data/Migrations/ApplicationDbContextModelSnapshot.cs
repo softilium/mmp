@@ -170,13 +170,13 @@ namespace WebApi.Data.Migrations
                     b.Property<string>("Comment")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long>("CreatedByID")
+                    b.Property<long>("CreatedById")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<long?>("DeletedByID")
+                    b.Property<long?>("DeletedById")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime?>("DeletedOn")
@@ -188,7 +188,7 @@ namespace WebApi.Data.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<long>("ModifiedByID")
+                    b.Property<long?>("ModifiedById")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("ModifiedOn")
@@ -198,6 +198,14 @@ namespace WebApi.Data.Migrations
                         .HasColumnType("bigint");
 
                     b.HasKey("ID");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("DeletedById");
+
+                    b.HasIndex("ModifiedById");
+
+                    b.HasIndex("OwnerShopID");
 
                     b.ToTable("Goods");
                 });
@@ -210,19 +218,19 @@ namespace WebApi.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
-                    b.Property<long>("BuyerID")
+                    b.Property<long>("BuyerId")
                         .HasColumnType("bigint");
 
                     b.Property<string>("Comment")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long>("CreatedByID")
+                    b.Property<long>("CreatedById")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<long?>("DeletedByID")
+                    b.Property<long?>("DeletedById")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime?>("DeletedOn")
@@ -231,7 +239,7 @@ namespace WebApi.Data.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<long>("ModifiedByID")
+                    b.Property<long?>("ModifiedById")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("ModifiedOn")
@@ -244,6 +252,16 @@ namespace WebApi.Data.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("ID");
+
+                    b.HasIndex("BuyerId");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("DeletedById");
+
+                    b.HasIndex("ModifiedById");
+
+                    b.HasIndex("ShopID");
 
                     b.ToTable("Orders");
                 });
@@ -259,13 +277,13 @@ namespace WebApi.Data.Migrations
                     b.Property<string>("Comment")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long>("CreatedByID")
+                    b.Property<long>("CreatedById")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<long?>("DeletedByID")
+                    b.Property<long?>("DeletedById")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime?>("DeletedOn")
@@ -277,7 +295,7 @@ namespace WebApi.Data.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<long>("ModifiedByID")
+                    b.Property<long?>("ModifiedById")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("ModifiedOn")
@@ -292,10 +310,24 @@ namespace WebApi.Data.Migrations
                     b.Property<long>("ShopID")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("WhoID")
+                    b.Property<long>("WhoId")
                         .HasColumnType("bigint");
 
                     b.HasKey("ID");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("DeletedById");
+
+                    b.HasIndex("GoodID");
+
+                    b.HasIndex("ModifiedById");
+
+                    b.HasIndex("OrderID");
+
+                    b.HasIndex("ShopID");
+
+                    b.HasIndex("WhoId");
 
                     b.ToTable("OrderLines");
                 });
@@ -315,13 +347,13 @@ namespace WebApi.Data.Migrations
                     b.Property<string>("Comment")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long>("CreatedByID")
+                    b.Property<long>("CreatedById")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<long?>("DeletedByID")
+                    b.Property<long?>("DeletedById")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime?>("DeletedOn")
@@ -330,13 +362,19 @@ namespace WebApi.Data.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<long>("ModifiedByID")
+                    b.Property<long?>("ModifiedById")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("ModifiedOn")
                         .HasColumnType("datetime2");
 
                     b.HasKey("ID");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("DeletedById");
+
+                    b.HasIndex("ModifiedById");
 
                     b.ToTable("Shops");
                 });
@@ -458,6 +496,156 @@ namespace WebApi.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("mmp.Models.Good", b =>
+                {
+                    b.HasOne("mmp.Models.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("mmp.Models.User", "DeletedBy")
+                        .WithMany()
+                        .HasForeignKey("DeletedById");
+
+                    b.HasOne("mmp.Models.User", "ModifiedBy")
+                        .WithMany()
+                        .HasForeignKey("ModifiedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("mmp.Models.Shop", "OwnerShop")
+                        .WithMany()
+                        .HasForeignKey("OwnerShopID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("DeletedBy");
+
+                    b.Navigation("ModifiedBy");
+
+                    b.Navigation("OwnerShop");
+                });
+
+            modelBuilder.Entity("mmp.Models.Order", b =>
+                {
+                    b.HasOne("mmp.Models.User", "Buyer")
+                        .WithMany()
+                        .HasForeignKey("BuyerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("mmp.Models.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("mmp.Models.User", "DeletedBy")
+                        .WithMany()
+                        .HasForeignKey("DeletedById");
+
+                    b.HasOne("mmp.Models.User", "ModifiedBy")
+                        .WithMany()
+                        .HasForeignKey("ModifiedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("mmp.Models.Shop", "Shop")
+                        .WithMany()
+                        .HasForeignKey("ShopID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Buyer");
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("DeletedBy");
+
+                    b.Navigation("ModifiedBy");
+
+                    b.Navigation("Shop");
+                });
+
+            modelBuilder.Entity("mmp.Models.OrderLine", b =>
+                {
+                    b.HasOne("mmp.Models.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("mmp.Models.User", "DeletedBy")
+                        .WithMany()
+                        .HasForeignKey("DeletedById");
+
+                    b.HasOne("mmp.Models.Good", "Good")
+                        .WithMany()
+                        .HasForeignKey("GoodID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("mmp.Models.User", "ModifiedBy")
+                        .WithMany()
+                        .HasForeignKey("ModifiedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("mmp.Models.Order", "Order")
+                        .WithMany()
+                        .HasForeignKey("OrderID");
+
+                    b.HasOne("mmp.Models.Shop", "Shop")
+                        .WithMany()
+                        .HasForeignKey("ShopID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("mmp.Models.User", "Who")
+                        .WithMany()
+                        .HasForeignKey("WhoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("DeletedBy");
+
+                    b.Navigation("Good");
+
+                    b.Navigation("ModifiedBy");
+
+                    b.Navigation("Order");
+
+                    b.Navigation("Shop");
+
+                    b.Navigation("Who");
+                });
+
+            modelBuilder.Entity("mmp.Models.Shop", b =>
+                {
+                    b.HasOne("mmp.Models.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("mmp.Models.User", "DeletedBy")
+                        .WithMany()
+                        .HasForeignKey("DeletedById");
+
+                    b.HasOne("mmp.Models.User", "ModifiedBy")
+                        .WithMany()
+                        .HasForeignKey("ModifiedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("DeletedBy");
+
+                    b.Navigation("ModifiedBy");
                 });
 #pragma warning restore 612, 618
         }

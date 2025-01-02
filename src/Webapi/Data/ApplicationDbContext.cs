@@ -46,20 +46,20 @@ namespace mmp.DbCtx
                             if (q.State == EntityState.Added)
                             {
                                 baseObj.CreatedOn = DateTime.UtcNow;
-                                baseObj.CreatedByID = currentUser.Id;
+                                baseObj.CreatedBy = currentUser;
                             }
                             else if (q.State == EntityState.Modified)
                             {
                                 baseObj.ModifiedOn = DateTime.UtcNow;
-                                baseObj.ModifiedByID = currentUser.Id;
+                                baseObj.ModifiedBy = currentUser;
                             }
                             if (
                                 baseObj.IsDeleted
-                                && (baseObj.DeletedOn == null || baseObj.DeletedByID == null)
+                                && (baseObj.DeletedOn == null || baseObj.DeletedBy == null)
                             )
                             {
                                 baseObj.DeletedOn = DateTime.UtcNow;
-                                baseObj.DeletedByID = currentUser.Id;
+                                baseObj.DeletedBy = currentUser;
                             }
                         }
                     }
@@ -70,61 +70,6 @@ namespace mmp.DbCtx
         protected override void OnModelCreating(ModelBuilder mb)
         {
             base.OnModelCreating(mb);
-
-            //mb.Entity<Models.Quote>().HasKey(_ => new { _.TickerId, _.D });
-            //mb.Entity<Models.Quote>()
-            //    .HasOne(_ => _.Ticker)
-            //    .WithMany(_ => _.Quotes)
-            //    .HasForeignKey(_ => _.TickerId);
-
-            //mb.Entity<Models.DSI>().HasKey(_ => new { _.TickerId, _.TargetYear });
-            //mb.Entity<Models.DSI>()
-            //    .HasOne(_ => _.Ticker)
-            //    .WithMany(_ => _.DSI)
-            //    .HasForeignKey(_ => _.TickerId);
-
-            //mb.Entity<Models.DivPayout>()
-            //    .HasOne(d => d.Ticker)
-            //    .WithMany(t => t.DivPayouts)
-            //    .HasForeignKey(_ => _.TickerId);
-            //mb.Entity<Models.DivPayout>()
-            //    .HasKey(_ => new
-            //    {
-            //        _.TickerId,
-            //        _.ForYear,
-            //        _.ForQuarter,
-            //        _.CloseDate,
-            //        _.DPS
-            //    });
-
-            //mb.Entity<Models.StrategyFactor>().HasKey(_ => new { _.StrategyId, _.LineNum });
-
-            //mb.Entity<Models.StrategyFilter>().HasKey(_ => new { _.StrategyId, _.LineNum });
-
-            //mb.Entity<Models.StrategyPreselected>().HasKey(_ => new { _.StrategyId, _.LineNum });
-
-            //mb.Entity<Models.Strategy>()
-            //    .Property(_ => _.SameEmitent)
-            //    .HasDefaultValue(Models.SameEmitentPolicy.Allow);
-
-            //mb.Entity<Models.InvestmentAccount>()
-            //    .HasOne(_ => _.Owner)
-            //    .WithMany(_ => _.InvestAccounts)
-            //    .HasForeignKey(_ => _.OwnerId);
-
-            //mb.Entity<Models.InvestmentAccountEvaluation>()
-            //    .HasKey(_ => new { _.AccountId, _.RecDate });
-            //mb.Entity<Models.InvestmentAccountEvaluation>()
-            //    .HasOne(_ => _.Account)
-            //    .WithMany(_ => _.Evaluations)
-            //    .HasForeignKey(_ => _.AccountId);
-
-            //mb.Entity<Models.InvestmentAccountCashflow>()
-            //    .HasKey(_ => new { _.AccountId, _.RecDate });
-            //mb.Entity<Models.InvestmentAccountCashflow>()
-            //    .HasOne(_ => _.Account)
-            //    .WithMany(_ => _.Cashflow)
-            //    .HasForeignKey(_ => _.AccountId);
         }
     }
 }
