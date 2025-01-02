@@ -7,12 +7,19 @@ namespace mmp.DbCtx
 {
     public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<long>, long>
     {
+
+        private IHttpContextAccessor _ctx;
+        public User? CurrentUser()
+        {
+            if (_ctx == null || _ctx.HttpContext == null || _ctx.HttpContext.User == null || _ctx.HttpContext.User.Identity == null) return null;
+            if (!_ctx.HttpContext.User.Identity.IsAuthenticated) return null;
+            return Users.FirstOrDefault(_ => _.UserName == _ctx.HttpContext.User.Identity.Name);
+        }
+
         public DbSet<Shop> Shops { get; set; }
         public DbSet<Good> Goods { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderLine> OrderLines { get; set; }
-
-        private IHttpContextAccessor _ctx;
 
         public ApplicationDbContext(
             DbContextOptions<ApplicationDbContext> options,
@@ -21,41 +28,39 @@ namespace mmp.DbCtx
             : base(options)
         {
             _ctx = ctx;
-
             SavingChanges += (s, e) =>
             {
-                if (_ctx.HttpContext == null || _ctx.HttpContext.User.Identity == null || !_ctx.HttpContext.User.Identity.IsAuthenticated)
-                    return;
-                var currentUser = Users.First(_ =>
-                    _.UserName == _ctx.HttpContext.User.Identity.Name
-                );
-
-                foreach (var q in ChangeTracker.Entries())
+                var currentUser = CurrentUser();
+                if (currentUser != null)
                 {
-                    if (
-                        q.Entity is BaseObject baseObj
-                        && (q.State == EntityState.Added || q.State == EntityState.Modified)
-                    )
-                    {
-                        baseObj.BeforeSave();
 
-                        if (q.State == EntityState.Added)
-                        {
-                            baseObj.CreatedOn = DateTime.UtcNow;
-                            baseObj.CreatedByID = currentUser.Id;
-                        }
-                        else if (q.State == EntityState.Modified)
-                        {
-                            baseObj.ModifiedOn = DateTime.UtcNow;
-                            baseObj.ModifiedByID = currentUser.Id;
-                        }
+                    foreach (var q in ChangeTracker.Entries())
+                    {
                         if (
-                            baseObj.IsDeleted
-                            && (baseObj.DeletedOn == null || baseObj.DeletedByID == null)
+                            q.Entity is BaseObject baseObj
+                            && (q.State == EntityState.Added || q.State == EntityState.Modified)
                         )
                         {
-                            baseObj.DeletedOn = DateTime.UtcNow;
-                            baseObj.DeletedByID = currentUser.Id;
+                            baseObj.BeforeSave();
+
+                            if (q.State == EntityState.Added)
+                            {
+                                baseObj.CreatedOn = DateTime.UtcNow;
+                                baseObj.CreatedByID = currentUser.Id;
+                            }
+                            else if (q.State == EntityState.Modified)
+                            {
+                                baseObj.ModifiedOn = DateTime.UtcNow;
+                                baseObj.ModifiedByID = currentUser.Id;
+                            }
+                            if (
+                                baseObj.IsDeleted
+                                && (baseObj.DeletedOn == null || baseObj.DeletedByID == null)
+                            )
+                            {
+                                baseObj.DeletedOn = DateTime.UtcNow;
+                                baseObj.DeletedByID = currentUser.Id;
+                            }
                         }
                     }
                 }

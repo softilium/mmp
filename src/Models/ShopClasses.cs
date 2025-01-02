@@ -25,8 +25,6 @@ namespace mmp.Models
 
     public class Shop : BaseObject
     {
-        [Required] public long OwnerUserID { get; set; }
-        [Required] public string Name { get; set; } = "shop1";
         [Required] public string Caption { get; set; } = "Shop 1";
 
     }

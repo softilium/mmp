@@ -13,67 +13,76 @@ export const authStore = reactive({
 
   SetRefreshToken(newToken) {
     this.refreshToken = newToken;
-    localStorage.setItem("refreshToken", this.refreshToken);
+    localStorage.setItem("refreshToken", newToken);
   },
 
   async CheckLogged() {
     if (this.accessToken != "") {
-      await fetch(this.rbUrl() + "/identity/manage/info", {
-        method: "GET",
-        headers: { "Authorization": "Bearer " + this.accessToken }
-      }).then(async res => {
-        let obj = await res.json();
-        this.loggedEmail = obj.email;
-      }).catch(async () => {
-        this.SetAccessToken("");
+      try {
+        let res = await fetch(this.rbUrl() + "/identity/manage/info", {
+          method: "GET",
+          signal: AbortSignal.timeout(5000),
+          headers: { "Authorization": "Bearer " + this.accessToken }
+        });
+        if (res.ok) {
+          let obj = await res.json();
+          this.loggedEmail = obj.email;
+        }
+      } catch (err) {
+        console.log(err);
         //try to use refresh token
         if (this.refreshToken != "") {
-          await fetch(this.rbUrl() + "/identity/refresh",
-            {
+          try {
+            let res = await fetch(this.rbUrl() + "/identity/refresh", {
               method: "POST",
+              signal: AbortSignal.timeout(5000),
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ "refreshToken": this.refreshToken })
-            })
-            .then(async res => {
-              let obj = await res.json();
+            });
+            if (res.ok) {
+              res = await res.json();
               this.loggedEmail = res.email;
-              this.SetAccessToken(obj.accessToken);
-              this.SetRefreshToken(obj.refreshToken);
+              this.SetAccessToken(res.accessToken);
+              this.SetRefreshToken(res.refreshToken);
               console.log('tokens was refreshed');
-            })
-            .catch(err => console.log(err));
+            }
+          }
+          catch (err) {
+            console.log(err);
+            this.SetAccessToken("");
+            this.SetRefreshToken("");
+          };
         }
-      });
+      }
     }
   },
 
   async Login(emailString, passwordString) {
-    let request = { email: emailString, password: passwordString };
-    let response = await fetch(this.rbUrl() + "/identity/login", {
-      method: "POST",
-      body: JSON.stringify(request),
-      headers: { "Content-Type": "application/json" }
-    });
-    if (response.ok) {
-      let res = await response.json();
-      this.SetAccessToken(res.accessToken);
-      this.SetRefreshToken(res.refreshToken);
-      this.loggedEmail = emailString;
-      this.CheckLogged();
-    } else alert(await response.text()); //todo handle errors, don't show
-
-  },
+    try {
+      let res = await fetch(this.rbUrl() + "/identity/login", {
+        method: "POST",
+        signal: AbortSignal.timeout(5000),
+        body: JSON.stringify({ email: emailString, password: passwordString }),
+        headers: { "Content-Type": "application/json" }
+      });
+      if (res.ok) {
+        res = await res.json();
+        this.SetAccessToken(res.accessToken);
+        this.SetRefreshToken(res.refreshToken);
+        this.CheckLogged();
+      }
+    } catch (err) { console.log(err); }
+  }, //todo handle errors, don't show
 
   async Logout() {
     let response = await fetch(this.rbUrl() + "/identity/logout", {
       method: "POST",
+      signal: AbortSignal.timeout(5000),
       headers: { "Content-Type": "application/json" }
     });
     if (response.ok) {
       this.SetAccessToken("");
       this.SetRefreshToken("");
-      this.loggedEmail = "";
-      this.CheckLogged();
     } else alert(await response.text()); //todo handle errors, don't show
 
   },
@@ -89,11 +98,9 @@ export const authStore = reactive({
     });
     if (response.ok) {
       let res = await response.json();
-      this.accessToken = res.accessToken;
-      this.refreshToken = res.RefreshToken;
-      localStorage.setItem("accessToken", this.accessToken);
-      localStorage.setItem("refreshToken", this.refreshToken);
-
+      this.SetAccessToken(res.accessToken);
+      this.SetRefreshToken(res.RefreshToken);
+      this.CheckLogged();
     } else
       alert(await response.text()); //todo handle errors, don't show
   }

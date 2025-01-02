@@ -6,11 +6,14 @@
   let shops = ref([]);
 
   onMounted(async () => {
-    await fetch(authStore.rbUrl() + "/api/shops")
-      .then(async res => { shops.value = await res.json(); })
-      .catch(err => { console.log(err); });
+    try {
+      let res = await fetch(authStore.rbUrl() + "/api/shops", { signal: AbortSignal.timeout(5000), });
+      if (res.ok) {
+        shops.value = await res.json();
+      }
+    } catch (err) { console.log(err); }
   });
-      
+
 </script>
 
 <template>
@@ -20,7 +23,8 @@
   <h2>Shops</h2>
   <table>
     <tr v-for="item in shops">
-      <td>{{ item.name }}</td><td>{{ item.caption }}</td>
+      <td>{{ item.name }}</td>
+      <td>{{ item.caption }}</td>
     </tr>
   </table>
 

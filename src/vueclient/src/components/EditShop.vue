@@ -9,7 +9,6 @@
   let title = "New shop";
   if (route.params.id) title = "Edit shop";
 
-  let nameField = "";
   let captionField = "";
 
   const Save = async () => {
@@ -20,9 +19,9 @@
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Autorization": "Bearer " + authStore.refreshToken
+        "Authorization": "Bearer " + authStore.accessToken
       },
-      body: JSON.stringify({ name: nameField, caption: captionField })
+      body: JSON.stringify({ caption: captionField })
     }).then(async res => {
       if (res.ok) {
         router.push("/");
@@ -37,9 +36,6 @@
 <template>
 
   <h1>{{ title }}</h1>
-
-  Name:
-  <input v-model="nameField" />
 
   Caption:
   <input v-model="captionField" />

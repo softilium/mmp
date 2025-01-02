@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using mmp.DbCtx;
 using mmp.Models;
@@ -9,12 +10,12 @@ namespace Webapi.Controllers
     [ApiController]
     public class ShopsController : ControllerBase
     {
-        private readonly ApplicationDbContext ctx;
+        private readonly ApplicationDbContext db;
         private readonly IHttpContextAccessor req;
 
         public ShopsController(ApplicationDbContext context, IHttpContextAccessor RequestCtx)
         {
-            ctx = context;
+            db = context;
             req = RequestCtx;
         }
 
@@ -22,14 +23,14 @@ namespace Webapi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Shop>>> GetShops()
         {
-            return await ctx.Shops.Where(_ => _.IsDeleted == false).ToListAsync();
+            return await db.Shops.Where(_ => _.IsDeleted == false).ToListAsync();
         }
 
         // GET: api/Shops/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Shop>> GetShop(long id)
         {
-            var shop = await ctx.Shops
+            var shop = await db.Shops
                 .Where(_ => _.IsDeleted == false && _.ID == id)
                 .FirstOrDefaultAsync();
 
@@ -44,38 +45,31 @@ namespace Webapi.Controllers
         public async Task<IActionResult> PutShop(long id, Shop shop)
         {
 
-            var dbobj = ctx.Shops.First(_ => _.ID == id && _.IsDeleted == false);
+            var dbobj = db.Shops.First(_ => _.ID == id && _.IsDeleted == false);
             if (dbobj == null) return NotFound();
 
-            dbobj.OwnerUserID = shop.OwnerUserID;
-            dbobj.Name = shop.Name;
             dbobj.Caption = shop.Caption;
             dbobj.Comment = shop.Comment;
 
-            await ctx.SaveChangesAsync();
+            await db.SaveChangesAsync();
 
             return NoContent();
         }
 
-        // POST: api/Shops
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<Shop>> PostShop(Shop shop)
         {
-
-            var IsAuth = 
-                req.HttpContext != null && req.HttpContext.User.Identity != null && req.HttpContext.User.Identity.IsAuthenticated;
-            if (!IsAuth) return Unauthorized();
+            var cu = db.CurrentUser();
+            if (cu == null) return Unauthorized();
 
             var dbobj = new Shop
             {
-                OwnerUserID = shop.OwnerUserID,
-                Name = shop.Name,
                 Caption = shop.Caption
             };
 
-            ctx.Shops.Add(dbobj);
-            await ctx.SaveChangesAsync();
+            db.Shops.Add(dbobj);
+            await db.SaveChangesAsync();
 
             return CreatedAtAction("GetShop", new { id = dbobj.ID }, dbobj);
         }
@@ -84,14 +78,14 @@ namespace Webapi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteShop(long id)
         {
-            var shop = await ctx.Shops.FirstOrDefaultAsync(_=>_.IsDeleted==false && _.ID==id);
+            var shop = await db.Shops.FirstOrDefaultAsync(_ => _.IsDeleted == false && _.ID == id);
             if (shop == null)
             {
                 return NotFound();
             }
 
-            ctx.Shops.Remove(shop);
-            await ctx.SaveChangesAsync();
+            db.Shops.Remove(shop);
+            await db.SaveChangesAsync();
 
             return NoContent();
         }

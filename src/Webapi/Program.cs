@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using mmp.DbCtx;
 using mmp.Models;
@@ -13,36 +12,17 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.EnableSensitiveDataLogging(builder.Environment.IsDevelopment());
 });
 
-builder.Services.AddIdentityApiEndpoints<User>(opt =>
-{
-    opt.Password.RequiredLength = 1; //todo : change password min.length to 8
-    opt.User.RequireUniqueEmail = true;
-    opt.Password.RequireNonAlphanumeric = false;
-    opt.SignIn.RequireConfirmedEmail = false;
-})
-        .AddEntityFrameworkStores<ApplicationDbContext>()
-        .AddRoles<IdentityRole<long>>()
-    .AddEntityFrameworkStores<ApplicationDbContext>();
-
-builder.Services.AddAuthentication();
-
 builder.Services.AddAuthorization();
+
+builder.Services.AddIdentityApiEndpoints<User>()
+    .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddOpenApi();
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: "MyPolicy",
-        b =>
-        {
-            //This is how you tell your app to allow cors
-            b
-                .WithOrigins("*")
-                //.WithMethods("POST", "DELETE", "GET", "OPTIONS")
-                .AllowAnyMethod()
-                .AllowAnyOrigin()
-                .AllowAnyHeader();
-        });
+        b => { b.WithOrigins("*").AllowAnyMethod().AllowAnyOrigin().AllowAnyHeader(); });
 });
 
 builder.Services.AddControllers();
@@ -50,9 +30,6 @@ builder.Services.AddControllers();
 var app = builder.Build();
 
 app.UseCors("MyPolicy");
-app.UseAuthentication();
-app.UseAuthorization();
-
 
 app.MapGroup("identity").MapIdentityApi<User>();
 app.MapPost("/identity/logout", ctx => ctx.SignOutAsync()); // std. MapIdentityApi doesn't contains logout endpoint
