@@ -28,7 +28,7 @@ export const authStore = reactive({
         this.SetAccessToken("");
         //try to use refresh token
         if (this.refreshToken != "") {
-          await fetch(this.rbUrl + "/identity/refresh",
+          await fetch(this.rbUrl() + "/identity/refresh",
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },
