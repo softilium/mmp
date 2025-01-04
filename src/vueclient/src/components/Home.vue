@@ -22,7 +22,7 @@
 
   <table>
     <tr v-for="item in shops">
-      <td>{{ item.caption }}</td>
+      <td><RouterLink v-bind:to="`/shop/${item.id}`">{{ item.caption }}</RouterLink></td>
       <td>{{ item.createdBy.userName }}</td>
       <td><RouterLink v-if="item.createdBy.email==authStore.loggedEmail" v-bind:to="`/edit-shop/${item.id}`">[edit]</RouterLink></td>
     </tr>

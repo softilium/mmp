@@ -34,6 +34,7 @@ namespace Webapi.Controllers
         {
             var shop = await db.Shops
                 .Where(_ => _.IsDeleted == false && _.ID == id)
+                .Include(_=>_.CreatedBy)
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
 
@@ -78,7 +79,6 @@ namespace Webapi.Controllers
             return CreatedAtAction("GetShop", new { id = dbobj.ID }, dbobj);
         }
 
-        // DELETE: api/Shops/5
         [HttpDelete("{id}")]
         [Authorize]
         public async Task<IActionResult> DeleteShop(long id)
@@ -90,7 +90,7 @@ namespace Webapi.Controllers
             if (shop == null) return NotFound();
             if (shop.CreatedBy.Id == cu.Id) return Unauthorized();
 
-            db.Shops.Remove(shop);
+            shop.IsDeleted = true;
             await db.SaveChangesAsync();
 
             return NoContent();

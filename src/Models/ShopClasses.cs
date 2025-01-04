@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 namespace mmp.Models
@@ -33,7 +32,7 @@ namespace mmp.Models
 
     public class Good : BaseObject
     {
-        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public Shop? OwnerShop { get; set; }
+        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public Shop OwnerShop { get; set; } = new();
         [Required] public string Caption { get; set; } = "";
         public string? Description { get; set; }
     }
@@ -91,3 +90,4 @@ namespace mmp.Models
 //todo llm
 //todo mini-profiler
 //todo opened-closed shops (public, direct-link, approved-only)
+//todo dataversion and checking for it before update

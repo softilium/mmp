@@ -4,8 +4,8 @@
   import { useRoute, useRouter } from 'vue-router'
   import { authStore } from './authStore.js';
 
-  const route = useRoute()
-  const router = useRouter()
+  const route = useRoute();
+  const router = useRouter();
 
   let title = "New shop";
   if (route.params.id) title = "Edit shop";
