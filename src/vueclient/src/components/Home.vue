@@ -18,16 +18,26 @@
 
 <template>
 
-  <h1>Shops</h1>
+  <h1>Витрины</h1>
 
-  <table>
-    <tr v-for="item in shops">
-      <td><RouterLink v-bind:to="`/shop/${item.id}`">{{ item.caption }}</RouterLink></td>
-      <td>{{ item.createdBy.userName }}</td>
-      <td><RouterLink v-if="item.createdBy.email==authStore.loggedEmail" v-bind:to="`/edit-shop/${item.id}`">[edit]</RouterLink></td>
-    </tr>
-  </table>
-
-  <button v-if="authStore.loggedEmail" @click="$router.push('/edit-shop');">Add a shop</button>
+  <div class="row">
+    <table class="table table-sm">
+      <thead>
+        <tr>
+          <td>Заголовок</td>
+          <td>Владелец</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="item in shops">
+          <td><RouterLink v-bind:to="`/shop/${item.id}`">{{ item.caption }}</RouterLink></td>
+          <td>{{ item.createdBy.userName }}</td>
+          <td><RouterLink v-if="item.createdBy.email==authStore.loggedEmail" v-bind:to="`/edit-shop/${item.id}`">[edit]</RouterLink></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <br />
+  <button class="btn btn-primary" v-if="authStore.loggedEmail" @click="$router.push('/edit-shop');">Добавить витрину</button>
 
 </template>

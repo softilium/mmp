@@ -13,20 +13,37 @@
 
 <template>
 
-  <div>
-    <RouterLink to="/">Home</RouterLink> |
-    <span v-if="!authStore.loggedEmail">
-      <RouterLink to="/login">Login</RouterLink> |
-    </span>
-    <span v-if="authStore.loggedEmail">
-      <RouterLink to="/logout">Logout</RouterLink> |
-    </span>
-    <span v-if="!authStore.loggedEmail">
-      <RouterLink to="/register">Register</RouterLink> |
-    </span>
-    <span v-if="authStore.loggedEmail">Logged as {{ authStore.loggedEmail }}</span>
-  </div>
+  <header>
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow.mb-3">
+      <RouterLink class="navbar-brand" to="/">В начало</RouterLink>
+      <span v-if="!authStore.loggedEmail">
+        <RouterLink class="navbar-text" to="/login">Войти</RouterLink>&nbsp;&nbsp;
+      </span>
+      <span v-if="authStore.loggedEmail">
+        <RouterLink class="navbar-text" to="/logout">Выйти</RouterLink>&nbsp;&nbsp;
+      </span>
+      <span v-if="!authStore.loggedEmail">
+        <RouterLink class="navbar-text" to="/register">Зарегистрироваться</RouterLink>&nbsp;&nbsp;
+      </span>
+      <span v-if="authStore.loggedEmail">&nbsp;&nbsp;Вы вошли как {{ authStore.loggedEmail }}</span>
+    </nav>
+  </header>
   <br />
-  <RouterView />
+
+  <div class="container-fluid">
+    <RouterView />
+  </div>
+
+  <br />
+  <br />
+  <footer class="border-top footer text-muted">
+    <div class="row">
+      <div class="col">
+        <p>
+          &copy; 2024-2025,
+        </p>
+      </div>
+    </div>
+  </footer>
 
 </template>

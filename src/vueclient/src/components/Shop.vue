@@ -39,14 +39,19 @@
 
   <h1>{{ shop.caption }}</h1>
 
-  <table>
-    <tr v-for="good in goods">
-      <td>{{ good.caption }}</td>
-      <td>{{ good.description }}</td>
-      <td><RouterLink v-if="isOwner" v-bind:to="`/edit-good/${shop.id}/${good.id}`">[edit]</RouterLink></td>
-    </tr>
-  </table>
+  <div class="row">
+    <table class="table table-sm">
+      <tbody>
+        <tr v-for="good in goods">
+          <td>{{ good.caption }}</td>
+          <td>{{ good.description }}</td>
+          <td><RouterLink v-if="isOwner" v-bind:to="`/edit-good/${shop.id}/${good.id}`">[edit]</RouterLink></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
-  <button v-if="isOwner" @click="router.push(`/edit-good/${route.params.id}`);">Add good</button>
+  <br />
+  <button class="btn btn-primary" v-if="isOwner" @click="router.push(`/edit-good/${route.params.id}`);">Добавить товар / услугу</button>
 
 </template>
