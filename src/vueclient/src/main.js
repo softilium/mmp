@@ -7,6 +7,7 @@ import Register from "./components/Register.vue";
 import EditShop from "./components/EditShop.vue";
 import EditGood from "./components/EditGood.vue";
 import Shop from "./components/Shop.vue";
+import CheckOut from "./components/CheckOut.vue";
 
 import App from './App.vue'
 
@@ -19,7 +20,8 @@ const routes = [
   { path: '/edit-shop/:id', component: EditShop },
   { path: '/shop/:id', component: Shop },
   { path: '/edit-good/:shopid', component: EditGood },
-  { path: '/edit-good/:shopid/:id', component: EditGood }
+  { path: '/edit-good/:shopid/:id', component: EditGood },
+  { path: '/checkout/:shopid', component: CheckOut },
 ];
 
 const router = createRouter({

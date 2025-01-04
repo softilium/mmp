@@ -57,7 +57,6 @@ namespace Webapi.Controllers
             if (dbobj.CreatedBy.Id != cu.Id) return Unauthorized();
 
             dbobj.Caption = shop.Caption;
-            dbobj.Comment = shop.Comment;
 
             await db.SaveChangesAsync();
 
@@ -71,7 +70,7 @@ namespace Webapi.Controllers
             var cu = db.CurrentUser();
             if (cu == null) return Unauthorized();
 
-            var dbobj = new Shop { Caption = shop.Caption, Comment = shop.Comment };
+            var dbobj = new Shop { Caption = shop.Caption };
 
             db.Shops.Add(dbobj);
             await db.SaveChangesAsync();

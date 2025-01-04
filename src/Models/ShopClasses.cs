@@ -18,16 +18,13 @@ namespace mmp.Models
         public bool IsDeleted { get; set; } = false;
         public User? DeletedBy { get; set; }
         public DateTime? DeletedOn { get; set; }
-
-        public string? Comment { get; set; }
-
+        
         public void BeforeSave() { }
     }
 
     public class Shop : BaseObject
     {
         [Required] public string Caption { get; set; } = "Shop 1";
-
     }
 
     public class Good : BaseObject
@@ -35,7 +32,7 @@ namespace mmp.Models
         [Required][DeleteBehavior(DeleteBehavior.Restrict)] public Shop OwnerShop { get; set; } = new();
         [Required] public string Caption { get; set; } = "";
         public string? Description { get; set; }
-        public decimal Price { get; set; }
+        [Precision(15, 2)] public decimal Price { get; set; }
     }
 
     public enum OrderStatuses : int
@@ -49,17 +46,18 @@ namespace mmp.Models
     public class Order : BaseObject
     {
         [Required][DeleteBehavior(DeleteBehavior.Restrict)] public Shop? Shop { get; set; }
-        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public User? Buyer { get; set; }
         [Required] public OrderStatuses Status { get; set; }
+        [Required][Precision(15, 2)] public decimal Qty { get; set; }
+        [Required][Precision(15, 2)] public decimal Sum { get; set; }
     }
 
     public class OrderLine : BaseObject
     {
-        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public User Who { get; set; } = new();
         [Required][DeleteBehavior(DeleteBehavior.Restrict)] public Shop Shop { get; set; } = new();
         public Order? Order { get; set; } //when empty it is basket
         [Required][DeleteBehavior(DeleteBehavior.Restrict)] public Good Good { get; set; } = new();
-        [Required] public long Qty { get; set; }
+        [Required][Precision(15, 2)] public decimal Qty { get; set; }
+        [Required][Precision(15, 2)] public decimal Sum { get; set; }
     }
 }
 

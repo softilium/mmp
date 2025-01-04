@@ -22,17 +22,22 @@
 
   <div class="row">
     <table class="table table-sm">
-      <thead>
+      <thead class="table-primary">
         <tr>
-          <td>Заголовок</td>
-          <td>Владелец</td>
+          <th>Заголовок</th>
+          <th>Владелец</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="item in shops">
-          <td><RouterLink v-bind:to="`/shop/${item.id}`">{{ item.caption }}</RouterLink></td>
-          <td>{{ item.createdBy.userName }}</td>
-          <td><RouterLink v-if="item.createdBy.email==authStore.loggedEmail" v-bind:to="`/edit-shop/${item.id}`">[edit]</RouterLink></td>
+          <td class="col-9"><RouterLink v-bind:to="`/shop/${item.id}`">{{ item.caption }}</RouterLink></td>
+          <td class="col-2">{{ item.createdBy.userName }}</td>
+          <td class="col-1">
+            <RouterLink v-if="item.createdBy.email==authStore.loggedEmail" v-bind:to="`/edit-shop/${item.id}`">
+              <i class="bi bi-pencil-square" />
+            </RouterLink>
+          </td>
         </tr>
       </tbody>
     </table>

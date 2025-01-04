@@ -77,6 +77,6 @@
   </div>
 
   <div>&nbsp;</div>
-  <button class="btn btn-primary" @click="Save">Save</button>
+  <button class="btn btn-primary" @click="Сохранить">Save</button>
 
 </template>

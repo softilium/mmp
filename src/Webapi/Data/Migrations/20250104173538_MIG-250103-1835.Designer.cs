@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using mmp.DbCtx;
 
@@ -11,9 +12,11 @@ using mmp.DbCtx;
 namespace WebApi.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250104173538_MIG-250103-1835")]
+    partial class MIG2501031835
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -167,6 +170,9 @@ namespace WebApi.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Comment")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<long>("CreatedById")
                         .HasColumnType("bigint");
 
@@ -195,8 +201,7 @@ namespace WebApi.Data.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<decimal>("Price")
-                        .HasPrecision(15, 2)
-                        .HasColumnType("decimal(15,2)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("ID");
 
@@ -219,6 +224,12 @@ namespace WebApi.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Comment")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<long>("CreatedById")
                         .HasColumnType("bigint");
 
@@ -240,19 +251,11 @@ namespace WebApi.Data.Migrations
                     b.Property<DateTime>("ModifiedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal>("Qty")
-                        .HasPrecision(15, 2)
-                        .HasColumnType("decimal(15,2)");
-
                     b.Property<long>("ShopID")
                         .HasColumnType("bigint");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
-
-                    b.Property<decimal>("Sum")
-                        .HasPrecision(15, 2)
-                        .HasColumnType("decimal(15,2)");
 
                     b.HasKey("ID");
 
@@ -274,6 +277,9 @@ namespace WebApi.Data.Migrations
                         .HasColumnType("bigint");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
+
+                    b.Property<string>("Comment")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<long>("CreatedById")
                         .HasColumnType("bigint");
@@ -302,16 +308,11 @@ namespace WebApi.Data.Migrations
                     b.Property<long?>("OrderID")
                         .HasColumnType("bigint");
 
-                    b.Property<decimal>("Qty")
-                        .HasPrecision(15, 2)
-                        .HasColumnType("decimal(15,2)");
+                    b.Property<long>("Qty")
+                        .HasColumnType("bigint");
 
                     b.Property<long>("ShopID")
                         .HasColumnType("bigint");
-
-                    b.Property<decimal>("Sum")
-                        .HasPrecision(15, 2)
-                        .HasColumnType("decimal(15,2)");
 
                     b.HasKey("ID");
 
@@ -340,6 +341,9 @@ namespace WebApi.Data.Migrations
 
                     b.Property<string>("Caption")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Comment")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<long>("CreatedById")
