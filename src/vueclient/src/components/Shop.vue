@@ -43,6 +43,7 @@
     <tr v-for="good in goods">
       <td>{{ good.caption }}</td>
       <td>{{ good.description }}</td>
+      <td><RouterLink v-if="isOwner" v-bind:to="`/edit-good/${shop.id}/${good.id}`">[edit]</RouterLink></td>
     </tr>
   </table>
 
