@@ -67,9 +67,16 @@
 
   <h1>{{ title }}</h1>
 
-  Caption:
-  <input v-model="captionField" />
+  <div class="row">
+    <div class="form-group form-group-sm row">
+      <label class="col-3 form-label">Caption</label>
+      <div class="col-7">
+        <input class="form-control" v-model="captionField" required />
+      </div>
+    </div>
+  </div>
 
-  <button @click="Save">Save</button>
+  <div>&nbsp;</div>
+  <button class="btn btn-primary" @click="Save">Save</button>
 
 </template>

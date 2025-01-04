@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using mmp.DbCtx;
 using mmp.Models;
@@ -31,6 +32,7 @@ namespace Webapi.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> PutGood(long id, Good good)
         {
             if (id != good.ID) return BadRequest();
@@ -39,6 +41,7 @@ namespace Webapi.Controllers
 
             dbGood.Caption = good.Caption;
             dbGood.Description = good.Description;
+            dbGood.Price = good.Price;
 
             await db.SaveChangesAsync();
 
@@ -46,6 +49,7 @@ namespace Webapi.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<Good>> PostGood(Good good)
         {
             var cu = db.CurrentUser(); 
@@ -60,7 +64,8 @@ namespace Webapi.Controllers
             {
                 OwnerShop = shop,
                 Caption = good.Caption,
-                Description = good.Description
+                Description = good.Description,
+                Price = good.Price
             };
 
             db.Goods.Add(dbGood);
@@ -70,6 +75,7 @@ namespace Webapi.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteGood(long id)
         {
             var good = await db.Goods.FirstOrDefaultAsync(_ => _.ID == id && !_.IsDeleted);

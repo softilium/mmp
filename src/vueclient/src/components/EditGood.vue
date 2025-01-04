@@ -54,7 +54,7 @@
       }
     }
   };
-    
+
 </script>
 
 <template>
@@ -73,6 +73,13 @@
       <label class="col-3 form-label">Описание</label>
       <div class="col-7">
         <textarea class="form-control" v-model="good.description" rows="5" />
+      </div>
+    </div>
+    <div>&nbsp;</div>
+    <div class="form-group form-group-sm row">
+      <label class="col-3 form-label">Цена</label>
+      <div class="col-7">
+        <input class="form-control" v-model="good.price" />
       </div>
     </div>
   </div>

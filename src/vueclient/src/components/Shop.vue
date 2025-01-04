@@ -41,10 +41,16 @@
 
   <div class="row">
     <table class="table table-sm">
+      <thead>
+        <tr>
+          <td>Товар или Услуга</td>
+          <td class="text-end">Цена</td>
+        </tr>
+      </thead>
       <tbody>
         <tr v-for="good in goods">
           <td>{{ good.caption }}</td>
-          <td>{{ good.description }}</td>
+          <td class="text-end">{{ good.price }}</td>
           <td><RouterLink v-if="isOwner" v-bind:to="`/edit-good/${shop.id}/${good.id}`">[edit]</RouterLink></td>
         </tr>
       </tbody>

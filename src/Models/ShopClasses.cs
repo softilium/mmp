@@ -35,6 +35,7 @@ namespace mmp.Models
         [Required][DeleteBehavior(DeleteBehavior.Restrict)] public Shop OwnerShop { get; set; } = new();
         [Required] public string Caption { get; set; } = "";
         public string? Description { get; set; }
+        public decimal Price { get; set; }
     }
 
     public enum OrderStatuses : int
@@ -54,10 +55,10 @@ namespace mmp.Models
 
     public class OrderLine : BaseObject
     {
-        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public User? Who { get; set; }
-        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public Shop? Shop { get; set; }
+        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public User Who { get; set; } = new();
+        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public Shop Shop { get; set; } = new();
         public Order? Order { get; set; } //when empty it is basket
-        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public Good? Good { get; set; }
+        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public Good Good { get; set; } = new();
         [Required] public long Qty { get; set; }
     }
 }
