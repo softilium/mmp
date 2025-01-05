@@ -49,6 +49,19 @@
 
   });
 
+  const Checkout = async () => {
+    let res = await fetch(authStore.rbUrl() + "/api/orders/outbox/" + route.params.shopid, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + authStore.accessToken
+      }
+    });
+    if (res.ok) {
+      router.push("/shop/" + route.params.shopid);
+    }
+  };
+
 </script>
 
 <template>
@@ -80,5 +93,7 @@
       </tr>
     </tfoot>
   </table>
+
+  <button class="btn btn-primary" @click="Checkout()">Оформить заказ</button>
 
 </template>

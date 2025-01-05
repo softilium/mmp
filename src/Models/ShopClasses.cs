@@ -45,10 +45,10 @@ namespace mmp.Models
 
     public class Order : BaseObject
     {
-        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public Shop? Shop { get; set; }
+        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public Shop Shop { get; set; } = new ();
         [Required] public OrderStatuses Status { get; set; }
         [Required][Precision(15, 2)] public decimal Qty { get; set; }
-        [Required][Precision(15, 2)] public decimal Sum { get; set; }
+        [Required][Precision(15, 2)] public decimal Sum { get; set; }       
     }
 
     public class OrderLine : BaseObject
@@ -90,3 +90,4 @@ namespace mmp.Models
 //todo mini-profiler
 //todo opened-closed shops (public, direct-link, approved-only)
 //todo dataversion and checking for it before update
+//todo good fields: url, images

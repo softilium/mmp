@@ -92,5 +92,20 @@ namespace Webapi.Controllers
             return NoContent();
         }
 
+        [HttpDelete]
+        [Authorize]
+        [Route("{goodId:long}")]
+        public async Task<ActionResult<OrderLine>> Delete(long goodId)
+        {
+            var cu = db.CurrentUser();
+            if (cu == null) return Unauthorized();
+
+            var ol = db.OrderLines.Where(_ => _.CreatedBy.Id == cu.Id && _.Order == null && _.Good.ID == goodId).FirstOrDefault();
+            if (ol == null) return NotFound();
+
+            db.OrderLines.Remove(ol);
+            await db.SaveChangesAsync();
+            return NoContent();
+        }
     }
 }

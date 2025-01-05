@@ -1,4 +1,4 @@
-<script setup lang="ts" >
+<script setup lang="ts">
 
   import { ref } from 'vue';
   import { authStore } from './authStore.js';
@@ -10,16 +10,20 @@
 
 <template>
 
-  <h1>Register</h1>
+  <h1>Регистрация</h1>
 
-  <div>
-
-    User email: <input v-model="emailString" />
-    Password: <input v-model="passwordString" />
-
-    <button @click="authStore.Register(emailString, passwordString); $router.push('/');">Register</button>
-
+  <div class="row mb-3">
+    <label class="col-3 form-label">Email</label>
+    <div class="col-7">
+      <input class="form-control" v-model="emailString" required />
+    </div>
   </div>
-
+  <div class="row mb-3">
+    <label class="col-3 form-label">Пароль</label>
+    <div class="col-7">
+      <input class="form-control" v-model="passwordString" type="password" />
+    </div>
+  </div>
+  <button class="btn btn-primary" @click="authStore.Register(emailString, passwordString); $router.push('/');">Регистрация</button>
 
 </template>

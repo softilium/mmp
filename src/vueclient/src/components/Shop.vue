@@ -152,7 +152,6 @@
     </table>
   </div>
 
-  <br />
   <button class="btn btn-primary" v-if="isOwner" @click="router.push(`/edit-good/${route.params.id}`);">Добавить товар / услугу</button>
 
 </template>
