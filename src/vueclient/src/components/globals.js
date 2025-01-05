@@ -1,4 +1,5 @@
-import moment from 'moment/min/moment-with-locales';
+import moment from 'moment';
+import 'moment/dist/locale/ru';
 
 export const glob = {
 
