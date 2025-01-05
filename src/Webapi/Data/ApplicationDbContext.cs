@@ -45,12 +45,12 @@ namespace mmp.DbCtx
 
                             if (q.State == EntityState.Added)
                             {
-                                baseObj.CreatedOn = DateTime.UtcNow;
+                                baseObj.CreatedOn = DateTime.Now;
                                 baseObj.CreatedBy = currentUser;
                             }
                             else if (q.State == EntityState.Modified)
                             {
-                                baseObj.ModifiedOn = DateTime.UtcNow;
+                                baseObj.ModifiedOn = DateTime.Now;
                                 baseObj.ModifiedBy = currentUser;
                             }
                             if (
@@ -58,7 +58,7 @@ namespace mmp.DbCtx
                                 && (baseObj.DeletedOn == null || baseObj.DeletedBy == null)
                             )
                             {
-                                baseObj.DeletedOn = DateTime.UtcNow;
+                                baseObj.DeletedOn = DateTime.Now;
                                 baseObj.DeletedBy = currentUser;
                             }
                         }

@@ -16,6 +16,9 @@
   <header>
     <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow.mb-3">
       <RouterLink class="navbar-brand" to="/">В начало</RouterLink>
+      <span v-if="authStore.loggedEmail">
+        <RouterLink class="navbar-text" to="/orders">Заказы</RouterLink>&nbsp;&nbsp;
+      </span>
       <span v-if="!authStore.loggedEmail">
         <RouterLink class="navbar-text" to="/login">Войти</RouterLink>&nbsp;&nbsp;
       </span>

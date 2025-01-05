@@ -58,7 +58,7 @@
       }
     });
     if (res.ok) {
-      router.push("/shop/" + route.params.shopid);
+      router.push("/orders");
     }
   };
 

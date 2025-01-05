@@ -1,4 +1,4 @@
-import { createApp } from 'vue'
+import { createApp } from 'vue';
 import { createWebHistory, createRouter } from 'vue-router';
 import Home from "./components/Home.vue";
 import Login from "./components/Login.vue";
@@ -8,6 +8,7 @@ import EditShop from "./components/EditShop.vue";
 import EditGood from "./components/EditGood.vue";
 import Shop from "./components/Shop.vue";
 import CheckOut from "./components/CheckOut.vue";
+import Orders from "./components/Orders.vue";
 
 import App from './App.vue'
 
@@ -22,6 +23,7 @@ const routes = [
   { path: '/edit-good/:shopid', component: EditGood },
   { path: '/edit-good/:shopid/:id', component: EditGood },
   { path: '/checkout/:shopid', component: CheckOut },
+  { path: '/orders', component: Orders },
 ];
 
 const router = createRouter({

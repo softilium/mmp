@@ -1,6 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+
 namespace mmp.Models
 {
     public class User : IdentityUser<long> { }
@@ -18,7 +20,7 @@ namespace mmp.Models
         public bool IsDeleted { get; set; } = false;
         public User? DeletedBy { get; set; }
         public DateTime? DeletedOn { get; set; }
-        
+
         public void BeforeSave() { }
     }
 
@@ -37,18 +39,28 @@ namespace mmp.Models
 
     public enum OrderStatuses : int
     {
+        [Description("Новый")] 
         New = 100,
+
+        [Description("Готов к доставке")]
         ReadyToDeliver = 200,
-        Delivered = 300,
-        Canceled = 400,
+
+        [Description("Готов к доставке")]
+        Delivering = 300,
+
+        [Description("Доставлен")] 
+        Done = 400,
+
+        [Description("Отменен")] 
+        Canceled = 500,
     }
 
     public class Order : BaseObject
     {
-        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public Shop Shop { get; set; } = new ();
+        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public Shop Shop { get; set; } = new();
         [Required] public OrderStatuses Status { get; set; }
         [Required][Precision(15, 2)] public decimal Qty { get; set; }
-        [Required][Precision(15, 2)] public decimal Sum { get; set; }       
+        [Required][Precision(15, 2)] public decimal Sum { get; set; }
     }
 
     public class OrderLine : BaseObject
