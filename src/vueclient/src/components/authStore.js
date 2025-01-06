@@ -16,6 +16,33 @@ export const authStore = reactive({
     localStorage.setItem("refreshToken", newToken);
   },
 
+  async RefreshToken() {
+    if (this.refreshToken != "") {
+      try {
+        let res = await fetch(this.rbUrl() + "/identity/refresh", {
+          method: "POST",
+          signal: AbortSignal.timeout(5000),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ "refreshToken": this.refreshToken })
+        });
+        if (res.ok) {
+          res = await res.json();
+          this.loggedEmail = res.email;
+          this.SetAccessToken(res.accessToken);
+          this.SetRefreshToken(res.refreshToken);
+          console.log('tokens was refreshed');
+        } else {
+          this.SetAccessToken("");
+          this.SetRefreshToken("");
+          console.log("unauthorized tokens was cleared");
+        }
+      }
+      catch (err) {
+        console.log(err);
+      };
+    }
+  },
+
   async CheckLogged() {
     if (this.accessToken != "") {
       try {
@@ -30,31 +57,9 @@ export const authStore = reactive({
         }
       } catch (err) {
         console.log(err);
-        //try to use refresh token
-        if (this.refreshToken != "") {
-          try {
-            let res = await fetch(this.rbUrl() + "/identity/refresh", {
-              method: "POST",
-              signal: AbortSignal.timeout(5000),
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ "refreshToken": this.refreshToken })
-            });
-            if (res.ok) {
-              res = await res.json();
-              this.loggedEmail = res.email;
-              this.SetAccessToken(res.accessToken);
-              this.SetRefreshToken(res.refreshToken);
-              console.log('tokens was refreshed');
-            }
-          }
-          catch (err) {
-            console.log(err);
-            this.SetAccessToken("");
-            this.SetRefreshToken("");
-          };
-        }
+        this.RefreshToken();
       }
-    }
+    } else await this.RefreshToken();
   },
 
   async Login(emailString, passwordString) {
@@ -85,7 +90,7 @@ export const authStore = reactive({
       this.SetAccessToken("");
       this.SetRefreshToken("");
       await this.CheckLogged();
-    } 
+    }
 
   },
 

@@ -33,13 +33,9 @@ namespace mmp.DbCtx
                 var currentUser = CurrentUser();
                 if (currentUser != null)
                 {
-
                     foreach (var q in ChangeTracker.Entries())
                     {
-                        if (
-                            q.Entity is BaseObject baseObj
-                            && (q.State == EntityState.Added || q.State == EntityState.Modified)
-                        )
+                        if (q.Entity is BaseObject baseObj && (q.State == EntityState.Added || q.State == EntityState.Modified))
                         {
                             baseObj.BeforeSave();
 
@@ -53,10 +49,7 @@ namespace mmp.DbCtx
                                 baseObj.ModifiedOn = DateTime.Now;
                                 baseObj.ModifiedBy = currentUser;
                             }
-                            if (
-                                baseObj.IsDeleted
-                                && (baseObj.DeletedOn == null || baseObj.DeletedBy == null)
-                            )
+                            if (baseObj.IsDeleted && (baseObj.DeletedOn == null || baseObj.DeletedBy == null))
                             {
                                 baseObj.DeletedOn = DateTime.Now;
                                 baseObj.DeletedBy = currentUser;
