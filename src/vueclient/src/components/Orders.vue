@@ -42,13 +42,15 @@
       <thead class="table-primary">
         <tr>
           <th>Витрина</th>
+          <th>Отправитель</th>
           <th>Статус</th>
           <th>Создано</th>
           <th class="text-end">Сумма</th>
         </tr>
       </thead>
       <tr v-for="order in orders">
-        <td><RouterLink :to="`/order/${order.id}`">{{order.shop.caption}}</RouterLink></td>
+        <td><RouterLink :to="`/order/${order.id}`">{{ order.shop.caption }}</RouterLink></td>
+        <td><RouterLink :to="`/order/${order.id}`">{{ order.shop.createdBy.userName }}</RouterLink></td>
         <td><RouterLink :to="`/order/${order.id}`">{{ statuses[order.status] }}</RouterLink></td>
         <td><RouterLink :to="`/order/${order.id}`">{{ glob.fmtDate(order.createdOn) }}</RouterLink></td>
         <td class="text-end"><RouterLink :to="`/order/${order.id}`">{{ order.sum }}</RouterLink></td>
