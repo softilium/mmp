@@ -11,7 +11,7 @@ namespace mmp.Models
     {
         [Key] public long ID { get; set; }
 
-        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public User CreatedBy { get; set; } = new();
+        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public User CreatedBy { get; set; }
         [Required] public DateTime CreatedOn { get; set; }
 
         [DeleteBehavior(DeleteBehavior.Restrict)] public User? ModifiedBy { get; set; }
@@ -31,7 +31,7 @@ namespace mmp.Models
 
     public class Good : BaseObject
     {
-        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public Shop OwnerShop { get; set; } = new();
+        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public Shop OwnerShop { get; set; } 
         [Required] public string Caption { get; set; } = "";
         public string? Description { get; set; }
         [Precision(15, 2)] public decimal Price { get; set; }
@@ -42,32 +42,36 @@ namespace mmp.Models
         [Description("Новый")] 
         New = 100,
 
-        [Description("Готов к доставке")]
-        ReadyToDeliver = 200,
+        [Description("В работе")]
+        InProcess = 200,
 
         [Description("Готов к доставке")]
-        Delivering = 300,
+        ReadyToDeliver = 300,
+
+        [Description("Доставляется")]
+        Delivering = 400,
 
         [Description("Доставлен")] 
-        Done = 400,
+        Done = 500,
 
         [Description("Отменен")] 
-        Canceled = 500,
+        Canceled = 600,
     }
 
     public class Order : BaseObject
     {
-        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public Shop Shop { get; set; } = new();
+        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public Shop Shop { get; set; }
         [Required] public OrderStatuses Status { get; set; }
         [Required][Precision(15, 2)] public decimal Qty { get; set; }
         [Required][Precision(15, 2)] public decimal Sum { get; set; }
+        public ICollection<OrderLine> Lines { get; set; } = [];
     }
 
     public class OrderLine : BaseObject
     {
-        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public Shop Shop { get; set; } = new();
+        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public Shop Shop { get; set; }
         public Order? Order { get; set; } //when empty it is basket
-        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public Good Good { get; set; } = new();
+        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public Good Good { get; set; }
         [Required][Precision(15, 2)] public decimal Qty { get; set; }
         [Required][Precision(15, 2)] public decimal Sum { get; set; }
     }
@@ -102,4 +106,12 @@ namespace mmp.Models
 //todo mini-profiler
 //todo opened-closed shops (public, direct-link, approved-only)
 //todo dataversion and checking for it before update
+
 //todo good fields: url, images
+//todo images storage (guid+file, separated collection for each Good)
+//todo use special proxy for IdentityUser
+//todo goods page
+//todo profile page
+//todo incoming orders page
+//todo email/telegram notify
+//todo stop to use email globally inside vueclient/api

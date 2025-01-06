@@ -13,6 +13,7 @@ namespace Webapi.Controllers
         public static string GetEnumDescription(this OrderStatuses enumValue)
         {
             var fieldInfo = enumValue.GetType().GetField(enumValue.ToString());
+            if (fieldInfo == null) return "";
 
             var descriptionAttributes = (DescriptionAttribute[])fieldInfo.GetCustomAttributes(typeof(DescriptionAttribute), false);
 
@@ -49,9 +50,9 @@ namespace Webapi.Controllers
 
             return await db.Orders
                 .Where(_ => !_.IsDeleted && _.CreatedBy.Id == cu.Id)
-                .Where(_ => showAll == 1 || _.Status != OrderStatuses.Done)
+                .Where(_ => showAll == 1 || (_.Status != OrderStatuses.Done && _.Status != OrderStatuses.Canceled))
                 .Include(_ => _.Shop)
-                .OrderByDescending(_=>_.CreatedOn)
+                .OrderByDescending(_ => _.CreatedOn)
                 .ToListAsync();
         }
 
@@ -61,7 +62,11 @@ namespace Webapi.Controllers
             var cu = db.CurrentUser();
             if (cu == null) return Unauthorized();
 
-            var order = await db.Orders.FirstOrDefaultAsync(_ => _.ID == id && !_.IsDeleted && _.CreatedBy.Id == cu.Id);
+            var order = await db.Orders
+                .Include(_=>_.Shop)
+                .Include(_=>_.Lines)
+                    .ThenInclude(_=>_.Good)
+                .FirstOrDefaultAsync(_ => _.ID == id && !_.IsDeleted && _.CreatedBy.Id == cu.Id);
             if (order == null) return NotFound();
 
             return order;

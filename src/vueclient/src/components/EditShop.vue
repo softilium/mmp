@@ -7,8 +7,8 @@
   const route = useRoute();
   const router = useRouter();
 
-  let title = "New shop";
-  if (route.params.id) title = "Edit shop";
+  let title = "Новая витрина";
+  if (route.params.id) title = "Редактировать витрину";
 
   let captionField = ref("");
   let shopId = null;
@@ -69,7 +69,7 @@
 
   <div class="row">
     <div class="form-group form-group-sm row">
-      <label class="col-3 form-label">Caption</label>
+      <label class="col-3 form-label">Название</label>
       <div class="col-7">
         <input class="form-control" v-model="captionField" required />
       </div>

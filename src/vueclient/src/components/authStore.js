@@ -81,9 +81,11 @@ export const authStore = reactive({
       headers: { "Content-Type": "application/json" }
     });
     if (response.ok) {
+      this.loggedEmail = "";
       this.SetAccessToken("");
       this.SetRefreshToken("");
-    } else alert(await response.text()); //todo handle errors, don't show
+      await this.CheckLogged();
+    } 
 
   },
 
@@ -97,12 +99,8 @@ export const authStore = reactive({
       },
     });
     if (response.ok) {
-      let res = await response.json();
-      this.SetAccessToken(res.accessToken);
-      this.SetRefreshToken(res.RefreshToken);
-      this.CheckLogged();
-    } else
-      alert(await response.text()); //todo handle errors, don't show
+      await this.Login(emailString, passwordString);
+    }
   }
 
 })

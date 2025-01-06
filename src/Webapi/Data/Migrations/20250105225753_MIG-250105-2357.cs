@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace WebApi.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class MIG2501022318 : Migration
+    public partial class MIG2501052357 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -171,8 +171,7 @@ namespace WebApi.Data.Migrations
                     ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     DeletedById = table.Column<long>(type: "bigint", nullable: true),
-                    DeletedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Comment = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    DeletedOn = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -205,14 +204,14 @@ namespace WebApi.Data.Migrations
                     OwnerShopID = table.Column<long>(type: "bigint", nullable: false),
                     Caption = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Price = table.Column<decimal>(type: "decimal(15,2)", precision: 15, scale: 2, nullable: false),
                     CreatedById = table.Column<long>(type: "bigint", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ModifiedById = table.Column<long>(type: "bigint", nullable: true),
                     ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     DeletedById = table.Column<long>(type: "bigint", nullable: true),
-                    DeletedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Comment = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    DeletedOn = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -249,26 +248,20 @@ namespace WebApi.Data.Migrations
                     ID = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ShopID = table.Column<long>(type: "bigint", nullable: false),
-                    BuyerId = table.Column<long>(type: "bigint", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
+                    Qty = table.Column<decimal>(type: "decimal(15,2)", precision: 15, scale: 2, nullable: false),
+                    Sum = table.Column<decimal>(type: "decimal(15,2)", precision: 15, scale: 2, nullable: false),
                     CreatedById = table.Column<long>(type: "bigint", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ModifiedById = table.Column<long>(type: "bigint", nullable: true),
                     ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     DeletedById = table.Column<long>(type: "bigint", nullable: true),
-                    DeletedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Comment = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    DeletedOn = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Orders", x => x.ID);
-                    table.ForeignKey(
-                        name: "FK_Orders_AspNetUsers_BuyerId",
-                        column: x => x.BuyerId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Orders_AspNetUsers_CreatedById",
                         column: x => x.CreatedById,
@@ -300,19 +293,18 @@ namespace WebApi.Data.Migrations
                 {
                     ID = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    WhoId = table.Column<long>(type: "bigint", nullable: false),
                     ShopID = table.Column<long>(type: "bigint", nullable: false),
                     OrderID = table.Column<long>(type: "bigint", nullable: true),
                     GoodID = table.Column<long>(type: "bigint", nullable: false),
-                    Qty = table.Column<long>(type: "bigint", nullable: false),
+                    Qty = table.Column<decimal>(type: "decimal(15,2)", precision: 15, scale: 2, nullable: false),
+                    Sum = table.Column<decimal>(type: "decimal(15,2)", precision: 15, scale: 2, nullable: false),
                     CreatedById = table.Column<long>(type: "bigint", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ModifiedById = table.Column<long>(type: "bigint", nullable: true),
                     ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     DeletedById = table.Column<long>(type: "bigint", nullable: true),
-                    DeletedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Comment = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    DeletedOn = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -331,12 +323,6 @@ namespace WebApi.Data.Migrations
                     table.ForeignKey(
                         name: "FK_OrderLines_AspNetUsers_ModifiedById",
                         column: x => x.ModifiedById,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_OrderLines_AspNetUsers_WhoId",
-                        column: x => x.WhoId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -447,16 +433,6 @@ namespace WebApi.Data.Migrations
                 name: "IX_OrderLines_ShopID",
                 table: "OrderLines",
                 column: "ShopID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_OrderLines_WhoId",
-                table: "OrderLines",
-                column: "WhoId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Orders_BuyerId",
-                table: "Orders",
-                column: "BuyerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Orders_CreatedById",

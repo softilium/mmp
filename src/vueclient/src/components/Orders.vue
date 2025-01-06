@@ -48,10 +48,10 @@
         </tr>
       </thead>
       <tr v-for="order in orders">
-        <td><RouterLink :to="`/shop/${order.shop.id}`">{{order.shop.caption}}</RouterLink></td>
-        <td>{{ statuses[order.status] }}</td>
-        <td>{{ glob.fmtDate(order.createdOn) }}</td>
-        <td class="text-end">{{ order.sum }}</td>
+        <td><RouterLink :to="`/order/${order.id}`">{{order.shop.caption}}</RouterLink></td>
+        <td><RouterLink :to="`/order/${order.id}`">{{ statuses[order.status] }}</RouterLink></td>
+        <td><RouterLink :to="`/order/${order.id}`">{{ glob.fmtDate(order.createdOn) }}</RouterLink></td>
+        <td class="text-end"><RouterLink :to="`/order/${order.id}`">{{ order.sum }}</RouterLink></td>
       </tr>
     </table>
   </div>

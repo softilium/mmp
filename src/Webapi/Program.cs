@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using mmp.DbCtx;
 using mmp.Models;
 using Microsoft.AspNetCore.Authentication;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,7 +26,8 @@ builder.Services.AddCors(options =>
         b => { b.WithOrigins("*").AllowAnyMethod().AllowAnyOrigin().AllowAnyHeader(); });
 });
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options => options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
 var app = builder.Build();
 
