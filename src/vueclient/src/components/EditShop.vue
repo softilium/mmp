@@ -30,7 +30,7 @@
 
   const Save = async () => {
 
-    if (!authStore.loggedEmail) return;
+    if (!authStore.userName) return;
 
     if (shopId == null)
       try {
@@ -67,7 +67,7 @@
 
   <h1>{{ title }}</h1>
 
-  <div class="row">
+  <div class="row mb-3">
     <div class="form-group form-group-sm row">
       <label class="col-3 form-label">Название</label>
       <div class="col-7">
@@ -75,8 +75,6 @@
       </div>
     </div>
   </div>
-
-  <div>&nbsp;</div>
   <button class="btn btn-primary" @click="Save">Сохранить</button>
 
 </template>

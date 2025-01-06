@@ -20,7 +20,7 @@
       let res = await fetch(authStore.rbUrl() + "/api/shops/" + route.params.shopid);
       if (res.ok) {
         shop.value = await res.json();
-        isOwner.value = shop.value.createdBy.email == authStore.loggedEmail;
+        isOwner.value = shop.value.createdBy.userName == authStore.userName;
       } else router.push("/");
     } catch (err) {
       console.log(err);

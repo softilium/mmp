@@ -10,6 +10,7 @@ import Shop from "./components/Shop.vue";
 import CheckOut from "./components/CheckOut.vue";
 import Orders from "./components/Orders.vue";
 import Order from "./components/Order.vue";
+import Profile from "./components/Profile.vue";
 
 import App from './App.vue'
 
@@ -26,6 +27,8 @@ const routes = [
   { path: '/checkout/:shopid', component: CheckOut },
   { path: '/orders', component: Orders },
   { path: '/order/:id', component: Order },
+  { path: '/profile', component: Profile },
+  { path: '/profile/:id', component: Profile },
 ];
 
 const router = createRouter({

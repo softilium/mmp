@@ -3,8 +3,6 @@
   import { ref } from 'vue';
   import { authStore } from './authStore.js';
 
-  const loggedEmail = defineModel();
-
   let emailString = ref<string>("");
   let passwordString = ref<string>("");
 

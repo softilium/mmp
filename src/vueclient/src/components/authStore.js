@@ -2,7 +2,7 @@ import { reactive } from 'vue'
 
 export const authStore = reactive({
   rbUrl: () => "http://localhost:5078",
-  loggedEmail: "",
+  userName: "",
   accessToken: "",
   refreshToken: "",
 
@@ -27,10 +27,10 @@ export const authStore = reactive({
         });
         if (res.ok) {
           res = await res.json();
-          this.loggedEmail = res.email;
           this.SetAccessToken(res.accessToken);
           this.SetRefreshToken(res.refreshToken);
           console.log('tokens was refreshed');
+          this.CheckLogged();
         } else {
           this.SetAccessToken("");
           this.SetRefreshToken("");
@@ -53,7 +53,14 @@ export const authStore = reactive({
         });
         if (res.ok) {
           let obj = await res.json();
-          this.loggedEmail = obj.email;
+          let email = obj.email;
+
+          res = await fetch(this.rbUrl() + "/api/profiles/public?email=" + encodeURIComponent(email))
+          if (res.ok) {
+            res = await res.json();
+            this.userName = res.userName;
+          }
+
         }
       } catch (err) {
         console.log(err);
@@ -86,7 +93,7 @@ export const authStore = reactive({
       headers: { "Content-Type": "application/json" }
     });
     if (response.ok) {
-      this.loggedEmail = "";
+      this.userName = "";
       this.SetAccessToken("");
       this.SetRefreshToken("");
       await this.CheckLogged();

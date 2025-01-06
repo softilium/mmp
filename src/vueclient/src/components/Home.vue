@@ -34,7 +34,7 @@
           <td class="col-9"><RouterLink v-bind:to="`/shop/${item.id}`">{{ item.caption }}</RouterLink></td>
           <td class="col-2">{{ item.createdBy.userName }}</td>
           <td class="col-1">
-            <RouterLink v-if="item.createdBy.email==authStore.loggedEmail" v-bind:to="`/edit-shop/${item.id}`">
+            <RouterLink v-if="item.createdBy.userName==authStore.userName" v-bind:to="`/edit-shop/${item.id}`">
               <i class="bi bi-pencil-square" />
             </RouterLink>
           </td>
@@ -43,6 +43,6 @@
     </table>
   </div>
   <br />
-  <button class="btn btn-primary" v-if="authStore.loggedEmail" @click="$router.push('/edit-shop');">Добавить витрину</button>
+  <button class="btn btn-primary" v-if="authStore.userName" @click="$router.push('/edit-shop');">Добавить витрину</button>
 
 </template>

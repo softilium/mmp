@@ -16,19 +16,21 @@
   <header>
     <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow.mb-3">
       <RouterLink class="navbar-brand" to="/">Витрины</RouterLink>
-      <span v-if="authStore.loggedEmail">
+      <span v-if="authStore.userName">
         <RouterLink class="navbar-text" to="/orders">Заказы</RouterLink>&nbsp;&nbsp;
       </span>
-      <span v-if="!authStore.loggedEmail">
+      <span v-if="!authStore.userName">
         <RouterLink class="navbar-text" to="/login">Войти</RouterLink>&nbsp;&nbsp;
       </span>
-      <span v-if="authStore.loggedEmail">
+      <span v-if="authStore.userName">
         <RouterLink class="navbar-text" to="/logout">Выйти</RouterLink>&nbsp;&nbsp;
       </span>
-      <span v-if="!authStore.loggedEmail">
+      <span v-if="!authStore.userName">
         <RouterLink class="navbar-text" to="/register">Зарегистрироваться</RouterLink>&nbsp;&nbsp;
       </span>
-      <span v-if="authStore.loggedEmail">&nbsp;&nbsp;Вы вошли как {{ authStore.loggedEmail }}</span>
+      <span v-if="authStore.userName">
+        <RouterLink class="navbar-text" to="/profile">{{ authStore.userName }}</RouterLink>
+      </span>
     </nav>
   </header>
   <br />

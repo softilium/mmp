@@ -11,12 +11,10 @@ namespace Webapi.Controllers
     public class ShopsController : ControllerBase
     {
         private readonly ApplicationDbContext db;
-        private readonly IHttpContextAccessor req;
 
-        public ShopsController(ApplicationDbContext context, IHttpContextAccessor RequestCtx)
+        public ShopsController(ApplicationDbContext context)
         {
             db = context;
-            req = RequestCtx;
         }
 
         [HttpGet]

@@ -61,21 +61,23 @@
   <h1>Редактирование товара / услуги</h1>
   <div>&nbsp;</div>
 
-  <div class="row">
+  <div class="row mb-3">
     <div class="form-group form-group-sm row">
       <label class="col-3 form-label">Название</label>
       <div class="col-7">
         <input class="form-control" v-model="good.caption" required />
       </div>
     </div>
-    <div>&nbsp;</div>
+  </div>
+  <div class="row mb-3">
     <div class="form-group form-group-sm row">
       <label class="col-3 form-label">Описание</label>
       <div class="col-7">
         <textarea class="form-control" v-model="good.description" rows="5" />
       </div>
     </div>
-    <div>&nbsp;</div>
+  </div>
+  <div class="row mb-3">
     <div class="form-group form-group-sm row">
       <label class="col-3 form-label">Цена</label>
       <div class="col-7">
@@ -83,7 +85,5 @@
       </div>
     </div>
   </div>
-
-  <div>&nbsp;</div>
   <button class="btn btn-primary" @click="Save">Сохранить</button>
 </template>
