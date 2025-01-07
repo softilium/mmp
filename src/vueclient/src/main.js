@@ -12,6 +12,7 @@ import Orders from "./components/Orders.vue";
 import Order from "./components/Order.vue";
 import Profile from "./components/Profile.vue";
 import SetRoles from "./components/SetRoles.vue";
+import IncOrders from "./components/IncOrders.vue";
 
 import App from './App.vue'
 
@@ -31,6 +32,7 @@ const routes = [
   { path: '/profile', component: Profile },
   { path: '/profile/:id', component: Profile },
   { path: '/set-roles', component: SetRoles },
+  { path: '/inc-orders', component: IncOrders },
 ];
 
 const router = createRouter({

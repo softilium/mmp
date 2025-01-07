@@ -26,18 +26,23 @@
         <tr>
           <th>Заголовок</th>
           <th>Владелец</th>
-          <th></th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="item in shops">
-          <td class="col-9"><RouterLink v-bind:to="`/shop/${item.id}`">{{ item.caption }}</RouterLink></td>
-          <td class="col-2">{{ item.createdByInfo.userName }}</td>
-          <td class="col-1">
-            <RouterLink v-if="authStore.userInfo.shopManage && item.createdByInfo.userName==authStore.userInfo.userName" v-bind:to="`/edit-shop/${item.id}`">
-              <i class="bi bi-pencil-square" />
-            </RouterLink>
+          <td class="col-9">
+            <div class="row">
+              <div class="col-11">
+                <RouterLink v-bind:to="`/shop/${item.id}`">{{ item.caption }}</RouterLink>
+              </div>
+              <div class="col-1 text-end">
+                <RouterLink v-if="authStore.userInfo.shopManage && item.createdByInfo.userName==authStore.userInfo.userName" v-bind:to="`/edit-shop/${item.id}`">
+                  <i class="bi bi-pencil-square" />
+                </RouterLink>
+              </div>
+            </div>
           </td>
+          <td class="col-2">{{ item.createdByInfo.userName }}</td>
         </tr>
       </tbody>
     </table>

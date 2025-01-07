@@ -60,7 +60,6 @@ export const authStore = reactive({
             res = await res.json();
             this.userInfo = res;
           }
-
         }
       } catch (err) {
         console.log(err);

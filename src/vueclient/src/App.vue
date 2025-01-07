@@ -31,8 +31,11 @@
       <span v-if="authStore.userInfo.userName">
         <RouterLink class="navbar-text" to="/logout">Выйти</RouterLink>&nbsp;&nbsp;
       </span>
+      <span v-if="authStore.userInfo.userName">
+        <RouterLink class="navbar-text" to="/inc-orders">[[ Заказы для обработки ]]</RouterLink>&nbsp;&nbsp;
+      </span>
       <span v-if="authStore.userInfo.admin">
-        <RouterLink class="navbar-text" to="/set-roles">[[admin: set-roles]]</RouterLink>
+        <RouterLink class="navbar-text" to="/set-roles">[[ admin ]]</RouterLink>
       </span>
     </nav>
   </header>

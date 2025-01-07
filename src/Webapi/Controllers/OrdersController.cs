@@ -113,5 +113,30 @@ namespace Webapi.Controllers
             return CreatedAtAction("GetOrder", new { id = dborder.ID }, dborder);
         }
 
+
+
+        [HttpGet("inbox")]
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<Order>>> GetIncOrders([FromQuery] int showAll)
+        {
+            var cu = db.CurrentUser();
+            if (cu == null) return Unauthorized();
+
+            var myshops = db.Shops.Where(_ => !_.IsDeleted && _.CreatedByID == cu.Id).Select(_=>_.ID).ToList();
+
+            var r = await db.Orders
+                .Where(_ => !_.IsDeleted && myshops.Contains(_.Shop.ID))
+                .Where(_ => showAll == 1 || (_.Status != OrderStatuses.Done && _.Status != OrderStatuses.Canceled))
+                .Include(_ => _.Shop)
+                .OrderByDescending(_ => _.CreatedOn)
+                .ToListAsync();
+            foreach (var item in r)
+            {
+                UserCache.LoadCreatedBy(item, db);
+                UserCache.LoadCreatedBy(item.Shop, db);
+            }
+            return r;
+        }
+
     }
 }

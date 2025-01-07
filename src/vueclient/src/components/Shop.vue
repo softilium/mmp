@@ -134,7 +134,7 @@
               <div class="col-11">
                 {{ good.caption }}
               </div>
-              <div class="col-1">
+              <div class="col-1 text-end">
                 <RouterLink v-if="isOwner" v-bind:to="`/edit-good/${shop.id}/${good.id}`">
                   <i class="bi bi-pencil-square" />
                 </RouterLink>
