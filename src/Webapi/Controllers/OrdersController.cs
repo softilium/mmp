@@ -152,7 +152,7 @@ namespace Webapi.Controllers
 
             order.Status = (OrderStatuses)newstatus;
 
-            db.SaveChanges();
+            await db.SaveChangesAsync();
 
             return NoContent();
         }

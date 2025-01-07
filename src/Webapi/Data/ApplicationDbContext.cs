@@ -37,14 +37,11 @@ namespace mmp.DbCtx
                         UserCache.Clear();
                         break;
                     }
-                
+
                 // make first user admin
                 foreach (var q in ChangeTracker.Entries())
-                    if (q.Entity is User && (q.State == EntityState.Added))
-                    {
-                        if (!Users.Any())
-                            (q.Entity as User).Admin = true;
-                    }
+                    if (q.Entity is User userEntity && (q.State == EntityState.Added))
+                        if (!Users.Any()) userEntity.Admin = true;
             };
             SavingChanges += (s, e) =>
             {

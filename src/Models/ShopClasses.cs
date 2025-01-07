@@ -86,7 +86,7 @@ namespace mmp.Models
 
     public class Order : BaseObject
     {
-        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public Shop? Shop { get; set; }
+        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public Shop Shop { get; set; }
         [Required] public OrderStatuses Status { get; set; }
         [Required][Precision(15, 2)] public decimal Qty { get; set; }
         [Required][Precision(15, 2)] public decimal Sum { get; set; }
@@ -95,9 +95,9 @@ namespace mmp.Models
 
     public class OrderLine : BaseObject
     {
-        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public Shop? Shop { get; set; }
+        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public Shop Shop { get; set; }
         public Order? Order { get; set; } //when empty it is basket
-        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public Good? Good { get; set; }
+        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public Good Good { get; set; }
         [Required][Precision(15, 2)] public decimal Qty { get; set; }
         [Required][Precision(15, 2)] public decimal Sum { get; set; }
     }
