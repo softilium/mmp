@@ -37,10 +37,10 @@ namespace Webapi.Controllers
         [HttpGet("public")]
         public async Task<ActionResult<UserInfo>> GetPublicUser([FromQuery] string email)
         {
-            var user = db.Users
+            var user = await db.Users
                 .Where(_ => _.Email == email)
                 .Select(_ => new UserInfo(_))
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
             if (user == null) return NotFound();
             return user;
         }

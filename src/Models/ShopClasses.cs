@@ -11,18 +11,21 @@ namespace mmp.Models
     {
         public string UserName { get; set; }
         public bool ShopManage { get; set; }
+        public bool Admin { get; set; }
 
         public UserInfo(User src)
         {
             ArgumentNullException.ThrowIfNull(src);
-            UserName = src.UserName;
+            UserName = src.UserName ?? "";
             ShopManage = src.ShopManage;
+            Admin = src.Admin;
         }
     }
 
     public class User : IdentityUser<long>
     {
         public bool ShopManage { get; set; }
+        public bool Admin { get; set; }
     }
 
     [Index(nameof(CreatedByID))]
@@ -83,7 +86,7 @@ namespace mmp.Models
 
     public class Order : BaseObject
     {
-        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public Shop Shop { get; set; }
+        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public Shop? Shop { get; set; }
         [Required] public OrderStatuses Status { get; set; }
         [Required][Precision(15, 2)] public decimal Qty { get; set; }
         [Required][Precision(15, 2)] public decimal Sum { get; set; }

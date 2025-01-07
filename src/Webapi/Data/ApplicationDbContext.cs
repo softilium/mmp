@@ -30,11 +30,20 @@ namespace mmp.DbCtx
             _ctx = ctx;
             SavingChanges += (s, e) =>
             {
+                // invalidate user cache when we save any user
                 foreach (var q in ChangeTracker.Entries())
                     if (q.Entity is User && (q.State == EntityState.Added || q.State == EntityState.Modified))
                     {
                         UserCache.Clear();
                         break;
+                    }
+                
+                // make first user admin
+                foreach (var q in ChangeTracker.Entries())
+                    if (q.Entity is User && (q.State == EntityState.Added))
+                    {
+                        if (!Users.Any())
+                            (q.Entity as User).Admin = true;
                     }
             };
             SavingChanges += (s, e) =>
