@@ -22,14 +22,17 @@
       <span v-if="!authStore.userInfo.userName">
         <RouterLink class="navbar-text" to="/login">Войти</RouterLink>&nbsp;&nbsp;
       </span>
-      <span v-if="authStore.userInfo.userName">
-        <RouterLink class="navbar-text" to="/logout">Выйти</RouterLink>&nbsp;&nbsp;
-      </span>
       <span v-if="!authStore.userInfo.userName">
         <RouterLink class="navbar-text" to="/register">Зарегистрироваться</RouterLink>&nbsp;&nbsp;
       </span>
       <span v-if="authStore.userInfo.userName">
-        <RouterLink class="navbar-text" to="/profile">{{ authStore.userInfo.userName }}</RouterLink>
+        <RouterLink class="navbar-text" to="/profile">Вы вошли как [{{ authStore.userInfo.userName }}]</RouterLink>&nbsp;&nbsp;
+      </span>
+      <span v-if="authStore.userInfo.userName">
+        <RouterLink class="navbar-text" to="/logout">Выйти</RouterLink>&nbsp;&nbsp;
+      </span>
+      <span v-if="authStore.userInfo.admin">
+        <RouterLink class="navbar-text" to="/set-roles">[[admin: set-roles]]</RouterLink>
       </span>
     </nav>
   </header>

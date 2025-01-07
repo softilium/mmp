@@ -11,6 +11,7 @@ import CheckOut from "./components/CheckOut.vue";
 import Orders from "./components/Orders.vue";
 import Order from "./components/Order.vue";
 import Profile from "./components/Profile.vue";
+import SetRoles from "./components/SetRoles.vue";
 
 import App from './App.vue'
 
@@ -29,6 +30,7 @@ const routes = [
   { path: '/order/:id', component: Order },
   { path: '/profile', component: Profile },
   { path: '/profile/:id', component: Profile },
+  { path: '/set-roles', component: SetRoles },
 ];
 
 const router = createRouter({

@@ -57,7 +57,6 @@
 
   <h1>Профиль пользователя {{ user.userName }}</h1>
 
-
   <div class="row mb-3">
     <label class="col-3 form-label">Имя пользователя</label>
     <div class="col-7">
