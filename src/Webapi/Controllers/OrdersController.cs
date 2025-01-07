@@ -138,5 +138,25 @@ namespace Webapi.Controllers
             return r;
         }
 
+        [HttpPut("inbox")]
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<Order>>> SetNewStatus([FromQuery] long orderid, [FromQuery] int newstatus)
+        {
+            var cu = db.CurrentUser();
+            if (cu == null) return Unauthorized();
+
+            var order = db.Orders.FirstOrDefault(_ => _.ID == orderid);
+            if (order == null) return NotFound();
+
+            if (order.CreatedByID != cu.Id) return Unauthorized();
+
+            order.Status = (OrderStatuses)newstatus;
+
+            db.SaveChanges();
+
+            return NoContent();
+        }
+
+
     }
 }

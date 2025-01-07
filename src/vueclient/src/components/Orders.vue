@@ -10,15 +10,13 @@
 
   const orders = ref([]);
   const statuses = ref([]);
+  const showAll = ref(false);
 
-  onMounted(async () => {
+  const Load = async () => {
 
-    let res = await fetch(authStore.rbUrl() + "/api/orders/statuses");
-    if (res.ok) {
-      statuses.value = await res.json();
-    }
-
-    res = await fetch(authStore.rbUrl() + "/api/orders/outbox",
+    let url = `${authStore.rbUrl()}/api/orders/outbox`;
+    if (showAll.value) url += "?showAll=1";
+    let res = await fetch(url,
       {
         headers: {
           "Content-Type": "application/json",
@@ -29,6 +27,16 @@
     if (res.ok) {
       orders.value = await res.json();
     }
+  }
+
+  onMounted(async () => {
+
+    let res = await fetch(`${authStore.rbUrl()}/api/orders/statuses`);
+    if (res.ok) {
+      statuses.value = await res.json();
+    }
+    Load();
+
   });
 
 </script>
@@ -36,16 +44,18 @@
 <template>
 
   <h1>Ваши заказы</h1>
+  Показывать закрытые
+  <input v-model="showAll" type="checkbox" @change="Load();" />
 
   <div class="row">
     <table class="table table-sm">
       <thead class="table-primary">
         <tr>
-          <th>Витрина</th>
-          <th>Отправитель</th>
-          <th>Статус</th>
-          <th>Создано</th>
-          <th class="text-end">Сумма</th>
+          <th class="col-3">Витрина</th>
+          <th class="col-3">Отправитель</th>
+          <th class="col-2">Статус</th>
+          <th class="col-2">Создано</th>
+          <th class="col-2 text-end">Сумма</th>
         </tr>
       </thead>
       <tr v-for="order in orders">
