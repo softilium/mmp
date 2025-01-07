@@ -2,7 +2,7 @@ import { reactive } from 'vue'
 
 export const authStore = reactive({
   rbUrl: () => "http://localhost:5078",
-  userName: "",
+  userInfo: { userName: null },
   accessToken: "",
   refreshToken: "",
 
@@ -58,7 +58,7 @@ export const authStore = reactive({
           res = await fetch(this.rbUrl() + "/api/profiles/public?email=" + encodeURIComponent(email))
           if (res.ok) {
             res = await res.json();
-            this.userName = res.userName;
+            this.userInfo = res;
           }
 
         }
@@ -93,7 +93,7 @@ export const authStore = reactive({
       headers: { "Content-Type": "application/json" }
     });
     if (response.ok) {
-      this.userName = "";
+      this.userName = { userName: null };
       this.SetAccessToken("");
       this.SetRefreshToken("");
       await this.CheckLogged();
