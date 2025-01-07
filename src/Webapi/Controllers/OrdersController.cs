@@ -48,12 +48,14 @@ namespace Webapi.Controllers
             var cu = db.CurrentUser();
             if (cu == null) return Unauthorized();
 
-            return await db.Orders
-                .Where(_ => !_.IsDeleted && _.CreatedBy.Id == cu.Id)
+            var r = await db.Orders
+                .Where(_ => !_.IsDeleted && _.CreatedByID == cu.Id)
                 .Where(_ => showAll == 1 || (_.Status != OrderStatuses.Done && _.Status != OrderStatuses.Canceled))
                 .Include(_ => _.Shop)
                 .OrderByDescending(_ => _.CreatedOn)
                 .ToListAsync();
+            foreach (var item in r) UserCache.LoadCreatedBy(item.Shop, db);
+            return r;
         }
 
         [HttpGet("outbox/{id}")]
@@ -63,10 +65,10 @@ namespace Webapi.Controllers
             if (cu == null) return Unauthorized();
 
             var order = await db.Orders
-                .Include(_=>_.Shop)
-                .Include(_=>_.Lines)
-                    .ThenInclude(_=>_.Good)
-                .FirstOrDefaultAsync(_ => _.ID == id && !_.IsDeleted && _.CreatedBy.Id == cu.Id);
+                .Include(_ => _.Shop)
+                .Include(_ => _.Lines)
+                    .ThenInclude(_ => _.Good)
+                .FirstOrDefaultAsync(_ => _.ID == id && !_.IsDeleted && _.CreatedByID == cu.Id);
             if (order == null) return NotFound();
 
             return order;

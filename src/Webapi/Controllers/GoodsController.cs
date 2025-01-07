@@ -58,7 +58,7 @@ namespace Webapi.Controllers
             var shop = await db.Shops.FirstOrDefaultAsync(_=>_.ID==good.OwnerShop.ID && !_.IsDeleted); 
             if (shop == null) return NotFound();
 
-            if (shop.CreatedBy.Email != cu.Email) return Unauthorized();
+            if (shop.CreatedByID != cu.Id) return Unauthorized();
 
             var dbGood = new Good
             {

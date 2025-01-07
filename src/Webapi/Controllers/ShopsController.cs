@@ -20,11 +20,12 @@ namespace Webapi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Shop>>> GetShops()
         {
-            return await db.Shops
+            var r = await db.Shops
                 .Where(_ => _.IsDeleted == false)
-                .Include(_=>_.CreatedBy)
                 .AsNoTracking()
                 .ToListAsync();
+            foreach (var shop in r) UserCache.LoadCreatedBy(shop, db);
+            return r;
         }
 
         [HttpGet("{id}")]
@@ -32,12 +33,12 @@ namespace Webapi.Controllers
         {
             var shop = await db.Shops
                 .Where(_ => _.IsDeleted == false && _.ID == id)
-                .Include(_=>_.CreatedBy)
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
 
             if (shop == null) return NotFound();
 
+            UserCache.LoadCreatedBy(shop, db);
             return shop;
         }
 
@@ -52,7 +53,7 @@ namespace Webapi.Controllers
             var dbobj = db.Shops.First(_ => _.ID == id && _.IsDeleted == false);
             if (dbobj == null) return NotFound();
 
-            if (dbobj.CreatedBy.Id != cu.Id) return Unauthorized();
+            if (dbobj.CreatedByID != cu.Id) return Unauthorized();
 
             dbobj.Caption = shop.Caption;
 
@@ -85,7 +86,7 @@ namespace Webapi.Controllers
 
             var shop = await db.Shops.FirstOrDefaultAsync(_ => _.IsDeleted == false && _.ID == id);
             if (shop == null) return NotFound();
-            if (shop.CreatedBy.Id == cu.Id) return Unauthorized();
+            if (shop.CreatedByID != cu.Id) return Unauthorized();
 
             shop.IsDeleted = true;
             await db.SaveChangesAsync();

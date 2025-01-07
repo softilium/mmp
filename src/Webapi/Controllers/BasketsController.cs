@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using mmp.DbCtx;
 using mmp.Models;
-using System.Net.NetworkInformation;
 
 namespace Webapi.Controllers
 {
@@ -28,7 +27,7 @@ namespace Webapi.Controllers
 
             return await db.OrderLines
                 .Include(_ => _.Good)
-                .Where(_ => _.CreatedBy.Id == cu.Id && _.Shop.ID == shopId && _.Order == null)
+                .Where(_ => _.CreatedByID == cu.Id && _.Shop.ID == shopId && _.Order == null)
                 .AsNoTracking()
                 .ToListAsync();
         }
@@ -46,7 +45,9 @@ namespace Webapi.Controllers
 
             qty = qty ?? 1;
 
-            var ol = db.OrderLines.Where(_ => _.CreatedBy.Id == cu.Id && _.Order == null && _.Good.ID == goodId).FirstOrDefault();
+            var ol = db.OrderLines
+                .Where(_ => _.CreatedByID == cu.Id && _.Order == null && _.Good.ID == goodId)
+                .FirstOrDefault();
             if (ol != null)
             {
                 ol.Qty += qty.Value;
@@ -79,7 +80,9 @@ namespace Webapi.Controllers
 
             qty = qty ?? 1;
 
-            var ol = db.OrderLines.Where(_ => _.CreatedBy.Id == cu.Id && _.Order == null && _.Good.ID == goodId).FirstOrDefault();
+            var ol = db.OrderLines
+                .Where(_ => _.CreatedByID == cu.Id && _.Order == null && _.Good.ID == goodId)
+                .FirstOrDefault();
             if (ol != null)
             {
                 var price = ol.Sum / ol.Qty;
@@ -100,7 +103,9 @@ namespace Webapi.Controllers
             var cu = db.CurrentUser();
             if (cu == null) return Unauthorized();
 
-            var ol = db.OrderLines.Where(_ => _.CreatedBy.Id == cu.Id && _.Order == null && _.Good.ID == goodId).FirstOrDefault();
+            var ol = db.OrderLines
+                .Where(_ => _.CreatedByID == cu.Id && _.Order == null && _.Good.ID == goodId)
+                .FirstOrDefault();
             if (ol == null) return NotFound();
 
             db.OrderLines.Remove(ol);

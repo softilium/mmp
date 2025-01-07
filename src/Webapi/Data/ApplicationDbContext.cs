@@ -30,6 +30,15 @@ namespace mmp.DbCtx
             _ctx = ctx;
             SavingChanges += (s, e) =>
             {
+                foreach (var q in ChangeTracker.Entries())
+                    if (q.Entity is User && (q.State == EntityState.Added || q.State == EntityState.Modified))
+                    {
+                        UserCache.Clear();
+                        break;
+                    }
+            };
+            SavingChanges += (s, e) =>
+            {
                 var currentUser = CurrentUser();
                 if (currentUser != null)
                 {
@@ -42,17 +51,17 @@ namespace mmp.DbCtx
                             if (q.State == EntityState.Added)
                             {
                                 baseObj.CreatedOn = DateTime.Now;
-                                baseObj.CreatedBy = currentUser;
+                                baseObj.CreatedByID = currentUser.Id;
                             }
                             else if (q.State == EntityState.Modified)
                             {
                                 baseObj.ModifiedOn = DateTime.Now;
-                                baseObj.ModifiedBy = currentUser;
+                                baseObj.ModifiedByID = currentUser.Id;
                             }
-                            if (baseObj.IsDeleted && (baseObj.DeletedOn == null || baseObj.DeletedBy == null))
+                            if (baseObj.IsDeleted && (baseObj.DeletedOn == null || baseObj.DeletedByID == null))
                             {
                                 baseObj.DeletedOn = DateTime.Now;
-                                baseObj.DeletedBy = currentUser;
+                                baseObj.DeletedByID = currentUser.Id;
                             }
                         }
                     }
@@ -65,4 +74,36 @@ namespace mmp.DbCtx
             base.OnModelCreating(mb);
         }
     }
+
+    public static class UserCache
+    {
+
+        private static Lock lck = new();
+
+        private static Dictionary<long, UserInfo> loaded = [];
+
+        public static void Clear()
+        {
+            lock (lck) loaded.Clear();
+        }
+        public static UserInfo FindUserInfo(long id, ApplicationDbContext db)
+        {
+            lock (lck)
+            {
+                if (loaded == null || loaded.Count == 0 || !loaded.ContainsKey(id))
+                    loaded = db.Users.ToDictionary(k => k.Id, v => new UserInfo(v));
+
+                if (!loaded.TryGetValue(id, out UserInfo? value))
+                    throw new Exception($"Unable to find user with id={id}");
+
+                return value;
+            }
+        }
+
+        public static void LoadCreatedBy(BaseObject obj, ApplicationDbContext db)
+        {
+            obj.CreatedByInfo = FindUserInfo(obj.CreatedByID, db);
+        }
+    }
+
 }

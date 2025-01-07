@@ -40,7 +40,7 @@
             "Content-Type": "application/json",
             "Authorization": "Bearer " + authStore.accessToken
           },
-          body: JSON.stringify({ caption: captionField.value, createdBy: {} })
+          body: JSON.stringify({ caption: captionField.value })
         });
 
         if (res.ok) router.push("/");
@@ -53,7 +53,7 @@
             "Content-Type": "application/json",
             "Authorization": "Bearer " + authStore.accessToken
           },
-          body: JSON.stringify({ caption: captionField.value, createdBy: {} })
+          body: JSON.stringify({ caption: captionField.value })
         });
 
         if (res.ok) router.push("/");

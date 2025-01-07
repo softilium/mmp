@@ -32,9 +32,9 @@
       <tbody>
         <tr v-for="item in shops">
           <td class="col-9"><RouterLink v-bind:to="`/shop/${item.id}`">{{ item.caption }}</RouterLink></td>
-          <td class="col-2">{{ item.createdBy.userName }}</td>
+          <td class="col-2">{{ item.createdByInfo.userName }}</td>
           <td class="col-1">
-            <RouterLink v-if="item.createdBy.userName==authStore.userName" v-bind:to="`/edit-shop/${item.id}`">
+            <RouterLink v-if="item.createdByInfo.userName==authStore.userName" v-bind:to="`/edit-shop/${item.id}`">
               <i class="bi bi-pencil-square" />
             </RouterLink>
           </td>

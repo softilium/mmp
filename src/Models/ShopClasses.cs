@@ -1,24 +1,47 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace mmp.Models
 {
-    public class User : IdentityUser<long> { }
+    // User's projection for frontend
+    public class UserInfo
+    {
+        public string UserName { get; set; }
+        public bool ShopManage { get; set; }
 
+        public UserInfo(User src)
+        {
+            ArgumentNullException.ThrowIfNull(src);
+            UserName = src.UserName;
+            ShopManage = src.ShopManage;
+        }
+    }
+
+    public class User : IdentityUser<long>
+    {
+        public bool ShopManage { get; set; }
+    }
+
+    [Index(nameof(CreatedByID))]
     public abstract class BaseObject
     {
         [Key] public long ID { get; set; }
 
-        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public User CreatedBy { get; set; }
+        [Required]
+        public long CreatedByID { get; set; }
+        [NotMapped] public UserInfo? CreatedByInfo { get; set; }
         [Required] public DateTime CreatedOn { get; set; }
 
-        [DeleteBehavior(DeleteBehavior.Restrict)] public User? ModifiedBy { get; set; }
+        public long? ModifiedByID { get; set; }
+        [NotMapped] public UserInfo? User { get; set; }
         public DateTime ModifiedOn { get; set; }
 
         public bool IsDeleted { get; set; } = false;
-        public User? DeletedBy { get; set; }
+        public long? DeletedByID { get; set; }
+        [NotMapped] public UserInfo? DeletedByInfo { get; set; }
         public DateTime? DeletedOn { get; set; }
 
         public void BeforeSave() { }
@@ -31,7 +54,7 @@ namespace mmp.Models
 
     public class Good : BaseObject
     {
-        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public Shop OwnerShop { get; set; } 
+        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public Shop OwnerShop { get; set; }
         [Required] public string Caption { get; set; } = "";
         public string? Description { get; set; }
         [Precision(15, 2)] public decimal Price { get; set; }
@@ -39,7 +62,7 @@ namespace mmp.Models
 
     public enum OrderStatuses : int
     {
-        [Description("Новый")] 
+        [Description("Новый")]
         New = 100,
 
         [Description("В работе")]
@@ -51,10 +74,10 @@ namespace mmp.Models
         [Description("Доставляется")]
         Delivering = 400,
 
-        [Description("Доставлен")] 
+        [Description("Доставлен")]
         Done = 500,
 
-        [Description("Отменен")] 
+        [Description("Отменен")]
         Canceled = 600,
     }
 
@@ -69,9 +92,9 @@ namespace mmp.Models
 
     public class OrderLine : BaseObject
     {
-        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public Shop Shop { get; set; }
+        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public Shop? Shop { get; set; }
         public Order? Order { get; set; } //when empty it is basket
-        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public Good Good { get; set; }
+        [Required][DeleteBehavior(DeleteBehavior.Restrict)] public Good? Good { get; set; }
         [Required][Precision(15, 2)] public decimal Qty { get; set; }
         [Required][Precision(15, 2)] public decimal Sum { get; set; }
     }

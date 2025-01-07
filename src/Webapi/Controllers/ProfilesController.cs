@@ -27,25 +27,26 @@ namespace Webapi.Controllers
 
         [HttpGet("{id}")]
         [Authorize]
-        public async Task<ActionResult<User>> GetUser(long id)
+        public async Task<ActionResult<UserInfo>> GetUser(long id)
         {
             var user = await db.Users.FindAsync(id);
             if (user == null) return NotFound();
-            return user;
+            return UserCache.FindUserInfo(id, db);
         }
 
         [HttpGet("public")]
-        public async Task<ActionResult<object>> GetPublicUser([FromQuery] string email)
+        public async Task<ActionResult<UserInfo>> GetPublicUser([FromQuery] string email)
         {
             var user = db.Users
                 .Where(_ => _.Email == email)
-                .Select(_ => new { _.Email, _.UserName })
+                .Select(_ => new UserInfo(_))
                 .FirstOrDefault();
             if (user == null) return NotFound();
             return user;
         }
 
         [HttpPut]
+        [Authorize]
         public async Task<IActionResult> PutUser(User user)
         {
             var cu = db.CurrentUser();
