@@ -17,11 +17,16 @@ namespace Webapi.Controllers
             db = context;
         }
 
+        private IQueryable<long> shopManagers()
+        {
+            return db.Users.Where(_ => _.ShopManage).Select(_ => _.Id);
+        }
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Shop>>> GetShops()
         {
             var r = await db.Shops
-                .Where(_ => _.IsDeleted == false)
+                .Where(_ => _.IsDeleted == false && shopManagers().Contains(_.CreatedByID))
                 .AsNoTracking()
                 .ToListAsync();
             foreach (var shop in r) UserCache.LoadCreatedBy(shop, db);
@@ -32,7 +37,7 @@ namespace Webapi.Controllers
         public async Task<ActionResult<Shop>> GetShop(long id)
         {
             var shop = await db.Shops
-                .Where(_ => _.IsDeleted == false && _.ID == id)
+                .Where(_ => _.IsDeleted == false && _.ID == id && shopManagers().Contains(_.CreatedByID))
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
 
@@ -50,7 +55,7 @@ namespace Webapi.Controllers
             var cu = db.CurrentUser();
             if (cu == null) return Unauthorized();
 
-            var dbobj = db.Shops.First(_ => _.ID == id && _.IsDeleted == false);
+            var dbobj = db.Shops.First(_ => _.ID == id && _.IsDeleted == false && shopManagers().Contains(_.CreatedByID));
             if (dbobj == null) return NotFound();
 
             if (dbobj.CreatedByID != cu.Id) return Unauthorized();
@@ -68,6 +73,8 @@ namespace Webapi.Controllers
         {
             var cu = db.CurrentUser();
             if (cu == null) return Unauthorized();
+
+            if (!shopManagers().Contains(cu.Id)) return Unauthorized();
 
             var dbobj = new Shop { Caption = shop.Caption };
 
