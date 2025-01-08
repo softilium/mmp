@@ -26,7 +26,7 @@ namespace Webapi.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Good>> GetGood(long id)
         {
-            var good = await db.Goods.AsNoTracking().FirstOrDefaultAsync(_ => _.ID == id);
+            var good = await db.Goods.Include(_=>_.OwnerShop).AsNoTracking().FirstOrDefaultAsync(_ => _.ID == id);
             if (good == null) return NotFound();
             return good;
         }
@@ -42,6 +42,8 @@ namespace Webapi.Controllers
             dbGood.Caption = good.Caption;
             dbGood.Description = good.Description;
             dbGood.Price = good.Price;
+            dbGood.Article = good.Article;
+            dbGood.Url = good.Url;
 
             await db.SaveChangesAsync();
 
@@ -65,7 +67,9 @@ namespace Webapi.Controllers
                 OwnerShop = shop,
                 Caption = good.Caption,
                 Description = good.Description,
-                Price = good.Price
+                Price = good.Price,
+                Article = good.Article,
+                Url = good.Url
             };
 
             db.Goods.Add(dbGood);

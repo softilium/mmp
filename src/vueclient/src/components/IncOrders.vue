@@ -82,7 +82,7 @@
           <th class="col-2">Новый статус</th>
         </tr>
       </thead>
-      <tr v-for="order in orders">
+      <tr v-for="order in orders" :key="order.id">
         <td><RouterLink :to="`/order/${order.id}`">{{ order.shop.caption }}</RouterLink></td>
         <td><RouterLink :to="`/order/${order.id}`">{{ order.createdByInfo.userName }}</RouterLink></td>
         <td><RouterLink :to="`/order/${order.id}`">{{ statuses[order.status] }}</RouterLink></td>

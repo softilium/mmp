@@ -94,6 +94,9 @@
     </tfoot>
   </table>
 
-  <button class="btn btn-primary" @click="Checkout()">Оформить заказ</button>
+  <div class="row mb-3">
+    <button class="btn btn-primary" @click="Checkout()">Оформить заказ</button>
+  </div>
+  <RouterLink :to="`/shop/${shop.id}`">Витрина "{{shop.caption}}"</RouterLink>
 
 </template>

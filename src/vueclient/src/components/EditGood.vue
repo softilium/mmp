@@ -71,6 +71,22 @@
   </div>
   <div class="row mb-3">
     <div class="form-group form-group-sm row">
+      <label class="col-3 form-label">Артикул</label>
+      <div class="col-7">
+        <input class="form-control" v-model="good.article" />
+      </div>
+    </div>
+  </div>
+  <div class="row mb-3">
+    <div class="form-group form-group-sm row">
+      <label class="col-3 form-label">Ссылка</label>
+      <div class="col-7">
+        <input class="form-control" v-model="good.url" />
+      </div>
+    </div>
+  </div>
+  <div class="row mb-3">
+    <div class="form-group form-group-sm row">
       <label class="col-3 form-label">Описание</label>
       <div class="col-7">
         <textarea class="form-control" v-model="good.description" rows="5" />

@@ -52,13 +52,15 @@ namespace mmp.Models
 
     public class Shop : BaseObject
     {
-        [Required] public string Caption { get; set; } = "Shop 1";
+        [MaxLength(100)] [Required] public string Caption { get; set; } = "Shop 1";
     }
 
     public class Good : BaseObject
     {
         [Required][DeleteBehavior(DeleteBehavior.Restrict)] public Shop OwnerShop { get; set; }
-        [Required] public string Caption { get; set; } = "";
+        [MaxLength(100)][Required] public string Caption { get; set; } = "";
+        [MaxLength(50)] public string? Article { get; set; }
+        [MaxLength(900)] public string? Url { get; set; }
         public string? Description { get; set; }
         [Precision(15, 2)] public decimal Price { get; set; }
     }
@@ -102,4 +104,3 @@ namespace mmp.Models
         [Required][Precision(15, 2)] public decimal Sum { get; set; }
     }
 }
-
