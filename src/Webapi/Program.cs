@@ -7,7 +7,14 @@ using System.Text.Json.Serialization;
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddEnvironmentVariables();
 
+//temporary begin
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+if (string.IsNullOrWhiteSpace(connectionString))
+    connectionString = Environment.GetEnvironmentVariable("DefaultConnection");
+
+Console.WriteLine($"connectionString={connectionString}"); //debug
+//temporary end
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseNpgsql(connectionString);
