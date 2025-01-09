@@ -1,0 +1,1 @@
+swa deploy --env production
