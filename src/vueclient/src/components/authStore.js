@@ -1,8 +1,9 @@
 import { reactive } from 'vue'
 
 export const authStore = reactive({
-  rbUrl: () => "http://localhost:5078",
-  userInfo: { userName: null },
+  // rbUrl: () => "http://localhost:5078",
+  rbUrl: () => "https://riverstores-ckbhckgxhkbwbkgz.polandcentral-01.azurewebsites.net",
+  userInfo: { userName: null, shopManage: false, admin: false },
   accessToken: "",
   refreshToken: "",
 

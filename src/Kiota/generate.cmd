@@ -7,3 +7,5 @@ rem dotnet tool install --global Microsoft.OpenApi.Kiota
 rem dotnet kiota generate --clean-output --language "csharp" --openapi "http://localhost:5078/openapi/v1.json" --output "ApiClient" --namespace-name "mmp.ApiClient"
 
 rem --class-name ""
+
+rem npm install -g @azure/static-web-apps-cli

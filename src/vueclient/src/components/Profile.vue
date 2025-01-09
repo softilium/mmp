@@ -1,12 +1,10 @@
 <script setup lang="ts">
 
-  import { onMounted, ref, nextTick } from 'vue';
-  import { useRoute, useRouter } from 'vue-router'
+  import { onMounted, ref } from 'vue';
+  import { useRoute } from 'vue-router'
   import { authStore } from './authStore.js';
-  import { glob } from './globals.js';
 
   const route = useRoute();
-  const router = useRouter();
 
   const user = ref({});
 

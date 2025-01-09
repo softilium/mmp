@@ -49,7 +49,7 @@
         basketSum.value = 0;
 
         let res = await fetch(authStore.rbUrl() + "/api/baskets/" + shop.value.id, {
-          mathod: "GET",
+          method: "GET",
           headers: {
             "Content-Type": "application/json",
             "Authorization": "Bearer " + authStore.accessToken
@@ -139,7 +139,7 @@
               </div>
               <div class="col-1 text-end">
                 <RouterLink v-if="isOwner" v-bind:to="`/edit-good/${shop.id}/${good.id}`">
-                  <i class="bi bi-pencil-square" />
+                  <span class="text-info" ><i class="bi bi-pencil-square" /></span>
                 </RouterLink>
               </div>
             </div>

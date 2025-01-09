@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-  import { onMounted, ref, computed } from 'vue';
+  import { onMounted, ref } from 'vue';
   import { authStore } from './authStore.js';
 
   let shops = ref([]);
@@ -29,7 +29,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="item in shops">
+        <tr v-for="item in shops" v-bind:key="item.id">
           <td class="col-9">
             <div class="row">
               <div class="col-11">
@@ -37,7 +37,7 @@
               </div>
               <div class="col-1 text-end">
                 <RouterLink v-if="authStore.userInfo.shopManage && item.createdByInfo.userName==authStore.userInfo.userName" v-bind:to="`/edit-shop/${item.id}`">
-                  <i class="bi bi-pencil-square" />
+                  <span class="text-info"><i class="bi bi-pencil-square" /></span>
                 </RouterLink>
               </div>
             </div>
@@ -48,6 +48,6 @@
     </table>
   </div>
   <br />
-  <button class="btn btn-primary" v-if="authStore.userInfo.userName && authStore.userInfo.shopManage" @click="$router.push('/edit-shop');">Добавить витрину</button>
+  <button class="btn btn-info" v-if="authStore.userInfo.userName && authStore.userInfo.shopManage" @click="$router.push('/edit-shop');">Добавить витрину</button>
 
 </template>

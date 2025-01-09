@@ -3,11 +3,11 @@
   import { ref } from 'vue';
   import { authStore } from './authStore.js';
 
-  let emailString = ref<string>("");
-  let passwordString = ref<string>("");
+  let emailString = ref("");
+  let passwordString = ref("");
 
-  let emailStringreg = ref<string>("");
-  let passwordStringreg = ref<string>("");
+  let emailStringreg = ref("");
+  let passwordStringreg = ref("");
 
 </script>
 

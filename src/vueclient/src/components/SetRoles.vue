@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-  import { onMounted, ref, nextTick } from 'vue';
+  import { onMounted, ref } from 'vue';
   import { authStore } from './authStore.js';
 
   const users = ref([]);
@@ -21,7 +21,7 @@
   const Save = async (id) => {
     users.value.forEach(async (_) => {
       if (_.id == id) {
-        let res = await fetch(authStore.rbUrl() + "/api/admin/allusers/" + _.id,
+        await fetch(authStore.rbUrl() + "/api/admin/allusers/" + _.id,
           {
             method: "PUT",
             body: JSON.stringify(_),

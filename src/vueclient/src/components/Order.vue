@@ -1,12 +1,11 @@
 <script setup lang="ts">
 
-  import { onMounted, ref, nextTick } from 'vue';
-  import { useRoute, useRouter } from 'vue-router'
+  import { onMounted, ref } from 'vue';
+  import { useRoute } from 'vue-router'
   import { authStore } from './authStore.js';
   import { glob } from './globals.js';
 
   const route = useRoute();
-  const router = useRouter();
 
   const order = ref(null);
 
@@ -43,7 +42,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="line in order.lines">
+        <tr v-for="line in order.lines" v-bind:key="line.id">
           <td>{{line.good.caption}}</td>
           <td>{{line.qty}}</td>
           <td>{{line.sum}}</td>

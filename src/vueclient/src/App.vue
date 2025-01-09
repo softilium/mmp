@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-  import { onMounted, ref, computed } from 'vue';
+  import { onMounted } from 'vue';
   import { authStore } from './components/authStore.js';
 
   onMounted(() => {
@@ -27,15 +27,15 @@
           <RouterLink class="btn btn-outline-secondary btn-sm" to="/logout">Выйти</RouterLink>&nbsp;&nbsp;
         </span>
         <span v-if="authStore.userInfo.userName">
-          <RouterLink class="btn btn-outline-warning btn-sm" to="/inc-orders">Заказы для обработки</RouterLink>&nbsp;&nbsp;
+          <RouterLink class="btn btn-info btn-sm" to="/inc-orders">Заказы для обработки</RouterLink>&nbsp;&nbsp;
         </span>
         <span v-if="authStore.userInfo.admin">
-          <RouterLink class="btn btn-outline-warning btn-sm" to="/set-roles">admin</RouterLink>
+          <RouterLink class="btn btn-info btn-sm" to="/set-roles">admin</RouterLink>
         </span>
         <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
           <ul class="navbar-nav flex-grow-1">&nbsp;</ul>
           <span v-if="authStore.userInfo.userName">
-            <RouterLink class="btn btn-secondary btn-sm" to="/profile">{{ authStore.userInfo.userName }}</RouterLink>&nbsp;&nbsp;
+            <RouterLink class="btn btn-outline-secondary btn-sm" to="/profile">{{ authStore.userInfo.userName }}</RouterLink>&nbsp;&nbsp;
           </span>
         </div>
       </div>

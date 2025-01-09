@@ -1,12 +1,9 @@
 <script setup lang="ts">
 
-  import { onMounted, ref, nextTick } from 'vue';
-  import { useRoute, useRouter } from 'vue-router'
+  import { onMounted, ref } from 'vue';
   import { authStore } from './authStore.js';
   import { glob } from './globals.js';
 
-  const route = useRoute();
-  const router = useRouter();
 
   const orders = ref([]);
   const statuses = ref([]);
@@ -46,7 +43,7 @@
     orders.value.forEach((order) => {
       if (order.newStatus) {
         try {
-          let res = fetch(`${authStore.rbUrl()}/api/orders/inbox?orderid=${order.id}&newstatus=${order.newStatus}`,
+          fetch(`${authStore.rbUrl()}/api/orders/inbox?orderid=${order.id}&newstatus=${order.newStatus}`,
             {
               method: "PUT",
               headers: {

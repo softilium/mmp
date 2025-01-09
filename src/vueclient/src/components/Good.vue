@@ -7,7 +7,7 @@
   const route = useRoute()
   const router = useRouter()
 
-  const good = ref({ ownerShop: { id: 0 }, caption: "", description: "" });
+  const good = ref({ ownerShop: { id: 0, caption: "" }, caption: "", description: "", basked: null, id:0, price:0, article:"", url:"" });
   const basketSum = ref(0);
 
   onMounted(async () => {
@@ -32,7 +32,7 @@
     good.value.basked = null;
     if (authStore.userInfo.userName) {
       let res = await fetch(authStore.rbUrl() + "/api/baskets/" + good.value.ownerShop.id, {
-        mathod: "GET",
+        method: "GET",
         headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer " + authStore.accessToken

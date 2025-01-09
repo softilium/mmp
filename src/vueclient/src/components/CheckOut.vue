@@ -1,6 +1,6 @@
 <script setup>
 
-  import { onMounted, ref, nextTick } from 'vue';
+  import { onMounted, ref } from 'vue';
   import { useRoute, useRouter } from 'vue-router'
   import { authStore } from './authStore.js';
 
@@ -79,7 +79,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr v-for="line in basket">
+      <tr v-for="line in basket" v-bind:key="line.id">
         <td>{{ line.good.caption }}</td>
         <td class="text-end">{{ line.qty }}</td>
         <td class="text-end">{{ line.sum }}</td>
