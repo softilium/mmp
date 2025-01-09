@@ -5,16 +5,9 @@ using Microsoft.AspNetCore.Authentication;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
-//builder.Configuration.AddEnvironmentVariables();
+builder.Configuration.AddEnvironmentVariables(); // azure uses env.variables for app config
 
-////temporary begin
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-//if (string.IsNullOrWhiteSpace(connectionString))
-//    connectionString = Environment.GetEnvironmentVariable("DefaultConnection");
-
-//Console.WriteLine($"connectionString={connectionString}"); //debug
-////temporary end
-
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseNpgsql(connectionString);
