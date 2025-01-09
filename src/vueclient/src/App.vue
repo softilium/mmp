@@ -15,31 +15,32 @@
 
   <header>
     <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow.mb-3">
-      <RouterLink class="navbar-brand" to="/">Витрины</RouterLink>
-      <span v-if="authStore.userInfo.userName">
-        <RouterLink class="navbar-text" to="/orders">Заказы</RouterLink>&nbsp;&nbsp;
-      </span>
-      <span v-if="!authStore.userInfo.userName">
-        <RouterLink class="navbar-text" to="/login">Войти</RouterLink>&nbsp;&nbsp;
-      </span>
-      <span v-if="!authStore.userInfo.userName">
-        <RouterLink class="navbar-text" to="/register">Зарегистрироваться</RouterLink>&nbsp;&nbsp;
-      </span>
-      <span v-if="authStore.userInfo.userName">
-        <RouterLink class="navbar-text" to="/profile">Вы вошли как [{{ authStore.userInfo.userName }}]</RouterLink>&nbsp;&nbsp;
-      </span>
-      <span v-if="authStore.userInfo.userName">
-        <RouterLink class="navbar-text" to="/logout">Выйти</RouterLink>&nbsp;&nbsp;
-      </span>
-      <span v-if="authStore.userInfo.userName">
-        <RouterLink class="navbar-text" to="/inc-orders">[[ Заказы для обработки ]]</RouterLink>&nbsp;&nbsp;
-      </span>
-      <span v-if="authStore.userInfo.admin">
-        <RouterLink class="navbar-text" to="/set-roles">[[ admin ]]</RouterLink>
-      </span>
+      <div class="container-fluid">
+        <RouterLink class="navbar-brand" to="/">Витрины</RouterLink>
+        <span v-if="authStore.userInfo.userName">
+          <RouterLink class="btn btn-outline-secondary btn-sm" to="/orders">Заказы</RouterLink>&nbsp;&nbsp;
+        </span>
+        <span v-if="!authStore.userInfo.userName">
+          <RouterLink class="btn btn-outline-secondary btn-sm" to="/login">Войти</RouterLink>&nbsp;&nbsp;
+        </span>
+        <span v-if="authStore.userInfo.userName">
+          <RouterLink class="btn btn-outline-secondary btn-sm" to="/logout">Выйти</RouterLink>&nbsp;&nbsp;
+        </span>
+        <span v-if="authStore.userInfo.userName">
+          <RouterLink class="btn btn-outline-warning btn-sm" to="/inc-orders">Заказы для обработки</RouterLink>&nbsp;&nbsp;
+        </span>
+        <span v-if="authStore.userInfo.admin">
+          <RouterLink class="btn btn-outline-warning btn-sm" to="/set-roles">admin</RouterLink>
+        </span>
+        <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+          <ul class="navbar-nav flex-grow-1">&nbsp;</ul>
+          <span v-if="authStore.userInfo.userName">
+            <RouterLink class="btn btn-secondary btn-sm" to="/profile">{{ authStore.userInfo.userName }}</RouterLink>&nbsp;&nbsp;
+          </span>
+        </div>
+      </div>
     </nav>
   </header>
-  <br />
 
   <div class="container-fluid">
     <RouterView />

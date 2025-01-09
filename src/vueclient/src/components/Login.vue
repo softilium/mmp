@@ -6,24 +6,57 @@
   let emailString = ref<string>("");
   let passwordString = ref<string>("");
 
+  let emailStringreg = ref<string>("");
+  let passwordStringreg = ref<string>("");
+
 </script>
 
 <template>
 
-  <h1>Войти</h1>
+  <div class="row">
 
-  <div class="row mb-3">
-    <label class="col-3 form-label">Email</label>
-    <div class="col-7">
-      <input class="form-control" v-model="emailString" required />
+    <div class="col-5">
+
+      <h1>Вход</h1>
+
+      <div class="row mb-3">
+        <label class="col-3 form-label">Email</label>
+        <div class="col-7">
+          <input class="form-control" v-model="emailString" required />
+        </div>
+      </div>
+      <div class="row mb-3">
+        <label class="col-3 form-label">Пароль</label>
+        <div class="col-7">
+          <input class="form-control" v-model="passwordString" type="password" />
+        </div>
+      </div>
+      <button class="btn btn-primary" @click="authStore.Login(emailString, passwordString); $router.push('/');">Вход</button>
+
     </div>
-  </div>
-  <div class="row mb-3">
-    <label class="col-3 form-label">Пароль</label>
-    <div class="col-7">
-      <input class="form-control" v-model="passwordString" type="password" />
+
+    <div class="col-2"></div>
+
+    <div class="col-5">
+      <h1>Регистрация</h1>
+
+      <div class="row mb-3">
+        <label class="col-3 form-label">Email</label>
+        <div class="col-7">
+          <input class="form-control" v-model="emailStringreg" required />
+        </div>
+      </div>
+      <div class="row mb-3">
+        <label class="col-3 form-label">Пароль</label>
+        <div class="col-7">
+          <input class="form-control" v-model="passwordStringreg" type="password" />
+        </div>
+      </div>
+      <button class="btn btn-primary" @click="authStore.Register(emailStringreg, passwordStringreg); $router.push('/');">Регистрация</button>
+
     </div>
+
   </div>
-  <button class="btn btn-primary" @click="authStore.Login(emailString, passwordString); $router.push('/');">Вход</button>
+
 
 </template>
