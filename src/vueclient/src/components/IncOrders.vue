@@ -62,7 +62,7 @@
 
 <template>
 
-  <h1>Ваши заказы</h1>
+  <h1>Заказы для обработки</h1>
 
   Показывать закрытые
   <input v-model="showAll" type="checkbox" @change="Load();" />

@@ -16,7 +16,7 @@
   <header>
     <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow.mb-3">
       <div class="container-fluid">
-        <RouterLink class="navbar-brand" to="/">Витрины</RouterLink>
+        <RouterLink class="btn btn-outline-secondary btn-sm" to="/">Витрины</RouterLink>&nbsp;&nbsp;
         <span v-if="authStore.userInfo.userName">
           <RouterLink class="btn btn-outline-secondary btn-sm" to="/orders">Заказы</RouterLink>&nbsp;&nbsp;
         </span>
