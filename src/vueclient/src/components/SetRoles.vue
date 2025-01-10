@@ -53,7 +53,7 @@
 
     <tbody>
 
-      <tr v-for="u in users">
+      <tr v-for="u in users" v-bind:key="u.id">
         <td>{{ u.userName }}</td>
         <td>{{ u.email }}</td>
         <td> <input v-model="u.admin" type="checkbox" /></td>

@@ -1,7 +1,7 @@
 import { reactive } from 'vue'
 
 export const authStore = reactive({
-  // rbUrl: () => "http://localhost:5078",
+  //rbUrl: () => "http://localhost:5078",
   rbUrl: () => "https://riverstores-ckbhckgxhkbwbkgz.polandcentral-01.azurewebsites.net",
   userInfo: { userName: null, shopManage: false, admin: false },
   accessToken: "",
@@ -82,9 +82,13 @@ export const authStore = reactive({
         this.SetAccessToken(res.accessToken);
         this.SetRefreshToken(res.refreshToken);
         this.CheckLogged();
+      } else {
+        let r = await res.json();
+        return this.errFormat(r);
       }
-    } catch (err) { console.log(err); }
-  }, //todo handle errors, don't show
+    } catch (err) { return err; }
+    return "";
+  },
 
   async Logout() {
     let response = await fetch(this.rbUrl() + "/identity/logout", {
@@ -93,7 +97,7 @@ export const authStore = reactive({
       headers: { "Content-Type": "application/json" }
     });
     if (response.ok) {
-      this.userName = { userName: null };
+      this.userInfo = { userName: null };
       this.SetAccessToken("");
       this.SetRefreshToken("");
       await this.CheckLogged();
@@ -101,17 +105,33 @@ export const authStore = reactive({
 
   },
 
+  errFormat(obj) {
+    let r = `${obj.title}: `;
+    if (obj.errors)
+      Object.values(obj.errors).forEach(_ => {
+        r += _ + " "
+      });
+    return r;
+  },
+
   async Register(emailString, passwordString) {
     let request = { email: emailString, password: passwordString };
-    let response = await fetch(this.rbUrl() + "/identity/register", {
-      method: "POST",
-      body: JSON.stringify(request),
-      headers: {
-        "Content-Type": "application/json"
-      },
-    });
-    if (response.ok) {
-      await this.Login(emailString, passwordString);
+    try {
+      let response = await fetch(this.rbUrl() + "/identity/register", {
+        method: "POST",
+        body: JSON.stringify(request),
+        headers: {
+          "Content-Type": "application/json"
+        },
+      });
+      let r = "";
+      if (response.ok)
+        r = await this.Login(emailString, passwordString);
+      else
+        r = this.errFormat(await response.json());
+      return r;
+    } catch (err) {
+      return err;
     }
   }
 

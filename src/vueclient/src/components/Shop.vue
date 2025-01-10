@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
 
   import { onMounted, ref, nextTick } from 'vue';
@@ -7,7 +8,7 @@
   const route = useRoute();
   const router = useRouter();
 
-  const shop = ref({});
+  const shop = ref({ id : 0, createdByInfo : { userName: "" }});
 
   const goods = ref([]);
 
@@ -128,7 +129,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="good in goods">
+        <tr v-for="good in goods" v-bind:key="good.id">
           <td class="col-8">
             <div class="row">
               <div class="col-11">

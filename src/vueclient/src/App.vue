@@ -24,9 +24,6 @@
           <RouterLink class="btn btn-outline-secondary btn-sm" to="/login">Войти</RouterLink>&nbsp;&nbsp;
         </span>
         <span v-if="authStore.userInfo.userName">
-          <RouterLink class="btn btn-outline-secondary btn-sm" to="/logout">Выйти</RouterLink>&nbsp;&nbsp;
-        </span>
-        <span v-if="authStore.userInfo.userName">
           <RouterLink class="btn btn-info btn-sm" to="/inc-orders">Заказы для обработки</RouterLink>&nbsp;&nbsp;
         </span>
         <span v-if="authStore.userInfo.admin">
@@ -42,6 +39,7 @@
     </nav>
   </header>
 
+  <br />
   <div class="container-fluid">
     <RouterView />
   </div>

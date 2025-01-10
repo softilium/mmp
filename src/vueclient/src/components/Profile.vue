@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
 
   import { onMounted, ref } from 'vue';
@@ -6,7 +7,7 @@
 
   const route = useRoute();
 
-  const user = ref({});
+  const user = ref({userName: "", email: "", phoneNumber: ""});
 
   const result = ref("");
 
@@ -53,7 +54,8 @@
 
 <template>
 
-  <h1>Профиль пользователя {{ user.userName }}</h1>
+  <h1>Профиль пользователя {{ user.userName }}&nbsp;<button class="btn btn-outline-secondary" @click="authStore.Logout(); $router.push('/');">Выйти</button></h1>
+  <br /><br />
 
   <div class="row mb-3">
     <label class="col-3 form-label">Имя пользователя</label>

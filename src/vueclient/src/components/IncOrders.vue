@@ -89,7 +89,7 @@
           <select class="form-select form-control-sm" v-model="order.newStatus">
             <option></option>
             <template v-for="(value,key) in statuses">
-              <option v-if="key != order.status" v-bind:value="key">{{ value }}</option>
+              <option v-if="key != order.status" v-bind:key="key">{{ value }}</option>
             </template>
           </select>
         </td>

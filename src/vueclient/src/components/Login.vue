@@ -1,13 +1,30 @@
+<!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
 
   import { ref } from 'vue';
   import { authStore } from './authStore.js';
+  import { useRouter } from 'vue-router';
+
+  const router = useRouter();
 
   let emailString = ref("");
   let passwordString = ref("");
+  let loginError = ref("");
 
   let emailStringreg = ref("");
   let passwordStringreg = ref("");
+  let registerError = ref("");
+
+  const doLogin = async () => {
+    loginError.value = await authStore.Login(emailString.value, passwordString.value);
+    if (loginError.value == "") router.push('/');
+  }
+
+  const doRegister = async () => {
+    let q = await authStore.Register(emailStringreg.value, passwordStringreg.value);
+    registerError.value = q;
+    if (registerError.value == "") router.push('/');
+  }
 
 </script>
 
@@ -31,7 +48,8 @@
           <input class="form-control" v-model="passwordString" type="password" />
         </div>
       </div>
-      <button class="btn btn-primary" @click="authStore.Login(emailString, passwordString); $router.push('/');">Вход</button>
+      <button class="btn btn-secondary" @click="doLogin();">Вход</button>
+      <div v-if="loginError" class="alert alert-danger" role="alert">{{loginError}}</div>
 
     </div>
 
@@ -52,7 +70,8 @@
           <input class="form-control" v-model="passwordStringreg" type="password" />
         </div>
       </div>
-      <button class="btn btn-primary" @click="authStore.Register(emailStringreg, passwordStringreg); $router.push('/');">Регистрация</button>
+      <button class="btn btn-secondary" @click="doRegister();">Регистрация</button>
+      <div v-if="registerError" class="alert alert-danger" role="alert">{{registerError}}</div>
 
     </div>
 
