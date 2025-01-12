@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Azure.Identity;
+using Azure.Storage.Blobs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using mmp.DbCtx;
@@ -13,10 +15,23 @@ namespace Webapi.Controllers
         private readonly ApplicationDbContext db;
         private IHostEnvironment host;
 
+        private BlobContainerClient blobContainer;
+
+        private bool UseAzureBlobs => !host.IsDevelopment();
+
         public GoodsController(ApplicationDbContext _db, IHostEnvironment hostEnvironment)
         {
             db = _db;
             host = hostEnvironment;
+
+            if (UseAzureBlobs)
+            {
+                var blobServiceClient = new BlobServiceClient(
+                    new Uri("https://riverstores.blob.core.windows.net"),
+                    new DefaultAzureCredential());
+                blobContainer = blobServiceClient.GetBlobContainerClient("goodimages");
+            }
+
         }
 
         [HttpGet]
@@ -101,13 +116,19 @@ namespace Webapi.Controllers
         [HttpGet("images/{goodId:long}/{num:int}")]
         public async Task<IActionResult> GetGoodImage(long goodId, int num)
         {
-            if (host.IsDevelopment())
+            if (!UseAzureBlobs)
             {
                 var fs = DevBlobStorageFolder + BlobName(goodId, num);
                 if (!System.IO.File.Exists(fs)) return NoContent();
                 return PhysicalFile(fs, "image/jpeg");
             }
-            return NotFound();
+            else
+            {
+                var handler = blobContainer.GetBlobClient(BlobName(goodId, num));
+                using var memoryStream = new MemoryStream();
+                await handler.DownloadToAsync(memoryStream);
+                return File(memoryStream.ToArray(), "image/jpeg");
+            }
         }
 
         [HttpPost("images/{goodId:long}/{num:int}")]
@@ -126,11 +147,17 @@ namespace Webapi.Controllers
             if (good == null) return NotFound();
             if (good.OwnerShop.CreatedByID != cu.Id) return Unauthorized();
 
-            if (host.IsDevelopment())
+            if (!UseAzureBlobs)
             {
-                var stream = System.IO.File.Create(DevBlobStorageFolder + BlobName(goodId, num));
+                using var stream = System.IO.File.Create(DevBlobStorageFolder + BlobName(goodId, num));
                 image.CopyTo(stream);
-                stream.Close();
+            }
+            else
+            {
+                var handler = blobContainer.GetBlobClient(BlobName(goodId, num));
+                using var memoryStream = new MemoryStream();
+                image.CopyTo(memoryStream);
+                await handler.UploadAsync(memoryStream);
             }
             return NoContent();
         }
@@ -148,10 +175,14 @@ namespace Webapi.Controllers
             if (good == null) return NotFound();
             if (good.OwnerShop.CreatedByID != cu.Id) return Unauthorized();
 
-            if (host.IsDevelopment())
+            if (!UseAzureBlobs)
             {
                 var fs = DevBlobStorageFolder + BlobName(goodId, num);
                 if (System.IO.File.Exists(fs)) System.IO.File.Delete(fs);
+            }
+            else
+            {
+                await blobContainer.DeleteBlobAsync(BlobName(goodId, num));
             }
             return NoContent();
         }
