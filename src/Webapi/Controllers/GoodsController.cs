@@ -127,6 +127,7 @@ namespace Webapi.Controllers
             else
             {
                 var handler = blobContainer.GetBlobClient(BlobName(goodId, num));
+                if (!handler.Exists()) return NoContent();
                 using var memoryStream = new MemoryStream();
                 await handler.DownloadToAsync(memoryStream);
                 return File(memoryStream.ToArray(), "image/jpeg");
@@ -184,7 +185,7 @@ namespace Webapi.Controllers
             }
             else
             {
-                await blobContainer.DeleteBlobAsync(BlobName(goodId, num));
+                await blobContainer.DeleteBlobIfExistsAsync(BlobName(goodId, num));
             }
             return NoContent();
         }
