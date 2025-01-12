@@ -1,5 +1,4 @@
-﻿using Azure.Identity;
-using Azure.Storage.Blobs;
+﻿using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -19,17 +18,17 @@ namespace Webapi.Controllers
 
         private bool UseAzureBlobs => !host.IsDevelopment();
 
-        public GoodsController(ApplicationDbContext _db, IHostEnvironment hostEnvironment)
+        public GoodsController(ApplicationDbContext _db, IHostEnvironment hostEnvironment, BlobServiceClient _blobServiceClient)
         {
             db = _db;
             host = hostEnvironment;
 
             if (UseAzureBlobs)
             {
-                var blobServiceClient = new BlobServiceClient(
-                    new Uri("https://riverstores.blob.core.windows.net"),
-                    new DefaultAzureCredential());
-                blobContainer = blobServiceClient.GetBlobContainerClient("goodimages");
+                //var blobServiceClient = new BlobServiceClient(
+                //    new Uri("https://riverstores.blob.core.windows.net"),
+                //    new DefaultAzureCredential());
+                blobContainer = _blobServiceClient.GetBlobContainerClient("goodimages");
 
                 Console.WriteLine($"storageAccountConnStr={Environment.GetEnvironmentVariable("storageAccountConnStr")}");//debug
 
