@@ -3,9 +3,12 @@ using mmp.DbCtx;
 using mmp.Models;
 using Microsoft.AspNetCore.Authentication;
 using System.Text.Json.Serialization;
+using Azure.Storage.Blobs;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddEnvironmentVariables(); // azure uses env.variables for app config
+
+builder.Services.AddSingleton(x => new BlobServiceClient(builder.Configuration.GetConnectionString("StorageAccount")));
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 if (string.IsNullOrWhiteSpace(connectionString))
