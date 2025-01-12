@@ -158,6 +158,7 @@ namespace Webapi.Controllers
             }
             else
             {
+                await blobContainer.DeleteBlobIfExistsAsync(BlobName(goodId, num));
                 var handler = blobContainer.GetBlobClient(BlobName(goodId, num));
                 using var memoryStream = new MemoryStream();
                 image.CopyTo(memoryStream);
