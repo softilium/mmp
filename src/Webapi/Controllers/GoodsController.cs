@@ -14,7 +14,7 @@ namespace Webapi.Controllers
         private readonly ApplicationDbContext db;
         private IHostEnvironment host;
 
-        private BlobContainerClient blobContainer;
+        private readonly BlobContainerClient blobContainer;
 
         private bool UseAzureBlobs => !host.IsDevelopment();
 
@@ -22,7 +22,7 @@ namespace Webapi.Controllers
         {
             db = _db;
             host = hostEnvironment;
-            if (UseAzureBlobs)
+            if (UseAzureBlobs && _blobServiceClient != null)
                 blobContainer = _blobServiceClient.GetBlobContainerClient("goodimages");
         }
 
@@ -102,7 +102,7 @@ namespace Webapi.Controllers
 
         #region images
 
-        private string BlobName(long goodId, int imgNum) => $"goodImage-{goodId}-{imgNum}";
+        private static string BlobName(long goodId, int imgNum) => $"goodImage-{goodId}-{imgNum}";
         private const string DevBlobStorageFolder = "c:\\tmp\\";
 
         [HttpGet("images/{goodId:long}/{num:int}")]

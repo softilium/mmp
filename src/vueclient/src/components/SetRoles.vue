@@ -47,6 +47,7 @@
         <th>Имя</th>
         <th>Email</th>
         <th>Админ</th>
+        <th>Telegram активен</th>
         <th>Менеджер витрин</th>
       </tr>
     </thead>
@@ -58,6 +59,7 @@
         <td>{{ u.email }}</td>
         <td> <input v-model="u.admin" type="checkbox" /></td>
         <td><input v-model="u.shopManage" type="checkbox" /></td>
+        <td><input v-model="u.telegramVerified" type="checkbox" /></td>
         <td><button class="btn btn-primary" @click="Save(u.id)">save</button></td>
       </tr>
 

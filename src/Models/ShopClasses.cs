@@ -25,7 +25,20 @@ namespace mmp.Models
     public class User : IdentityUser<long>
     {
         public bool ShopManage { get; set; }
+        
         public bool Admin { get; set; }
+        
+        [MaxLength(50)]
+        public string TelegramUserName { get; set; }
+        
+        [MaxLength(20)]
+        
+        public string TelegramCheckCode { get; set; }
+        
+        public bool TelegramVerified { get; set; }
+        
+        [NotMapped]
+        public long BotChatId { get; set; } // shows according chatId from BotChats (for profile page)
     }
 
     [Index(nameof(CreatedByID))]

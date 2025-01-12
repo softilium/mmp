@@ -7,7 +7,7 @@
   const route = useRoute()
   const router = useRouter()
 
-  const good = ref({ ownerShop: { id: 0 }, caption: "", description: "" });
+  const good = ref({ ownerShop: { id: 0 }, caption: "", description: "", article: "", url: "", price: 0 });
 
   onMounted(async () => {
     if (route.params.id) {
@@ -27,11 +27,11 @@
 
   const isImageLoading = ref(true);
   const LoadImages = async () => {
-      for (let i = 0; i < maxImagesCnt.value; i++) {
+    for (let i = 0; i < maxImagesCnt.value; i++) {
       let res = await fetch(`${authStore.rbUrl()}/api/goods/images/${route.params.id}/${i}`, { method: "GET" });
       if (res.status == 200) { // status 204 also ok but it means no image
-        res = await res.blob();
-        const src = URL.createObjectURL(res);
+        let b = await res.blob();
+        const src = URL.createObjectURL(b);
         imageSrc.value.push(src);
       }
     }
@@ -170,15 +170,16 @@
   <div class="row mb-3">
     <div class="col-1">
       <span v-for="(src, index) in imageSrc" :key="index">
-        <button :class="`${index==curImgIndex ? 'btn btn-secondary btn-sm' : 'btn btn-outline-secondary btn-sm'}`" @click="curImgIndex=index">{{index+1}}</button>&nbsp;
+        <button :class="`${index == curImgIndex ? 'btn btn-secondary btn-sm' : 'btn btn-outline-secondary btn-sm'}`"
+          @click="curImgIndex = index">{{ index + 1 }}</button>&nbsp;
       </span>
     </div>
     <div class="col">
-      <input v-if="imageSrc.length<maxImagesCnt" type="file" accept="image/*" @change="(event) => handelFileUpload(event)" />
+      <input v-if="imageSrc.length < maxImagesCnt" type="file" accept="image/*" @change="(event) => handelFileUpload(event)" />
     </div>
   </div>
 
-  <div v-if="!isImageLoading && imageSrc.length>0" class="row mb-3">
+  <div v-if="!isImageLoading && imageSrc.length > 0" class="row mb-3">
     <div class="col-1">
       <button class="btn btn-secondary btn-sm" @click="removeItem(curImgIndex)">Удалить</button>
     </div>

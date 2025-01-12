@@ -8,7 +8,7 @@
   const route = useRoute();
   const router = useRouter();
 
-  const shop = ref({ id : 0, createdByInfo : { userName: "" }});
+  const shop = ref({ id: 0, caption: "", createdByInfo: { userName: "" } });
 
   const goods = ref([]);
 
@@ -140,7 +140,7 @@
               </div>
               <div class="col-1 text-end">
                 <RouterLink v-if="isOwner" v-bind:to="`/edit-good/${shop.id}/${good.id}`">
-                  <span class="text-info" ><i class="bi bi-pencil-square" /></span>
+                  <span class="text-info"><i class="bi bi-pencil-square" /></span>
                 </RouterLink>
               </div>
             </div>
@@ -149,7 +149,7 @@
           <td v-if="authStore.userInfo.userName" class="col-2">
             <button class="btn btn-primary btn-sm" @click="Inc(good)">+</button>&nbsp;
             <span v-if="good.basked"><button class="btn btn-primary btn-sm" @click="Dec(good)">-</button>&nbsp;</span>
-            {{good.basked}}
+            {{ good.basked }}
           </td>
         </tr>
       </tbody>
