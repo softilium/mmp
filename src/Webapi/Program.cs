@@ -8,8 +8,6 @@ using Azure.Storage.Blobs;
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddEnvironmentVariables(); // azure uses env.variables for app config
 
-builder.Services.AddSingleton(x => new BlobServiceClient(builder.Configuration.GetConnectionString("StorageAccount")));
-
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 if (string.IsNullOrWhiteSpace(connectionString))
     connectionString = builder.Configuration["DefaultConnection"];
@@ -19,6 +17,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString);
     options.EnableSensitiveDataLogging(builder.Environment.IsDevelopment());
 });
+
+var storageAccountConnStr = builder.Configuration.GetConnectionString("StorageAccount");
+if (string.IsNullOrWhiteSpace(storageAccountConnStr))
+    storageAccountConnStr = builder.Configuration["StorageAccount"];
+
+builder.Services.AddSingleton(x => new BlobServiceClient(storageAccountConnStr));
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
