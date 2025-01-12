@@ -130,6 +130,7 @@ namespace Webapi.Controllers
                 if (!handler.Exists()) return NoContent();
                 using var memoryStream = new MemoryStream();
                 await handler.DownloadToAsync(memoryStream);
+                memoryStream.Position = 0;
                 return File(memoryStream.ToArray(), "image/jpeg");
             }
         }
@@ -160,6 +161,7 @@ namespace Webapi.Controllers
                 var handler = blobContainer.GetBlobClient(BlobName(goodId, num));
                 using var memoryStream = new MemoryStream();
                 image.CopyTo(memoryStream);
+                memoryStream.Position = 0;
                 await handler.UploadAsync(memoryStream);
             }
             return NoContent();
