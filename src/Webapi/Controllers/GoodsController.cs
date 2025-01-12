@@ -30,6 +30,9 @@ namespace Webapi.Controllers
                     new Uri("https://riverstores.blob.core.windows.net"),
                     new DefaultAzureCredential());
                 blobContainer = blobServiceClient.GetBlobContainerClient("goodimages");
+
+                Console.WriteLine($"storageAccountConnStr={Environment.GetEnvironmentVariable("storageAccountConnStr")}");//debug
+
             }
 
         }

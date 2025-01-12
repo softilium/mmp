@@ -22,6 +22,8 @@ var storageAccountConnStr = builder.Configuration.GetConnectionString("StorageAc
 if (string.IsNullOrWhiteSpace(storageAccountConnStr))
     storageAccountConnStr = builder.Configuration["StorageAccount"];
 
+Console.WriteLine($"storageAccountConnStr={storageAccountConnStr}");//debug
+
 builder.Services.AddSingleton(x => new BlobServiceClient(storageAccountConnStr));
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
