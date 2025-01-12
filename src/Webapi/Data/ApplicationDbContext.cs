@@ -21,6 +21,8 @@ namespace mmp.DbCtx
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderLine> OrderLines { get; set; }
 
+        public DbSet<BotChat> BotChats { get; set; }
+
         public ApplicationDbContext(
             DbContextOptions<ApplicationDbContext> options,
             IHttpContextAccessor ctx

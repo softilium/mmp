@@ -52,7 +52,7 @@ namespace mmp.Models
 
     public class Shop : BaseObject
     {
-        [MaxLength(100)] [Required] public string Caption { get; set; } = "Shop 1";
+        [MaxLength(100)][Required] public string Caption { get; set; } = "Shop 1";
     }
 
     public class Good : BaseObject
@@ -103,4 +103,16 @@ namespace mmp.Models
         [Required][Precision(15, 2)] public decimal Qty { get; set; }
         [Required][Precision(15, 2)] public decimal Sum { get; set; }
     }
+
+    public class BotChat
+    {
+        [Key]
+        [Required]
+        public long ChatId { get; set; }
+
+        [Required]
+        [MaxLength(50)]
+        public string UserName { get; set; }
+    }
+
 }
