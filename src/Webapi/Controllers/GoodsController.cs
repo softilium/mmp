@@ -22,18 +22,8 @@ namespace Webapi.Controllers
         {
             db = _db;
             host = hostEnvironment;
-
             if (UseAzureBlobs)
-            {
-                //var blobServiceClient = new BlobServiceClient(
-                //    new Uri("https://riverstores.blob.core.windows.net"),
-                //    new DefaultAzureCredential());
                 blobContainer = _blobServiceClient.GetBlobContainerClient("goodimages");
-
-                Console.WriteLine($"storageAccountConnStr={Environment.GetEnvironmentVariable("storageAccountConnStr")}");//debug
-
-            }
-
         }
 
         [HttpGet]
