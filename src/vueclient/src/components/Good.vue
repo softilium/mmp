@@ -20,6 +20,7 @@
           good.value.basked = null;
           basketSum.value = null;
           LoadBasket();
+          LoadImages();
         } else router.push("/shop/" + route.params.shopid);
       } catch (err) {
         console.log(err);
@@ -27,6 +28,23 @@
       }
     }
   });
+
+  const isImageLoading = ref(true);
+  const maxImagesCnt = ref(3);
+  const imageSrc = ref([]);
+  let curImgIndex = ref(0);
+
+  const LoadImages = async () => {
+    for (let i = 0; i < maxImagesCnt.value; i++) {
+      let res = await fetch(`${authStore.rbUrl()}/api/goods/images/${route.params.id}/${i}`, { method: "GET" });
+      if (res.status == 200) { // status 204 means no image
+        let b = await res.blob();
+        const src = URL.createObjectURL(b);
+        imageSrc.value.push(src);
+      }
+    }
+    isImageLoading.value = false;
+  }
 
   const LoadBasket = async () => {
     basketSum.value = null;
@@ -78,6 +96,7 @@
 
 <template>
   <h1>{{good.caption}}</h1>
+  <RouterLink :to="`/shop/${good.ownerShop.id}`">Витрина "{{good.ownerShop.caption}}"</RouterLink>
   <div>&nbsp;</div>
 
   <table class="table">
@@ -113,6 +132,18 @@
     </tbody>
   </table>
 
-  <RouterLink :to="`/shop/${good.ownerShop.id}`">Витрина "{{good.ownerShop.caption}}"</RouterLink>
+  <div class="row mb-3" v-if="imageSrc.length>1">
+    <div class="col">
+      <span v-for="(src, index) in imageSrc" :key="index">
+        <button :class="`${index==curImgIndex ? 'btn btn-secondary btn-sm' : 'btn btn-outline-secondary btn-sm'}`" @click="curImgIndex=index">{{index+1}}</button>&nbsp;
+      </span>
+    </div>
+  </div>
+
+  <div v-if="!isImageLoading && imageSrc.length>0" class="row mb-3">
+    <div class="col">
+      <img :src="imageSrc[curImgIndex]" class="d-block w-100">
+    </div>
+  </div>
 
 </template>

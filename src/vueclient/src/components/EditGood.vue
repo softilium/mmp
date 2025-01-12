@@ -15,16 +15,30 @@
         let res = await fetch(authStore.rbUrl() + "/api/goods/" + route.params.id);
         if (res.ok) {
           good.value = await res.json();
+          await LoadImages();
         } else router.push("/shop/" + route.params.shopid);
       } catch (err) {
         console.log(err);
         router.push("/shop/" + route.params.shopid);
       }
+
     }
   });
 
-  const Save = async () => {
+  const isImageLoading = ref(true);
+  const LoadImages = async () => {
+      for (let i = 0; i < maxImagesCnt.value; i++) {
+      let res = await fetch(`${authStore.rbUrl()}/api/goods/images/${route.params.id}/${i}`, { method: "GET" });
+      if (res.status == 200) { // status 204 also ok but it means no image
+        res = await res.blob();
+        const src = URL.createObjectURL(res);
+        imageSrc.value.push(src);
+      }
+    }
+    isImageLoading.value = false;
+  }
 
+  const Save = async () => {
     if (route.params.id) {
       let res = await fetch(authStore.rbUrl() + "/api/goods/" + route.params.id, {
         method: "PUT",
@@ -35,10 +49,34 @@
         body: JSON.stringify(good.value)
       });
       if (res.ok) {
+        for (let i = 0; i <= maxImagesCnt.value - 1; i++) {
+          if (!imageSrc.value[i]) {
+            res = await fetch(`${authStore.rbUrl()}/api/goods/images/${route.params.id}/${i}`, {
+              method: "DELETE",
+              headers: {
+                "Authorization": "Bearer " + authStore.accessToken
+              }
+            });
+            if (!res.ok) console.log(res);
+          } else {
+            let blob = await fetch(imageSrc.value[i]).then(r => r.blob()); // load image from blob url
+            let data = new FormData();
+            data.append("image", blob);
+            res = await fetch(`${authStore.rbUrl()}/api/goods/images/${route.params.id}/${i}`, {
+              method: "POST",
+              headers: {
+                "Authorization": "Bearer " + authStore.accessToken
+              },
+              body: data
+            });
+            if (!res.ok) console.log(res);
+          }
+        }
         router.push("/shop/" + route.params.shopid);
       }
 
     } else {
+      //TODO get id after post and upload images for new good
       good.value.ownerShop.id = route.params.shopid;
 
       let res = await fetch(authStore.rbUrl() + "/api/goods", {
@@ -55,10 +93,37 @@
     }
   };
 
+  //images handling
+
+  const maxImagesCnt = ref(3);
+  const imageSrc = ref([]);
+  let curImgIndex = ref(0);
+
+  const handelFileUpload = (e) => {
+    curImgIndex.value = 0;
+    var files = e.target.files || e.dataTransfer.files;
+    if (!files.length) return;
+
+    for (let i = 0; i < files.length; i++) {
+      const src = URL.createObjectURL(files[i]);
+      imageSrc.value.push(src);
+
+    }
+    curImgIndex.value = imageSrc.value.length - 1;
+  };
+
+  const removeItem = (index) => {
+    imageSrc.value.splice(index, 1);
+    curImgIndex.value = 0;
+  };
+
+
 </script>
 
 <template>
   <h1>Редактирование товара / услуги</h1>
+  <div>&nbsp;</div>
+  <button class="btn btn-primary" @click="Save">Сохранить</button>
   <div>&nbsp;</div>
 
   <div class="row mb-3">
@@ -101,5 +166,25 @@
       </div>
     </div>
   </div>
-  <button class="btn btn-primary" @click="Save">Сохранить</button>
+
+  <div class="row mb-3">
+    <div class="col-1">
+      <span v-for="(src, index) in imageSrc" :key="index">
+        <button :class="`${index==curImgIndex ? 'btn btn-secondary btn-sm' : 'btn btn-outline-secondary btn-sm'}`" @click="curImgIndex=index">{{index+1}}</button>&nbsp;
+      </span>
+    </div>
+    <div class="col">
+      <input v-if="imageSrc.length<maxImagesCnt" type="file" accept="image/*" @change="(event) => handelFileUpload(event)" />
+    </div>
+  </div>
+
+  <div v-if="!isImageLoading && imageSrc.length>0" class="row mb-3">
+    <div class="col-1">
+      <button class="btn btn-secondary btn-sm" @click="removeItem(curImgIndex)">Удалить</button>
+    </div>
+    <div class="col-11">
+      <img :src="imageSrc[curImgIndex]" class="d-block w-100">
+    </div>
+  </div>
+
 </template>

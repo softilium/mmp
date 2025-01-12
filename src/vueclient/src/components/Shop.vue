@@ -130,7 +130,7 @@
       </thead>
       <tbody>
         <tr v-for="good in goods" v-bind:key="good.id">
-          <td class="col-8">
+          <td class="col-9">
             <div class="row">
               <div class="col-11">
                 <RouterLink v-if="isOwner" v-bind:to="`/good/${good.id}`">
@@ -145,7 +145,7 @@
               </div>
             </div>
           </td>
-          <td class="col-2 text-end">{{ good.price }}</td>
+          <td class="col-1 text-end">{{ good.price }}</td>
           <td v-if="authStore.userInfo.userName" class="col-2">
             <button class="btn btn-primary btn-sm" @click="Inc(good)">+</button>&nbsp;
             <span v-if="good.basked"><button class="btn btn-primary btn-sm" @click="Dec(good)">-</button>&nbsp;</span>
