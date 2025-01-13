@@ -49,7 +49,7 @@
   const LoadBasket = async () => {
     basketSum.value = null;
     good.value.basked = null;
-    if (authStore.userInfo.userName) {
+    if (authStore.userInfo.id) {
       let res = await fetch(authStore.rbUrl() + "/api/baskets/" + good.value.ownerShop.id, {
         method: "GET",
         headers: {
@@ -101,7 +101,7 @@
 
   <table class="table">
     <tbody>
-      <tr v-if="authStore.userInfo.userName">
+      <tr v-if="authStore.userInfo.id">
         <td>В корзине</td>
         <td>
           <button class="btn btn-primary btn-sm" @click="Inc(good)">+</button>&nbsp;

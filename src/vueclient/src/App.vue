@@ -2,6 +2,9 @@
 
   import { onMounted } from 'vue';
   import { authStore } from './components/authStore.js';
+  import { useRoute } from 'vue-router'
+
+  const route = useRoute();
 
   onMounted(() => {
     authStore.SetAccessToken(localStorage.getItem("accessToken"));
@@ -17,13 +20,13 @@
     <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow.mb-3">
       <div class="container-fluid">
         <RouterLink class="btn btn-outline-secondary btn-sm" to="/">Витрины</RouterLink>&nbsp;&nbsp;
-        <span v-if="authStore.userInfo.userName">
+        <span v-if="authStore.userInfo.id">
           <RouterLink class="btn btn-outline-secondary btn-sm" to="/orders">Заказы</RouterLink>&nbsp;&nbsp;
         </span>
-        <span v-if="!authStore.userInfo.userName">
+        <span v-if="!authStore.userInfo.id">
           <RouterLink class="btn btn-outline-secondary btn-sm" to="/login">Войти</RouterLink>&nbsp;&nbsp;
         </span>
-        <span v-if="authStore.userInfo.userName">
+        <span v-if="authStore.userInfo.id">
           <RouterLink class="btn btn-info btn-sm" to="/inc-orders">Заказы для обработки</RouterLink>&nbsp;&nbsp;
         </span>
         <span v-if="authStore.userInfo.admin">
@@ -31,8 +34,8 @@
         </span>
         <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
           <ul class="navbar-nav flex-grow-1">&nbsp;</ul>
-          <span v-if="authStore.userInfo.userName">
-            <RouterLink class="btn btn-outline-secondary btn-sm" to="/profile">{{ authStore.userInfo.userName }}</RouterLink>&nbsp;&nbsp;
+          <span v-if="authStore.userInfo.id">
+            <RouterLink class="btn btn-outline-secondary btn-sm" to="/myprofile">{{ authStore.userInfo.userName }}</RouterLink>&nbsp;&nbsp;
           </span>
         </div>
       </div>
@@ -41,7 +44,8 @@
 
   <br />
   <div class="container-fluid">
-    <RouterView />
+    <RouterView :key="route.fullPath" />
+
   </div>
 
   <br />

@@ -58,7 +58,7 @@
         });
       if (res.ok) {
         user.value = await res.json();
-        me.value = !route.params.id || authStore.userInfo.userName == user.value.userName;
+        me.value = !route.params.id;
       }
     }
     else {

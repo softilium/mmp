@@ -26,7 +26,7 @@ const routes = [
   { path: '/checkout/:shopid', component: CheckOut },
   { path: '/orders', component: Orders },
   { path: '/order/:id', component: Order },
-  { path: '/profile', component: Profile },
+  { path: '/myprofile', component: Profile },
   { path: '/profile/:id', component: Profile },
   { path: '/set-roles', component: SetRoles },
   { path: '/inc-orders', component: IncOrders },

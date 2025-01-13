@@ -1,10 +1,15 @@
 import { reactive } from 'vue'
 
+function newUserInfo() {
+  return { userName: null, shopManage: false, admin: false, id: 0 }
+}
+
 export const authStore = reactive({
 
   rbUrl: () => import.meta.env.VITE_API_URL,
 
-  userInfo: { userName: null, shopManage: false, admin: false },
+
+  userInfo: newUserInfo(),
   accessToken: "",
   refreshToken: "",
 
@@ -98,7 +103,7 @@ export const authStore = reactive({
       headers: { "Content-Type": "application/json" }
     });
     if (response.ok) {
-      this.userInfo = { userName: null };
+      this.userInfo = newUserInfo();
       this.SetAccessToken("");
       this.SetRefreshToken("");
       await this.CheckLogged();

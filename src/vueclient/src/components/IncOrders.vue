@@ -3,6 +3,7 @@
   import { onMounted, ref } from 'vue';
   import { authStore } from './authStore.js';
   import { glob } from './globals.js';
+  import ProfileLink from './ProfileLink.vue';
 
 
   const orders = ref([]);
@@ -81,7 +82,7 @@
       </thead>
       <tr v-for="order in orders" :key="order.id">
         <td><RouterLink :to="`/order/${order.id}`">{{ order.shop.caption }}</RouterLink></td>
-        <td><RouterLink :to="`/order/${order.id}`">{{ order.createdByInfo.userName }}</RouterLink></td>
+        <td><ProfileLink :userInfo="order.createdByInfo"></ProfileLink></td>
         <td><RouterLink :to="`/order/${order.id}`">{{ statuses[order.status] }}</RouterLink></td>
         <td><RouterLink :to="`/order/${order.id}`">{{ glob.fmtDate(order.createdOn) }}</RouterLink></td>
         <td class="text-end"><RouterLink :to="`/order/${order.id}`">{{ order.sum }}</RouterLink></td>

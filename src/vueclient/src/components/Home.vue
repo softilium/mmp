@@ -3,6 +3,7 @@
 
   import { onMounted, ref } from 'vue';
   import { authStore } from './authStore.js';
+  import ProfileLink from './ProfileLink.vue';
 
   let shops = ref([]);
 
@@ -37,18 +38,18 @@
                 <RouterLink v-bind:to="`/shop/${item.id}`">{{ item.caption }}</RouterLink>
               </div>
               <div class="col-1 text-end">
-                <RouterLink v-if="authStore.userInfo.shopManage && item.createdByInfo.userName==authStore.userInfo.userName" v-bind:to="`/edit-shop/${item.id}`">
+                <RouterLink v-if="authStore.userInfo.shopManage && item.createdByInfo.id==authStore.userInfo.id" v-bind:to="`/edit-shop/${item.id}`">
                   <span class="text-info"><i class="bi bi-pencil-square" /></span>
                 </RouterLink>
               </div>
             </div>
           </td>
-          <td class="col-2">{{ item.createdByInfo.userName }}</td>
+          <td class="col-2"><ProfileLink :userInfo="item.createdByInfo"></ProfileLink></td>
         </tr>
       </tbody>
     </table>
   </div>
   <br />
-  <button class="btn btn-info" v-if="authStore.userInfo.userName && authStore.userInfo.shopManage" @click="$router.push('/edit-shop');">Добавить витрину</button>
+  <button class="btn btn-info" v-if="authStore.userInfo.id && authStore.userInfo.shopManage" @click="$router.push('/edit-shop');">Добавить витрину</button>
 
 </template>

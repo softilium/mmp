@@ -20,7 +20,7 @@
       let res = await fetch(authStore.rbUrl() + "/api/shops/" + route.params.shopid);
       if (res.ok) {
         shop.value = await res.json();
-        isOwner.value = shop.value.createdByInfo.userName == authStore.userInfo.userName;
+        isOwner.value = shop.value.createdByInfo.id == authStore.userInfo.id;
       } else router.push("/");
     } catch (err) {
       console.log(err);

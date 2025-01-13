@@ -13,12 +13,15 @@ namespace mmp.Models
         public bool ShopManage { get; set; }
         public bool Admin { get; set; }
 
+        public long Id { get; set; }
+
         public UserInfo(User src)
         {
             ArgumentNullException.ThrowIfNull(src);
             UserName = src.UserName ?? "";
             ShopManage = src.ShopManage;
             Admin = src.Admin;
+            Id = src.Id;
         }
     }
 

@@ -30,7 +30,7 @@
 
   const Save = async () => {
 
-    if (!authStore.userInfo.userName) return;
+    if (!authStore.userInfo.id) return;
 
     if (shopId == null)
       try {

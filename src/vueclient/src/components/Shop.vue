@@ -8,7 +8,7 @@
   const route = useRoute();
   const router = useRouter();
 
-  const shop = ref({ id: 0, caption: "", createdByInfo: { userName: "" } });
+  const shop = ref({ id: 0, caption: "", createdByInfo: { id: 0 } });
 
   const goods = ref([]);
 
@@ -20,7 +20,7 @@
       let res = await fetch(authStore.rbUrl() + "/api/shops/" + route.params.id);
       if (res.ok) {
         shop.value = await res.json();
-        isOwner.value = shop.value.createdByInfo.userName == authStore.userInfo.userName && authStore.userInfo.shopManage;
+        isOwner.value = shop.value.createdByInfo.id == authStore.userInfo.id && authStore.userInfo.shopManage;
       } else router.push("/");
     } catch (err) {
       console.log(err);
@@ -43,7 +43,7 @@
   const basketSum = ref(0);
 
   const LoadBasket = async () => {
-    if (authStore.userInfo.userName) {
+    if (authStore.userInfo.id) {
 
       try {
 
@@ -143,7 +143,7 @@
             </div>
           </td>
           <td class="col-1 text-end">{{ good.price }}</td>
-          <td v-if="authStore.userInfo.userName" class="col-2">
+          <td v-if="authStore.userInfo.id" class="col-2">
             <button class="btn btn-primary btn-sm" @click="Inc(good)">+</button>&nbsp;
             <span v-if="good.basked"><button class="btn btn-primary btn-sm" @click="Dec(good)">-</button>&nbsp;</span>
             {{ good.basked }}
