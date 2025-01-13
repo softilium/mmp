@@ -133,10 +133,7 @@
           <td class="col-9">
             <div class="row">
               <div class="col-11">
-                <RouterLink v-if="isOwner" v-bind:to="`/good/${good.id}`">
-                  {{ good.caption }}
-                </RouterLink>
-
+                <RouterLink v-bind:to="`/good/${good.id}`"> {{ good.caption }} </RouterLink>
               </div>
               <div class="col-1 text-end">
                 <RouterLink v-if="isOwner" v-bind:to="`/edit-good/${shop.id}/${good.id}`">

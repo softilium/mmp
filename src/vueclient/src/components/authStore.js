@@ -1,8 +1,9 @@
 import { reactive } from 'vue'
 
 export const authStore = reactive({
-  //rbUrl: () => "http://localhost:5078",
-  rbUrl: () => "https://riverstores-ckbhckgxhkbwbkgz.polandcentral-01.azurewebsites.net",
+
+  rbUrl: () => import.meta.env.VITE_API_URL,
+
   userInfo: { userName: null, shopManage: false, admin: false },
   accessToken: "",
   refreshToken: "",
