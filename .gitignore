@@ -366,3 +366,7 @@ FodyWeavers.xsd
 
 .env
 /src/appsettings.Development.json
+/devops/database-backup-azure-postres.cmd
+/devops/rsdata.rar
+/src/vueclient/.env.development
+/src/vueclient/.env.production
