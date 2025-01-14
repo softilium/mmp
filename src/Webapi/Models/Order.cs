@@ -58,20 +58,14 @@ namespace mmp.Data
                 var clientUser = UserCache.FindUserInfo(CreatedByID, db);
                 if (!clientUser.TelegramVerified)
                 {
-                    //todo notify sender that receives isn't notified!
+                    var senderUser = UserCache.FindUserInfo(Shop.CreatedByID, db);
+                    db.NotifyAfterSave(senderUser.BotChatId, $"Заказчик {clientUser.UserName} для заказа {ID} от {CreatedOn:g} не получает уведомления, не настроена интеграция с Телеграм");
                     return;
                 }
                 else
                 {
-                    var clientChat = db.BotChats.FirstOrDefault(_ => _.UserName == clientUser.UserName);
-                    if (clientChat == null)
-                    {
-                        //TODO notify admin here: $"Unable to find chat for user {clientUser.UserName}"
-                        return;
-                    }
-
                     if (Status != oldStatus)
-                        db.AddMessage(clientChat.ChatId, $"Статус вашего заказа {ID} от {CreatedOn:g} изменился с [{oldStatus.GetEnumDescription()}] на [{Status.GetEnumDescription()}]");
+                        db.NotifyAfterSave(clientUser.BotChatId, $"Статус вашего заказа {ID} от {CreatedOn:g} изменился с [{oldStatus.GetEnumDescription()}] на [{Status.GetEnumDescription()}]");
                 }
             }
         }

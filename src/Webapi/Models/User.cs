@@ -10,8 +10,8 @@ namespace mmp.Data
         public string UserName { get; set; }
         public bool ShopManage { get; set; }
         public bool Admin { get; set; }
-        public bool TelegramVerified { get; set; }    
-
+        public bool TelegramVerified { get; set; }
+        public long BotChatId { get; set; }
         public long Id { get; set; }
 
         public UserInfo(User src)
@@ -22,6 +22,7 @@ namespace mmp.Data
             Admin = src.Admin;
             Id = src.Id;
             TelegramVerified = src.TelegramVerified;
+            BotChatId = src.BotChatId;
         }
     }
 

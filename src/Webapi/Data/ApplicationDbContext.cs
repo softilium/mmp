@@ -7,20 +7,35 @@ namespace mmp.Data
 {
     public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<long>, long>
     {
-        #region Messages for telegram bot
-        private readonly Dictionary<long, List<string>> messages = [];
-        public void AddMessage(long chatId, string message)
+
+        private List<long> adminChatIds = null;
+
+        #region NotifyAfterSave
+        private readonly Dictionary<long, List<string>> afterSaveNotifies = [];
+        public void NotifyAfterSave(long chatId, string message)
         {
-            if (!messages.TryGetValue(chatId, out List<string>? value))
+            if (!afterSaveNotifies.TryGetValue(chatId, out List<string>? value))
             {
                 value = [];
-                messages.Add(chatId, value);
+                afterSaveNotifies.Add(chatId, value);
             }
             value.Add(message);
         }
-        public void ClearMessages()
+
+        public void NotifyAdminsAfterSave(string message)
         {
-            messages.Clear();
+            if (adminChatIds == null)
+            {
+                var allAdmins = Users.Where(_ => _.Admin && _.TelegramVerified).Select(_ => _.TelegramUserName);
+                adminChatIds = BotChats.Where(_ => allAdmins.Contains(_.UserName)).Select(_ => _.ChatId).ToList();
+            }
+            foreach (var chatId in adminChatIds)
+                NotifyAfterSave(chatId, $"АДМ.СООБЩЕНИЕ:\n\r{message}");
+        }
+
+        public void ClearAfterSaveNotifies()
+        {
+            afterSaveNotifies.Clear();
         }
         #endregion
 
@@ -90,9 +105,9 @@ namespace mmp.Data
 
             SavedChanges += (s, e) =>
             {
-                foreach (var kp in messages)
+                foreach (var kp in afterSaveNotifies)
                     _bot.SendMessage(kp.Key, string.Join("\n\r", kp.Value.ToArray()));
-                ClearMessages();
+                ClearAfterSaveNotifies();
             };
         }
 
