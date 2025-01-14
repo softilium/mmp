@@ -40,6 +40,25 @@ namespace Webapi.Controllers
             return res;
         }
 
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Order>> GetOrder(long id)
+        {
+            var cu = db.CurrentUser();
+            if (cu == null) return Unauthorized();
+
+            var order = await db.Orders
+                .Include(_ => _.Shop)
+                .Include(_ => _.Lines)
+                    .ThenInclude(_ => _.Good)
+                .FirstOrDefaultAsync(_ => _.ID == id && !_.IsDeleted);
+            if (order == null) return NotFound();
+
+            if (order.CreatedByID != cu.Id && order.Shop.CreatedByID != cu.Id) return Unauthorized();
+
+            return order;
+        }
+
+
         [HttpGet("outbox")]
         [Authorize]
         public async Task<ActionResult<IEnumerable<Order>>> GetOrders([FromQuery] int showAll)
@@ -57,38 +76,31 @@ namespace Webapi.Controllers
             return r;
         }
 
-        [HttpGet("outbox/{id}")]
-        public async Task<ActionResult<Order>> GetOrder(long id)
+        [HttpPut("outbox/{id:long}")]
+        [Authorize]
+        public async Task<IActionResult> PutCustomerOrder(long id, Order order)
         {
             var cu = db.CurrentUser();
             if (cu == null) return Unauthorized();
 
-            var order = await db.Orders
-                .Include(_ => _.Shop)
-                .Include(_ => _.Lines)
-                    .ThenInclude(_ => _.Good)
-                .FirstOrDefaultAsync(_ => _.ID == id && !_.IsDeleted && _.CreatedByID == cu.Id);
-            if (order == null) return NotFound();
+            var dborder = db.Orders.Include(_ => _.Shop).FirstOrDefault(_ => _.ID == id);
+            if (dborder == null) return NotFound();
 
-            return order;
-        }
+            if (order.CreatedByID != cu.Id) return Unauthorized();
 
-        [HttpPut("outbox/{id}")]
-        [Authorize]
-        public async Task<IActionResult> PutOrder(long id, Order order)
-        {
-            var dborder = await GetOrder(id);
-            if (dborder.Value == null) return NotFound();
+            dborder.CustomerComment = order.CustomerComment;
 
-            dborder.Value.Status = order.Status;
             await db.SaveChangesAsync();
             return NoContent();
         }
 
         [HttpPost("outbox/{shopid:long}")]
         [Authorize]
-        public async Task<ActionResult<Order>> PostOrder([FromRoute] long shopId)
+        public async Task<ActionResult<Order>> PostCustomerOrder([FromRoute] long shopId)
         {
+            using StreamReader reader = new(Request.Body, leaveOpen: true);
+            string customerComment = await reader.ReadToEndAsync();
+
             var cu = db.CurrentUser();
             if (cu == null) return Unauthorized();
 
@@ -103,7 +115,8 @@ namespace Webapi.Controllers
                 Shop = shop,
                 Status = OrderStatuses.New,
                 Qty = lines.Sum(_ => _.Qty),
-                Sum = lines.Sum(_ => _.Sum)
+                Sum = lines.Sum(_ => _.Sum),
+                CustomerComment = customerComment
             };
             db.Orders.Add(dborder);
             foreach (var line in lines) line.Order = dborder;
@@ -112,16 +125,14 @@ namespace Webapi.Controllers
             return CreatedAtAction("GetOrder", new { id = dborder.ID }, dborder);
         }
 
-
-
         [HttpGet("inbox")]
         [Authorize]
-        public async Task<ActionResult<IEnumerable<Order>>> GetIncOrders([FromQuery] int showAll)
+        public async Task<ActionResult<IEnumerable<Order>>> GetSenderOrders([FromQuery] int showAll)
         {
             var cu = db.CurrentUser();
             if (cu == null) return Unauthorized();
 
-            var myshops = db.Shops.Where(_ => !_.IsDeleted && _.CreatedByID == cu.Id).Select(_=>_.ID).ToList();
+            var myshops = db.Shops.Where(_ => !_.IsDeleted && _.CreatedByID == cu.Id).Select(_ => _.ID).ToList();
 
             var r = await db.Orders
                 .Where(_ => !_.IsDeleted && myshops.Contains(_.Shop.ID))
@@ -137,25 +148,25 @@ namespace Webapi.Controllers
             return r;
         }
 
-        [HttpPut("inbox")]
+        [HttpPut("inbox/{id:long}")]
         [Authorize]
-        public async Task<ActionResult<IEnumerable<Order>>> SetNewStatus([FromQuery] long orderid, [FromQuery] int newstatus)
+        public async Task<ActionResult<IEnumerable<Order>>> PutSenderOrder(long id, Order order)
         {
             var cu = db.CurrentUser();
             if (cu == null) return Unauthorized();
 
-            var order = db.Orders.FirstOrDefault(_ => _.ID == orderid);
-            if (order == null) return NotFound();
+            var dborder = db.Orders.Include(_=>_.Shop).FirstOrDefault(_ => _.ID == id);
+            if (dborder == null) return NotFound();
 
-            if (order.CreatedByID != cu.Id) return Unauthorized();
+            if (cu.Id != order.Shop.CreatedByID) return Unauthorized();
 
-            order.Status = (OrderStatuses)newstatus;
+            dborder.Status = order.Status;
+            dborder.SenderComment = order.SenderComment;
+            dborder.ExpectedDeliveryDate = order.ExpectedDeliveryDate;
 
             await db.SaveChangesAsync();
 
             return NoContent();
         }
-
-
     }
 }

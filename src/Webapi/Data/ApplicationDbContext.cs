@@ -7,8 +7,7 @@ namespace mmp.Data
 {
     public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<long>, long>
     {
-
-        private List<long> adminChatIds = null;
+        private List<long>? adminChatIds = null;
 
         #region NotifyAfterSave
         private readonly Dictionary<long, List<string>> afterSaveNotifies = [];

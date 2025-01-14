@@ -370,3 +370,4 @@ FodyWeavers.xsd
 /devops/rsdata.rar
 /src/vueclient/.env.development
 /src/vueclient/.env.production
+/devops/backup.sql

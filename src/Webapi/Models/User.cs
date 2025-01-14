@@ -33,16 +33,16 @@ namespace mmp.Data
         public bool Admin { get; set; }
 
         [MaxLength(50)]
-        public string TelegramUserName { get; set; }
+        public string TelegramUserName { get; set; } = "";
 
         [MaxLength(20)]
 
-        public string TelegramCheckCode { get; set; }
+        public string TelegramCheckCode { get; set; } = "";
 
-        public bool TelegramVerified { get; set; }
+        public bool TelegramVerified { get; set; } = false;
 
         [NotMapped]
-        public long BotChatId { get; set; } // shows according chatId from BotChats (for profile page)
+        public long BotChatId { get; set; } = 0; // shows according chatId from BotChats (for profile page)
     }
 
     public static class UserCache

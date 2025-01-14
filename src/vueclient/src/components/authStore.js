@@ -8,7 +8,6 @@ export const authStore = reactive({
 
   rbUrl: () => import.meta.env.VITE_API_URL,
 
-
   userInfo: newUserInfo(),
   accessToken: "",
   refreshToken: "",

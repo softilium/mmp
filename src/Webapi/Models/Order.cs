@@ -43,6 +43,14 @@ namespace mmp.Data
         [Precision(15, 2)]
         public decimal Sum { get; set; }
 
+        [MaxLength(200)]
+        public string? SenderComment { get; set; }
+        
+        [MaxLength(200)]
+        public string? CustomerComment { get; set; }
+
+        public DateTime? ExpectedDeliveryDate { get; set; }
+
         public ICollection<OrderLine> Lines { get; set; } = [];
 
         public override void BeforeSave(ApplicationDbContext db, Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry entity)

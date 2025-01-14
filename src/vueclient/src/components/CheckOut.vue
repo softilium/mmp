@@ -13,6 +13,7 @@
   const basket = ref([]);
   const qtyTotal = ref(0);
   const sumTotal = ref(0);
+  const customerComment = ref("");
 
   onMounted(async () => {
 
@@ -55,7 +56,8 @@
       headers: {
         "Content-Type": "application/json",
         "Authorization": "Bearer " + authStore.accessToken
-      }
+      },
+      body: customerComment.value
     });
     if (res.ok) {
       router.push("/orders");
@@ -93,6 +95,15 @@
       </tr>
     </tfoot>
   </table>
+
+  <div class="row mb-3">
+    <div class="form-group form-group-sm row">
+      <label class="col-3 form-label">Примечание к заказу</label>
+      <div class="col-9">
+        <textarea class="form-control" v-model="customerComment" rows="5" />
+      </div>
+    </div>
+  </div>
 
   <div class="row mb-3">
     <button class="btn btn-primary" @click="Checkout()">Оформить заказ</button>

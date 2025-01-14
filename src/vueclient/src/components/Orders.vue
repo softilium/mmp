@@ -43,7 +43,7 @@
   <input v-model="showAll" type="checkbox" @change="Load();" />
 
   <div class="row">
-    <table class="table table-sm">
+    <table class="table table-hover">
       <thead class="table-primary">
         <tr>
           <th class="col-3">Витрина</th>
@@ -54,11 +54,21 @@
         </tr>
       </thead>
       <tr v-for="order in orders" v-bind:key="order.id">
-        <td><RouterLink :to="`/order/${order.id}`">{{ order.shop.caption }}</RouterLink></td>
-        <td><ProfileLink :userInfo="order.shop.createdByInfo"></ProfileLink></td>
-        <td><RouterLink :to="`/order/${order.id}`">{{ statuses[order.status] }}</RouterLink></td>
-        <td><RouterLink :to="`/order/${order.id}`">{{ glob.fmtDate(order.createdOn) }}</RouterLink></td>
-        <td class="text-end"><RouterLink :to="`/order/${order.id}`">{{ order.sum }}</RouterLink></td>
+        <td>
+          <RouterLink :to="`/order/${order.id}`">{{ order.shop.caption }}</RouterLink>
+        </td>
+        <td>
+          <RouterLink :to="`/order/${order.id}`">{{ order.shop.createdByInfo.userName }} </RouterLink>
+        </td>
+        <td>
+          <RouterLink :to="`/order/${order.id}`">{{ statuses[order.status] }}</RouterLink>
+        </td>
+        <td>
+          <RouterLink :to="`/order/${order.id}`">{{ glob.fmtDate(order.createdOn) }}</RouterLink>
+        </td>
+        <td class="text-end">
+          <RouterLink :to="`/order/${order.id}`">{{ order.sum }}</RouterLink>
+        </td>
       </tr>
     </table>
   </div>

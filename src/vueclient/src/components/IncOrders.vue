@@ -5,11 +5,9 @@
   import { glob } from './globals.js';
   import ProfileLink from './ProfileLink.vue';
 
-
   const orders = ref([]);
-  const statuses = ref([]);
-
   const showAll = ref(false);
+  const statuses = ref([]);
 
   const Load = async () => {
 
@@ -30,34 +28,12 @@
   }
 
   onMounted(async () => {
-
     let res = await fetch(authStore.rbUrl() + "/api/orders/statuses");
     if (res.ok) {
       statuses.value = await res.json();
     }
-
     Load();
-
   });
-
-  const Save = async () => {
-    orders.value.forEach((order) => {
-      if (order.newStatus) {
-        try {
-          fetch(`${authStore.rbUrl()}/api/orders/inbox?orderid=${order.id}&newstatus=${order.newStatus}`,
-            {
-              method: "PUT",
-              headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer " + authStore.accessToken
-              }
-            });
-        } catch (err) { console.log(err); }
-      }
-    });
-    window.location.reload();
-    Load();
-  }
 
 </script>
 
@@ -77,27 +53,26 @@
           <th class="col-2">Статус</th>
           <th class="col-2">Создано</th>
           <th class="col-2 text-end">Сумма</th>
-          <th class="col-2">Новый статус</th>
         </tr>
       </thead>
       <tr v-for="order in orders" :key="order.id">
-        <td><RouterLink :to="`/order/${order.id}`">{{ order.shop.caption }}</RouterLink></td>
-        <td><ProfileLink :userInfo="order.createdByInfo"></ProfileLink></td>
-        <td><RouterLink :to="`/order/${order.id}`">{{ statuses[order.status] }}</RouterLink></td>
-        <td><RouterLink :to="`/order/${order.id}`">{{ glob.fmtDate(order.createdOn) }}</RouterLink></td>
-        <td class="text-end"><RouterLink :to="`/order/${order.id}`">{{ order.sum }}</RouterLink></td>
         <td>
-          <select class="form-select form-control-sm" v-model="order.newStatus">
-            <option></option>
-            <template v-for="(value,key) in statuses">
-              <option v-if="key != order.status" v-bind:value="key">{{ value }}</option>
-            </template>
-          </select>
+          <RouterLink :to="`/order/${order.id}`">{{ order.shop.caption }}</RouterLink>
+        </td>
+        <td>
+          <RouterLink :to="`/order/${order.id}`">{{ order.shop.createdByInfo.userName }}</RouterLink>
+        </td>
+        <td>
+          <RouterLink :to="`/order/${order.id}`">{{ statuses[order.status] }}</RouterLink>
+        </td>
+        <td>
+          <RouterLink :to="`/order/${order.id}`">{{ glob.fmtDate(order.createdOn) }}</RouterLink>
+        </td>
+        <td class="text-end">
+          <RouterLink :to="`/order/${order.id}`">{{ order.sum }}</RouterLink>
         </td>
       </tr>
     </table>
   </div>
-
-  <button class="btn btn-primary" @click="Save">Сохранить</button>
 
 </template>

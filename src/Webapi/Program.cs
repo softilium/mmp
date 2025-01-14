@@ -36,7 +36,7 @@ builder.Configuration.AddEnvironmentVariables(); // azure uses env.variables for
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
-var TelegramBotAPIKEY = builder.Configuration["TelegramBotAPIKEY"];
+var TelegramBotAPIKEY = builder.Configuration["TelegramBotAPIKEY"] ?? "";
 
 builder.Services.AddSingleton(x => new TelegramBotClient(TelegramBotAPIKEY));
 
