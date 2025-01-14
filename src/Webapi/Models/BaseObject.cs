@@ -7,32 +7,32 @@ namespace mmp.Models
     [Index(nameof(CreatedByID))]
     public abstract class BaseObject
     {
-        [Key] 
+        [Key]
         public long ID { get; set; }
 
         [Required]
         public long CreatedByID { get; set; }
-        
-        [NotMapped] 
+
+        [NotMapped]
         public UserInfo? CreatedByInfo { get; set; }
-        
-        [Required] 
+
+        [Required]
         public DateTime CreatedOn { get; set; }
 
         public long? ModifiedByID { get; set; }
-        
-        [NotMapped] 
+
+        [NotMapped]
         public UserInfo? User { get; set; }
         public DateTime ModifiedOn { get; set; }
 
         public bool IsDeleted { get; set; } = false;
         public long? DeletedByID { get; set; }
-        
-        [NotMapped] 
+
+        [NotMapped]
         public UserInfo? DeletedByInfo { get; set; }
         public DateTime? DeletedOn { get; set; }
 
-        public void BeforeSave() { }
-        public void AfterSave() { }
+        public virtual void BeforeSave(Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry entity) { }
+        public virtual void AfterSave(Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry entity) { }
     }
 }

@@ -20,14 +20,9 @@ namespace mmp.DbCtx
         public DbSet<Good> Goods { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderLine> OrderLines { get; set; }
-
         public DbSet<BotChat> BotChats { get; set; }
 
-        public ApplicationDbContext(
-            DbContextOptions<ApplicationDbContext> options,
-            IHttpContextAccessor ctx
-        )
-            : base(options)
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IHttpContextAccessor ctx) : base(options)
         {
             _ctx = ctx;
             SavingChanges += (s, e) =>
@@ -45,17 +40,18 @@ namespace mmp.DbCtx
                     if (q.Entity is User userEntity && (q.State == EntityState.Added))
                         if (!Users.Any()) userEntity.Admin = true;
             };
+
             SavingChanges += (s, e) =>
             {
                 var currentUser = CurrentUser();
-                if (currentUser != null)
+                foreach (var q in ChangeTracker.Entries())
                 {
-                    foreach (var q in ChangeTracker.Entries())
+                    if (q.Entity is BaseObject baseObj && (q.State == EntityState.Added || q.State == EntityState.Modified))
                     {
-                        if (q.Entity is BaseObject baseObj && (q.State == EntityState.Added || q.State == EntityState.Modified))
-                        {
-                            baseObj.BeforeSave();
+                        baseObj.BeforeSave(q);
 
+                        if (currentUser != null)
+                        {
                             if (q.State == EntityState.Added)
                             {
                                 baseObj.CreatedOn = DateTime.Now;
@@ -73,6 +69,15 @@ namespace mmp.DbCtx
                             }
                         }
                     }
+                }
+            };
+
+            SavedChanges += (s, e) =>
+            {
+                foreach (var q in ChangeTracker.Entries())
+                {
+                    if (q.Entity is BaseObject baseObj && (q.State == EntityState.Added || q.State == EntityState.Modified))
+                        baseObj.AfterSave(q);
                 }
             };
         }
