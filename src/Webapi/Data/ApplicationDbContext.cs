@@ -83,35 +83,4 @@ namespace mmp.DbCtx
         }
     }
 
-    public static class UserCache
-    {
-
-        private static Lock lck = new();
-
-        private static Dictionary<long, UserInfo> loaded = [];
-
-        public static void Clear()
-        {
-            lock (lck) loaded.Clear();
-        }
-        public static UserInfo FindUserInfo(long id, ApplicationDbContext db)
-        {
-            lock (lck)
-            {
-                if (loaded == null || loaded.Count == 0 || !loaded.ContainsKey(id))
-                    loaded = db.Users.ToDictionary(k => k.Id, v => new UserInfo(v));
-
-                if (!loaded.TryGetValue(id, out UserInfo? value))
-                    throw new Exception($"Unable to find user with id={id}");
-
-                return value;
-            }
-        }
-
-        public static void LoadCreatedBy(BaseObject obj, ApplicationDbContext db)
-        {
-            obj.CreatedByInfo = FindUserInfo(obj.CreatedByID, db);
-        }
-    }
-
 }

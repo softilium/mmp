@@ -33,5 +33,6 @@ namespace mmp.Models
         public DateTime? DeletedOn { get; set; }
 
         public void BeforeSave() { }
+        public void AfterSave() { }
     }
 }
