@@ -83,8 +83,11 @@ if (!string.IsNullOrEmpty(TelegramBotAPIKEY))
 {
     var bot = new TelegramBotClient(TelegramBotAPIKEY);
     var me = await bot.GetMe();
-    bot.OnMessage += OnMessage;
 
+    if (!app.Environment.IsDevelopment())
+        bot.OnMessage += OnMessage;
+
+    // associate users with chatIds
     async Task OnMessage(Telegram.Bot.Types.Message msg, UpdateType type)
     {
         if (msg == null || msg.From == null || msg.From.Username == null) return;
