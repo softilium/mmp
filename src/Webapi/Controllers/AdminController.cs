@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using mmp.DbCtx;
-using mmp.Models;
 
 namespace Webapi.Controllers
 {
@@ -17,7 +16,7 @@ namespace Webapi.Controllers
         }
 
         [HttpGet("allusers")]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        public async Task<ActionResult<IEnumerable<mmp.Models.User>>> GetUsers()
         {
             var cu = db.CurrentUser();
             if (cu == null || !cu.Admin) return Unauthorized();
@@ -26,7 +25,7 @@ namespace Webapi.Controllers
         }
 
         [HttpPut("allusers/{id}")]
-        public async Task<IActionResult> PutUser(long id, User user)
+        public async Task<IActionResult> PutUser(long id, mmp.Models.User user)
         {
             var cu = db.CurrentUser();
             if (cu == null || !cu.Admin) return Unauthorized();
