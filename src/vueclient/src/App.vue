@@ -21,23 +21,21 @@
       <div class="container-fluid">
         <RouterLink class="btn btn-outline-secondary btn-sm" to="/">Витрины</RouterLink>&nbsp;&nbsp;
         <span v-if="authStore.userInfo.id">
-          <RouterLink class="btn btn-outline-secondary btn-sm" to="/orders">Заказы</RouterLink>&nbsp;&nbsp;
+          <RouterLink class="btn btn-outline-secondary btn-sm" to="/orders">Заказы</RouterLink>&nbsp;
         </span>
         <span v-if="!authStore.userInfo.id">
-          <RouterLink class="btn btn-outline-secondary btn-sm" to="/login">Войти</RouterLink>&nbsp;&nbsp;
+          <RouterLink class="btn btn-outline-secondary btn-sm" to="/login">Войти</RouterLink>&nbsp;
         </span>
         <span v-if="authStore.userInfo.id">
-          <RouterLink class="btn btn-info btn-sm" to="/inc-orders">Заказы для обработки</RouterLink>&nbsp;&nbsp;
+          <RouterLink class="btn btn-info btn-sm" to="/inc-orders">Заказы для обработки</RouterLink>&nbsp;
         </span>
         <span v-if="authStore.userInfo.admin">
-          <RouterLink class="btn btn-info btn-sm" to="/set-roles">admin</RouterLink>
+          <RouterLink class="btn btn-info btn-sm" to="/set-roles">admin</RouterLink>&nbsp;
         </span>
-        <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-          <ul class="navbar-nav flex-grow-1">&nbsp;</ul>
-          <span v-if="authStore.userInfo.id">
-            <RouterLink class="btn btn-outline-secondary btn-sm" to="/myprofile">{{ authStore.userInfo.userName }}</RouterLink>&nbsp;&nbsp;
-          </span>
-        </div>
+        <ul class="navbar-nav flex-grow-1">&nbsp;</ul>
+        <span v-if="authStore.userInfo.id">
+          <RouterLink class="btn btn-outline-secondary btn-sm" to="/myprofile">{{ authStore.userInfo.userName }}</RouterLink>&nbsp;
+        </span>
       </div>
     </nav>
   </header>
@@ -45,7 +43,6 @@
   <br />
   <div class="container-fluid">
     <RouterView :key="route.fullPath" />
-
   </div>
 
   <br />
