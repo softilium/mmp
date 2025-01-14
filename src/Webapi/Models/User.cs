@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
-using mmp.DbCtx;
 
-namespace mmp.Models
+namespace mmp.Data
 {
     // User's projection for frontend
     public class UserInfo
@@ -11,6 +10,7 @@ namespace mmp.Models
         public string UserName { get; set; }
         public bool ShopManage { get; set; }
         public bool Admin { get; set; }
+        public bool TelegramVerified { get; set; }    
 
         public long Id { get; set; }
 
@@ -21,6 +21,7 @@ namespace mmp.Models
             ShopManage = src.ShopManage;
             Admin = src.Admin;
             Id = src.Id;
+            TelegramVerified = src.TelegramVerified;
         }
     }
 

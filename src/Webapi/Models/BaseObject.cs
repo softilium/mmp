@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
-namespace mmp.Models
+namespace mmp.Data
 {
     [Index(nameof(CreatedByID))]
     public abstract class BaseObject
@@ -32,7 +32,6 @@ namespace mmp.Models
         public UserInfo? DeletedByInfo { get; set; }
         public DateTime? DeletedOn { get; set; }
 
-        public virtual void BeforeSave(Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry entity) { }
-        public virtual void AfterSave(Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry entity) { }
+        public virtual void BeforeSave(ApplicationDbContext db, Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry entity) { }
     }
 }

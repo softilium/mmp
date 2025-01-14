@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
-namespace mmp.Models
+namespace mmp.Data
 {
     public class Good : BaseObject
     {

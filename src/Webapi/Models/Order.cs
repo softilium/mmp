@@ -1,8 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using Webapi.Controllers;
 
-namespace mmp.Models
+namespace mmp.Data
 {
     public enum OrderStatuses : int
     {
@@ -28,41 +29,72 @@ namespace mmp.Models
     public class Order : BaseObject
     {
         [Required]
-        [DeleteBehavior(DeleteBehavior.Restrict)] 
+        [DeleteBehavior(DeleteBehavior.Restrict)]
         public Shop Shop { get; set; }
 
-        [Required] 
+        [Required]
         public OrderStatuses Status { get; set; }
 
         [Required]
-        [Precision(15, 2)] 
+        [Precision(15, 2)]
         public decimal Qty { get; set; }
 
         [Required]
-        [Precision(15, 2)] 
+        [Precision(15, 2)]
         public decimal Sum { get; set; }
 
         public ICollection<OrderLine> Lines { get; set; } = [];
+
+        public override void BeforeSave(ApplicationDbContext db, Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry entity)
+        {
+            if (entity.State != EntityState.Modified) return;
+
+            var oldStatus = entity.OriginalValues[nameof(Status)] == null
+                ? Status
+                : (OrderStatuses)entity.OriginalValues[nameof(Status)];
+
+            if (Status != oldStatus)
+            {
+                var clientUser = UserCache.FindUserInfo(CreatedByID, db);
+                if (!clientUser.TelegramVerified)
+                {
+                    //todo notify sender that receives isn't notified!
+                    return;
+                }
+                else
+                {
+                    var clientChat = db.BotChats.FirstOrDefault(_ => _.UserName == clientUser.UserName);
+                    if (clientChat == null)
+                    {
+                        //TODO notify admin here: $"Unable to find chat for user {clientUser.UserName}"
+                        return;
+                    }
+
+                    if (Status != oldStatus)
+                        db.AddMessage(clientChat.ChatId, $"Статус вашего заказа {ID} от {CreatedOn:g} изменился с [{oldStatus.GetEnumDescription()}] на [{Status.GetEnumDescription()}]");
+                }
+            }
+        }
     }
 
     public class OrderLine : BaseObject
     {
         [Required]
-        [DeleteBehavior(DeleteBehavior.Restrict)] 
+        [DeleteBehavior(DeleteBehavior.Restrict)]
         public Shop Shop { get; set; }
-        
+
         public Order? Order { get; set; } //when empty it is basket
-        
+
         [Required]
-        [DeleteBehavior(DeleteBehavior.Restrict)] 
+        [DeleteBehavior(DeleteBehavior.Restrict)]
         public Good Good { get; set; }
-        
+
         [Required]
-        [Precision(15, 2)] 
+        [Precision(15, 2)]
         public decimal Qty { get; set; }
-        
+
         [Required]
-        [Precision(15, 2)] 
+        [Precision(15, 2)]
         public decimal Sum { get; set; }
     }
 }

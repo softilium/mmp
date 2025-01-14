@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace mmp.Models
+namespace mmp.Data
 {
 
     public class BotChat

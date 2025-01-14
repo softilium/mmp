@@ -1,12 +1,28 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using mmp.Models;
+using Telegram.Bot;
 
-namespace mmp.DbCtx
+namespace mmp.Data
 {
     public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<long>, long>
     {
+        #region Messages for telegram bot
+        private readonly Dictionary<long, List<string>> messages = [];
+        public void AddMessage(long chatId, string message)
+        {
+            if (!messages.TryGetValue(chatId, out List<string>? value))
+            {
+                value = [];
+                messages.Add(chatId, value);
+            }
+            value.Add(message);
+        }
+        public void ClearMessages()
+        {
+            messages.Clear();
+        }
+        #endregion
 
         private IHttpContextAccessor _ctx;
         public User? CurrentUser()
@@ -22,7 +38,7 @@ namespace mmp.DbCtx
         public DbSet<OrderLine> OrderLines { get; set; }
         public DbSet<BotChat> BotChats { get; set; }
 
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IHttpContextAccessor ctx) : base(options)
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IHttpContextAccessor ctx, TelegramBotClient _bot) : base(options)
         {
             _ctx = ctx;
             SavingChanges += (s, e) =>
@@ -48,7 +64,7 @@ namespace mmp.DbCtx
                 {
                     if (q.Entity is BaseObject baseObj && (q.State == EntityState.Added || q.State == EntityState.Modified))
                     {
-                        baseObj.BeforeSave(q);
+                        baseObj.BeforeSave(this, q);
 
                         if (currentUser != null)
                         {
@@ -74,11 +90,9 @@ namespace mmp.DbCtx
 
             SavedChanges += (s, e) =>
             {
-                foreach (var q in ChangeTracker.Entries())
-                {
-                    if (q.Entity is BaseObject baseObj && (q.State == EntityState.Added || q.State == EntityState.Modified))
-                        baseObj.AfterSave(q);
-                }
+                foreach (var kp in messages)
+                    _bot.SendMessage(kp.Key, string.Join("\n\r", kp.Value.ToArray()));
+                ClearMessages();
             };
         }
 

@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using mmp.DbCtx;
-using mmp.Models;
+using mmp.Data;
 using Microsoft.AspNetCore.Authentication;
 using System.Text.Json.Serialization;
 using Azure.Storage.Blobs;

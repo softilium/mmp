@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using mmp.DbCtx;
-using mmp.Models;
+using mmp.Data;
 
 namespace Webapi.Controllers
 {
