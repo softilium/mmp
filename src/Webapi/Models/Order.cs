@@ -25,7 +25,7 @@ namespace mmp.Data
         [Description("Отменен")]
         Canceled = 600,
     }
-    
+
     public class Order : BaseObject
     {
         [Required]
@@ -53,8 +53,8 @@ namespace mmp.Data
 
         public ICollection<OrderLine> Lines { get; set; } = [];
 
-        public string DeltaTxt(string ov, string nv) => 
-            string.IsNullOrWhiteSpace(ov) 
+        public string DeltaTxt(string ov, string nv) =>
+            string.IsNullOrWhiteSpace(ov)
             ? $"\n\r\n\r{nv}"
             : $"\n\r\n\rБЫЛО:\n\r{ov}\n\r\n\rСТАЛО:\n\r{nv}";
 
@@ -63,7 +63,11 @@ namespace mmp.Data
             if (entity.State != EntityState.Modified) return;
 
             var oldStatus = (OrderStatuses)entity.OriginalValues[nameof(Status)];
-            var oldExpectedDeliveryDate = (DateTime)entity.OriginalValues[nameof(ExpectedDeliveryDate)];
+
+            var oldExpectedDeliveryDate = entity.OriginalValues[nameof(ExpectedDeliveryDate)] == null
+                ? null
+                : (DateTime?)entity.OriginalValues[nameof(ExpectedDeliveryDate)];
+
             var oldCustomerComment = (string)entity.OriginalValues[nameof(CustomerComment)];
             var oldSenderComment = (string)entity.OriginalValues[nameof(SenderComment)];
 
@@ -89,7 +93,10 @@ namespace mmp.Data
                         db.NotifyAfterSave(clientUser.BotChatId, $"Статус вашего заказа {ID} от {CreatedOn:g} изменился.{DeltaTxt(oldStatus.GetEnumDescription(), Status.GetEnumDescription())}");
 
                     if (ExpectedDeliveryDate != oldExpectedDeliveryDate)
-                        db.NotifyAfterSave(clientUser.BotChatId, $"Ожидаемая дата доставки заказа {ID} от {CreatedOn:g} уточнена.{DeltaTxt(oldExpectedDeliveryDate.ToString("g"), ExpectedDeliveryDate.Value.ToString("g"))}");
+                        db.NotifyAfterSave(clientUser.BotChatId, $"Ожидаемая дата доставки заказа {ID} от {CreatedOn:g} уточнена.{DeltaTxt(
+                            oldExpectedDeliveryDate == null ? "": oldExpectedDeliveryDate.Value.ToString("g"),
+                            ExpectedDeliveryDate == null ? "" : ExpectedDeliveryDate.Value.ToString("g")
+                        )}");
 
                     if (oldSenderComment != SenderComment)
                         db.NotifyAfterSave(clientUser.BotChatId, $"Отправитель {senderUser.UserName} по заказу {ID} от {CreatedOn:g} указал примечание продавца.{DeltaTxt(oldSenderComment, SenderComment)}");
