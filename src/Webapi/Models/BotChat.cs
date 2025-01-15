@@ -13,7 +13,4 @@ namespace mmp.Data
         [MaxLength(50)]
         public string UserName { get; set; }
     }
-
-    //todo clean old records. When user verify it, we put chatId value into user record
-
 }

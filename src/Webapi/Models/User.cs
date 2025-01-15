@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 
 namespace mmp.Data
 {
@@ -61,7 +62,15 @@ namespace mmp.Data
             lock (lck)
             {
                 if (loaded == null || loaded.Count == 0 || !loaded.ContainsKey(id))
-                    loaded = db.Users.ToDictionary(k => k.Id, v => new UserInfo(v));
+                {
+                    var chats = db.BotChats.AsNoTracking().ToDictionary(k => k.UserName, v => v.ChatId);
+                    loaded = db.Users.AsNoTracking().ToDictionary(k => k.Id, v => new UserInfo(v));
+                    foreach (var kv in loaded)
+                    {
+                        if (chats.TryGetValue(kv.Value.UserName, out long chatId))
+                        kv.Value.BotChatId = chatId;
+                    }
+                }
 
                 if (!loaded.TryGetValue(id, out UserInfo? value))
                     throw new Exception($"Unable to find user with id={id}");
