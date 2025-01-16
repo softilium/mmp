@@ -58,6 +58,8 @@ builder.Services.AddControllers()
 
 var app = builder.Build();
 
+app.UseMiddleware<TelegramAuthMiddleWare>();
+
 app.UseCors("MyPolicy");
 
 app.MapGroup("identity").MapIdentityApi<User>();

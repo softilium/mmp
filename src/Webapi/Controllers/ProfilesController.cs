@@ -12,7 +12,7 @@ namespace Webapi.Controllers
     {
         private readonly ApplicationDbContext db = context;
         private readonly TelegramBotClient bot = _bot;
-
+    
         [HttpGet("my")]
         [Authorize]
         public async Task<ActionResult<User>> GetMyProfile()
@@ -42,6 +42,14 @@ namespace Webapi.Controllers
         [HttpGet("public")]
         public async Task<ActionResult<UserInfo>> GetPublicUser([FromQuery] string email)
         {
+
+            if (email == null)
+            {
+                var cu = db.CurrentUser();
+                if (cu == null) return NotFound();
+                return new UserInfo(cu);
+            }
+
             var user = await db.Users
                 .Where(_ => _.Email == email)
                 .Select(_ => new UserInfo(_))
