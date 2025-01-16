@@ -11,6 +11,6 @@ namespace mmp.Data
 
         [Required]
         [MaxLength(50)]
-        public string UserName { get; set; }
+        public string UserName { get; set; } = "";
     }
 }

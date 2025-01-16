@@ -7,9 +7,11 @@ namespace mmp.Data
 {
     public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<long>, long>
     {
-        private List<long>? adminChatIds = null;
 
         #region NotifyAfterSave
+
+        private List<long>? adminChatIds = null;
+
         private readonly Dictionary<long, List<string>> afterSaveNotifies = [];
         public void NotifyAfterSave(long chatId, string message)
         {
@@ -113,6 +115,9 @@ namespace mmp.Data
         protected override void OnModelCreating(ModelBuilder mb)
         {
             base.OnModelCreating(mb);
+
+            mb.Entity<Order>().Navigation(_ => _.Shop).AutoInclude(true);
+
         }
     }
 
