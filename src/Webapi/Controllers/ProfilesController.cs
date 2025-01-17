@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using mmp.Data;
+using System.Runtime.InteropServices;
 using Telegram.Bot;
 
 namespace Webapi.Controllers
@@ -40,9 +41,8 @@ namespace Webapi.Controllers
         }
 
         [HttpGet("public")]
-        public async Task<ActionResult<UserInfo>> GetPublicUser([FromQuery] string email)
+        public async Task<ActionResult<UserInfo>> GetPublicUser([FromQuery] [Optional] string? email)
         {
-
             if (email == null)
             {
                 var cu = db.CurrentUser();

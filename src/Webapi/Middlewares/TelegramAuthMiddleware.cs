@@ -1,4 +1,7 @@
-﻿using System.Security.Cryptography;
+﻿using Microsoft.EntityFrameworkCore;
+using mmp.Data;
+using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Web;
 using Telegram.Bot;
@@ -15,7 +18,7 @@ public class TelegramAuthMiddleWare
 
     public static bool CheckInitData(string initData, string botToken, out string username)
     {
-        Console.WriteLine($"initData={initData}");
+        //Console.WriteLine($"initData={initData}");
         username = "";
 
         // Parse string initData from telegram.
@@ -28,7 +31,7 @@ public class TelegramAuthMiddleWare
 
         foreach (var kv in dataDict)
         {
-            Console.WriteLine($"{kv.Key} = {kv.Value}");
+            //Console.WriteLine($"{kv.Key} = {kv.Value}");
             if (kv.Key == "user")
             {   // extract value from "username" field in JSON
                 var usernamePos = kv.Value.IndexOf("username") + 9;
@@ -68,7 +71,7 @@ public class TelegramAuthMiddleWare
         return actualHash.SequenceEqual(generatedHash);
     }
 
-    public async Task Invoke(HttpContext context, TelegramBotClient bot)
+    public async Task Invoke(HttpContext context, TelegramBotClient bot, ApplicationDbContext db)
     {
         if (context.Request.Headers.ContainsKey("tgauth") && context.Request.Headers["tgauth"].Count > 0)
         {
@@ -79,11 +82,13 @@ public class TelegramAuthMiddleWare
                 var username = "";
                 if (CheckInitData(tgauth, botToken, out username))
                 {
-                    Console.WriteLine("VALIDATED: " + username);
-                }
-                else
-                {
-                    Console.WriteLine("NOT VALIDATED!");
+                    var user = await db.Users.FirstOrDefaultAsync(_ => _.TelegramUserName == username);
+                    if (user != null)
+                    {
+                        var claims = new[] { new Claim("name", user.UserName) };
+                        var identity = new ClaimsIdentity(claims, "Basic");
+                        context.User = new ClaimsPrincipal(identity);
+                    }
                 }
             }
         }
