@@ -6,11 +6,37 @@ function newUserInfo() {
 
 export const authStore = reactive({
 
-  rbUrl: () => import.meta.env.VITE_API_URL,
-
   userInfo: newUserInfo(),
   accessToken: "",
   refreshToken: "",
+
+  // tgUserName: () => {
+  //   let r = window.Telegram.WebApp.initDataUnsafe.user.username;
+  //   if (typeof (r) != "string" || r == "") return null;
+  //   return r;
+  // },
+
+  tgInitData() {
+    let r = window.Telegram.WebApp.initData;
+    if (typeof (r) != "string" || r == "") return null;
+    return r;
+  },
+
+  isTg() {
+    var r = this.tgInitData();
+    return r != null;
+  },
+
+  rbUrl() {
+    return import.meta.env.VITE_API_URL;
+  },
+
+  authHeaders() {
+    if (this.isTg())
+      return { "tgauth": this.tgInitData() };
+    else
+      return { "Authorization": "Bearer " + this.accessToken };
+  },
 
   SetAccessToken(newToken) {
     this.accessToken = newToken;
@@ -23,6 +49,9 @@ export const authStore = reactive({
   },
 
   async RefreshToken() {
+
+    if (this.isTg()) return;
+
     if (this.refreshToken != "") {
       try {
         let res = await fetch(this.rbUrl() + "/identity/refresh", {
@@ -50,12 +79,22 @@ export const authStore = reactive({
   },
 
   async CheckLogged() {
+
+    if (this.isTg()) {
+      let res = fetch(`${this.rbUrl()}/api/profiles/public?email=0`, { headers: this.authHeaders() });
+      if (res.ok) {
+        res = await res.json();
+        this.userInfo = res;
+      }
+      return;
+    }
+
     if (this.accessToken != "") {
       try {
         let res = await fetch(this.rbUrl() + "/identity/manage/info", {
           method: "GET",
           signal: AbortSignal.timeout(5000),
-          headers: { "Authorization": "Bearer " + this.accessToken }
+          headers: this.authHeaders()
         });
         if (res.ok) {
           let obj = await res.json();
@@ -75,6 +114,9 @@ export const authStore = reactive({
   },
 
   async Login(emailString, passwordString) {
+
+    if (this.isTg()) return;
+
     try {
       let res = await fetch(this.rbUrl() + "/identity/login", {
         method: "POST",
@@ -96,6 +138,9 @@ export const authStore = reactive({
   },
 
   async Logout() {
+
+    if (this.isTg()) return;
+
     let response = await fetch(this.rbUrl() + "/identity/logout", {
       method: "POST",
       signal: AbortSignal.timeout(5000),
@@ -120,6 +165,9 @@ export const authStore = reactive({
   },
 
   async Register(emailString, passwordString) {
+
+    if (this.isTg()) return;
+
     let request = { email: emailString, password: passwordString };
     try {
       let response = await fetch(this.rbUrl() + "/identity/register", {
