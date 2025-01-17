@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using mmp.Data;
 
@@ -47,7 +46,6 @@ namespace Webapi.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize]
         public async Task<IActionResult> PutShop(long id, Shop shop)
         {
 
@@ -67,7 +65,6 @@ namespace Webapi.Controllers
         }
 
         [HttpPost]
-        [Authorize]
         public async Task<ActionResult<Shop>> PostShop(Shop shop)
         {
             var cu = db.CurrentUser();
@@ -84,7 +81,6 @@ namespace Webapi.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize]
         public async Task<IActionResult> DeleteShop(long id)
         {
             var cu = db.CurrentUser();

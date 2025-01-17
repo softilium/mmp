@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using mmp.Data;
 using Telegram.Bot;
@@ -14,7 +13,6 @@ namespace Webapi.Controllers
         private readonly TelegramBotClient bot = _bot;
 
         [HttpGet("my")]
-        [Authorize]
         public async Task<ActionResult<User>> GetMyProfile()
         {
             var cu = db.CurrentUser();
@@ -31,7 +29,6 @@ namespace Webapi.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize]
         public async Task<ActionResult<UserInfo>> GetUser(long id)
         {
             var user = await db.Users.FindAsync(id);
@@ -57,11 +54,11 @@ namespace Webapi.Controllers
         }
 
         [HttpPut]
-        [Authorize]
         public async Task<IActionResult> PutUser(User user)
         {
             var cu = db.CurrentUser();
             if (cu == null) return Unauthorized();
+            if (cu.Id != user.Id) return Unauthorized();
 
             // establish uniquess of username
             var newUserName = user.UserName;
@@ -80,7 +77,6 @@ namespace Webapi.Controllers
         }
 
         [HttpPost("newtelegramcode")]
-        [Authorize]
         public async Task<IActionResult> SetNewCodeForTelegram()
         {
             var cu = db.CurrentUser();
@@ -103,7 +99,6 @@ namespace Webapi.Controllers
         }
 
         [HttpPost("checktelegramcode/{newcode}")]
-        [Authorize]
         public async Task<IActionResult> CheckCodeForTelegram(string newcode)
         {
             var cu = db.CurrentUser();

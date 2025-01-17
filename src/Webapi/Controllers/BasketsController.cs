@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using mmp.Data;
 
@@ -18,7 +17,6 @@ namespace Webapi.Controllers
 
         [HttpGet]
         [Route("{shopId:long}")]
-        [Authorize]
         public async Task<ActionResult<IEnumerable<OrderLine>>> GetOrderLines(long shopId)
         {
             var cu = db.CurrentUser();
@@ -32,7 +30,6 @@ namespace Webapi.Controllers
         }
 
         [HttpPost]
-        [Authorize]
         [Route("increase/{goodId:long}")]
         public async Task<ActionResult<OrderLine>> Increase(long goodId, [FromQuery] decimal? qty)
         {
@@ -70,7 +67,6 @@ namespace Webapi.Controllers
         }
 
         [HttpPost]
-        [Authorize]
         [Route("decrease/{goodId:long}")]
         public async Task<ActionResult<OrderLine>> Decrease(long goodId, [FromQuery] decimal? qty)
         {
@@ -95,7 +91,6 @@ namespace Webapi.Controllers
         }
 
         [HttpDelete]
-        [Authorize]
         [Route("{goodId:long}")]
         public async Task<ActionResult<OrderLine>> Delete(long goodId)
         {

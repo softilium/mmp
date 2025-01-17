@@ -1,5 +1,4 @@
 ﻿using Azure.Storage.Blobs;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using mmp.Data;
@@ -40,12 +39,16 @@ namespace Webapi.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize]
         public async Task<IActionResult> PutGood(long id, Good good)
         {
             if (id != good.ID) return BadRequest();
+
+            var cu = db.CurrentUser();
+            if (cu == null) return Unauthorized();
+
             var dbGood = await db.Goods.FirstOrDefaultAsync(_ => _.ID == id && !_.IsDeleted);
             if (dbGood == null) return NotFound();
+            if (dbGood.CreatedByID != cu.Id) return Unauthorized();
 
             dbGood.Caption = good.Caption;
             dbGood.Description = good.Description;
@@ -59,7 +62,6 @@ namespace Webapi.Controllers
         }
 
         [HttpPost]
-        [Authorize]
         public async Task<ActionResult<Good>> PostGood(Good good)
         {
             var cu = db.CurrentUser();
@@ -87,11 +89,15 @@ namespace Webapi.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize]
         public async Task<IActionResult> DeleteGood(long id)
         {
+
+            var cu = db.CurrentUser();
+            if (cu == null) return Unauthorized();
+
             var good = await db.Goods.FirstOrDefaultAsync(_ => _.ID == id && !_.IsDeleted);
             if (good == null) return NotFound();
+            if (good.CreatedByID != cu.Id) return Unauthorized();
 
             good.IsDeleted = true;
             await db.SaveChangesAsync();
@@ -125,7 +131,6 @@ namespace Webapi.Controllers
         }
 
         [HttpPost("images/{goodId:long}/{num:int}")]
-        [Authorize]
         public async Task<IActionResult> PostGoodImage(long goodId, int num)
         {
             var image = Request.Form.Files.Count > 0 ? Request.Form.Files[0] : null;
@@ -158,7 +163,6 @@ namespace Webapi.Controllers
         }
 
         [HttpDelete("images/{goodId:long}/{num:int}")]
-        [Authorize]
         public async Task<IActionResult> DeleteGoodImage(long goodId, int num)
         {
             var cu = db.CurrentUser();

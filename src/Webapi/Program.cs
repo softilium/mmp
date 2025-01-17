@@ -40,7 +40,7 @@ var TelegramBotAPIKEY = builder.Configuration["TelegramBotAPIKEY"] ?? "";
 
 builder.Services.AddSingleton(x => new TelegramBotClient(TelegramBotAPIKEY));
 
-builder.Services.AddAuthorization();
+//builder.Services.AddAuthorization();
 
 builder.Services.AddIdentityApiEndpoints<User>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
@@ -58,9 +58,9 @@ builder.Services.AddControllers()
 
 var app = builder.Build();
 
-app.UseCors("MyPolicy");
-
 app.UseMiddleware<TelegramAuthMiddleWare>();
+
+app.UseCors("MyPolicy");
 
 app.MapGroup("identity").MapIdentityApi<User>();
 app.MapPost("/identity/logout", ctx => ctx.SignOutAsync()); // std. MapIdentityApi doesn't contains logout endpoint

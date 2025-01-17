@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using mmp.Data;
 using System.ComponentModel;
@@ -59,7 +58,6 @@ namespace Webapi.Controllers
 
 
         [HttpGet("outbox")]
-        [Authorize]
         public async Task<ActionResult<IEnumerable<Order>>> GetOrders([FromQuery] int showAll)
         {
             var cu = db.CurrentUser();
@@ -75,7 +73,6 @@ namespace Webapi.Controllers
         }
 
         [HttpPut("outbox/{id:long}")]
-        [Authorize]
         public async Task<IActionResult> PutCustomerOrder(long id, Order order)
         {
             var cu = db.CurrentUser();
@@ -93,7 +90,6 @@ namespace Webapi.Controllers
         }
 
         [HttpPost("outbox/{shopid:long}")]
-        [Authorize]
         public async Task<ActionResult<Order>> PostCustomerOrder([FromRoute] long shopId)
         {
             using StreamReader reader = new(Request.Body, leaveOpen: true);
@@ -124,7 +120,6 @@ namespace Webapi.Controllers
         }
 
         [HttpGet("inbox")]
-        [Authorize]
         public async Task<ActionResult<IEnumerable<Order>>> GetSenderOrders([FromQuery] int showAll)
         {
             var cu = db.CurrentUser();
@@ -146,7 +141,6 @@ namespace Webapi.Controllers
         }
 
         [HttpPut("inbox/{id:long}")]
-        [Authorize]
         public async Task<ActionResult<IEnumerable<Order>>> PutSenderOrder(long id, Order order)
         {
             var cu = db.CurrentUser();

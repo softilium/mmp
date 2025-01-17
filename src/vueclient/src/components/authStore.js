@@ -33,7 +33,7 @@ export const authStore = reactive({
 
   authHeaders() {
     if (this.isTg())
-      return { "Authorization-tg": this.tgInitData() };
+      return { "Authorization": "tg " + this.tgInitData() };
     else
       return { "Authorization": "Bearer " + this.accessToken };
   },
@@ -41,7 +41,7 @@ export const authStore = reactive({
   authHeadersAppJson() {
     if (this.isTg())
       return {
-        "Authorization-tg": this.tgInitData(),
+        "Authorization": "tg " + this.tgInitData(),
         "Content-Type": "application/json",
       };
     else
