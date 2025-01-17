@@ -18,7 +18,6 @@ public class TelegramAuthMiddleWare
 
     public static bool CheckInitData(string initData, string botToken, out string username)
     {
-        //Console.WriteLine($"initData={initData}");
         username = "";
 
         // Parse string initData from telegram.
@@ -31,7 +30,6 @@ public class TelegramAuthMiddleWare
 
         foreach (var kv in dataDict)
         {
-            //Console.WriteLine($"{kv.Key} = {kv.Value}");
             if (kv.Key == "user")
             {   // extract value from "username" field in JSON
                 var usernamePos = kv.Value.IndexOf("username") + 9;
@@ -82,16 +80,12 @@ public class TelegramAuthMiddleWare
                 var username = "";
                 if (CheckInitData(tgauth, botToken, out username))
                 {
-                    Console.WriteLine("tg.username=" + username);
                     var user = await db.Users.FirstOrDefaultAsync(_ => _.TelegramUserName == username);
                     if (user != null)
                     {
-                        Console.WriteLine("user found with id=" + user.Id.ToString());
-                        var claims = new[] { new Claim("name", user.UserName) };
-                        var identity = new ClaimsIdentity(claims, "Basic");
+                        var identity = new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, username) }, "custom");
                         context.User = new ClaimsPrincipal(identity);
                     }
-                    else Console.WriteLine("user not found by TelegramUserName=" + username);
                 }
             }
         }
