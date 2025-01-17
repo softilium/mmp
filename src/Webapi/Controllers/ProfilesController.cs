@@ -41,15 +41,14 @@ namespace Webapi.Controllers
         }
 
         [HttpGet("public")]
-        public async Task<ActionResult<UserInfo>> GetPublicUser([FromQuery] [Optional] string? email)
+        public async Task<ActionResult<UserInfo>> GetPublicUser([FromQuery] string email)
         {
-            if (email == null)
+            if (string.IsNullOrWhiteSpace(email))
             {
                 var cu = db.CurrentUser();
                 if (cu == null) return NotFound();
                 return new UserInfo(cu);
             }
-
             var user = await db.Users
                 .Where(_ => _.Email == email)
                 .Select(_ => new UserInfo(_))
