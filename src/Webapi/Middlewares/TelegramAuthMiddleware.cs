@@ -55,6 +55,12 @@ public class TelegramAuthMiddleWare
         // Convert received hash from telegram to a byte array.
         var actualHash = Convert.FromHexString(dataDict["hash"]); // .NET 5.0 
 
+        if (!actualHash.SequenceEqual(generatedHash))
+        {
+            Console.WriteLine("generatedhash=" + generatedHash.ToString());
+            Console.WriteLine("actualhash=" + actualHash.ToString());
+        }
+
         // Compare our hash with the one from telegram.
         return actualHash.SequenceEqual(generatedHash);
     }
@@ -72,8 +78,11 @@ public class TelegramAuthMiddleWare
 
                 if (CheckInitData(tgauth, botToken))
                 {
-                    // set context.user here 
-
+                    Console.WriteLine("VALIDATED!");
+                } 
+                else
+                {
+                    Console.WriteLine("NOT VALIDATED!");
                 }
             }
         }
