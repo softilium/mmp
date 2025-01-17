@@ -60,6 +60,15 @@ namespace mmp.Data
 
         public override void BeforeSave(ApplicationDbContext db, Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry entity)
         {
+            if (entity.State == EntityState.Added)
+            {
+                var cu = db.CurrentUser();
+
+                var senderUser = UserCache.FindUserInfo(Shop.CreatedByID, db);
+
+                db.NotifyAfterSave(senderUser.BotChatId, $"Новый заказ. Заказчик {cu.UserName}, {DateTime.Now:g}.");
+            }
+
             if (entity.State != EntityState.Modified) return;
 
             var oldStatus = (OrderStatuses)entity.OriginalValues[nameof(Status)];
