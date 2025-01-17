@@ -1,6 +1,4 @@
-﻿using Azure.Storage.Blobs.Models;
-using System.Security.Claims;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
 using System.Web;
 using Telegram.Bot;
@@ -17,6 +15,9 @@ public class TelegramAuthMiddleWare
 
     public static bool CheckInitData(string initData, string botToken)
     {
+
+        Console.WriteLine($"initData = {initData}");
+
         // Parse string initData from telegram.
         var data = HttpUtility.ParseQueryString(initData);
 
