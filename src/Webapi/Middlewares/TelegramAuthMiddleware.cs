@@ -16,6 +16,7 @@ public class TelegramAuthMiddleWare
 
     public static bool CheckInitData(string initData, string botToken, out string username)
     {
+        Console.WriteLine($"initData={initData}");
         username = "";
 
         // Parse string initData from telegram.
@@ -27,12 +28,16 @@ public class TelegramAuthMiddleWare
             StringComparer.Ordinal);
 
         foreach (var kv in dataDict)
+        {
+            Console.WriteLine($"{kv.Key} = {kv.Value}");
             if (kv.Key == "user")
             {
-                var values = JsonSerializer.Deserialize<Dictionary<string, string>>(kv.Value);
+                Console.WriteLine("user JSON is " + kv.Value.Trim());
+                var values = JsonSerializer.Deserialize<Dictionary<string, string>>(kv.Value.Trim());
                 if (values != null && values.TryGetValue("username", out string? value))
                     username = value;
             }
+        }
 
         // Constant key to genrate secret key.
         var constantKey = "WebAppData";
