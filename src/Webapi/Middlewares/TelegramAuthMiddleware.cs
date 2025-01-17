@@ -1,6 +1,5 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
-using System.Text.Json;
 using System.Web;
 using Telegram.Bot;
 
@@ -31,11 +30,11 @@ public class TelegramAuthMiddleWare
         {
             Console.WriteLine($"{kv.Key} = {kv.Value}");
             if (kv.Key == "user")
-            {
-                Console.WriteLine("user JSON is " + kv.Value.Trim());
-                var values = JsonSerializer.Deserialize<Dictionary<string, object>>(kv.Value.Trim());
-                if (values != null && values.TryGetValue("username", out object value))
-                    username = (string)value;
+            {   // extract value from "username" field in JSON
+                var usernamePos = kv.Value.IndexOf("username") + 9;
+                var firstQ = kv.Value.IndexOf("\"", usernamePos) + 1;
+                var secondQ = kv.Value.IndexOf("\"", firstQ);
+                username = kv.Value[firstQ..secondQ];
             }
         }
 
