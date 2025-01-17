@@ -1,5 +1,6 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using System.Web;
 using Telegram.Bot;
 
@@ -13,10 +14,9 @@ public class TelegramAuthMiddleWare
         _next = next;
     }
 
-    public static bool CheckInitData(string initData, string botToken)
+    public static bool CheckInitData(string initData, string botToken, out string username)
     {
-
-        Console.WriteLine($"initData = {initData}");
+        username = "";
 
         // Parse string initData from telegram.
         var data = HttpUtility.ParseQueryString(initData);
@@ -26,8 +26,13 @@ public class TelegramAuthMiddleWare
             data.AllKeys.ToDictionary(x => x!, x => data[x]!),
             StringComparer.Ordinal);
 
-        foreach ( var kv in dataDict )
-            Console.WriteLine($"{kv.Key} = {kv.Value}");
+        foreach (var kv in dataDict)
+            if (kv.Key == "user")
+            {
+                var values = JsonSerializer.Deserialize<Dictionary<string, string>>(kv.Value);
+                if (values != null && values.TryGetValue("username", out string? value))
+                    username = value;
+            }
 
         // Constant key to genrate secret key.
         var constantKey = "WebAppData";
@@ -55,40 +60,30 @@ public class TelegramAuthMiddleWare
         // Convert received hash from telegram to a byte array.
         var actualHash = Convert.FromHexString(dataDict["hash"]); // .NET 5.0 
 
-        if (!actualHash.SequenceEqual(generatedHash))
-        {
-            Console.WriteLine("generatedhash=" + generatedHash.ToString());
-            Console.WriteLine("actualhash=" + actualHash.ToString());
-        }
-
         // Compare our hash with the one from telegram.
         return actualHash.SequenceEqual(generatedHash);
     }
 
     public async Task Invoke(HttpContext context, TelegramBotClient bot)
     {
-
         if (context.Request.Headers.ContainsKey("tgauth") && context.Request.Headers["tgauth"].Count > 0)
         {
             var tgauth = context.Request.Headers["tgauth"][0];
             if (!string.IsNullOrWhiteSpace(tgauth))
             {
-
                 var botToken = Environment.GetEnvironmentVariable("TelegramBotAPIKEY");
-
-                if (CheckInitData(tgauth, botToken))
+                var username = "";
+                if (CheckInitData(tgauth, botToken, out username))
                 {
-                    Console.WriteLine("VALIDATED!");
-                } 
+                    Console.WriteLine("VALIDATED: " + username);
+                }
                 else
                 {
                     Console.WriteLine("NOT VALIDATED!");
                 }
             }
         }
-
         await _next(context);
     }
-
 }
 
