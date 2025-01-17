@@ -33,9 +33,9 @@ public class TelegramAuthMiddleWare
             if (kv.Key == "user")
             {
                 Console.WriteLine("user JSON is " + kv.Value.Trim());
-                var values = JsonSerializer.Deserialize<Dictionary<string, string>>(kv.Value.Trim());
-                if (values != null && values.TryGetValue("username", out string? value))
-                    username = value;
+                var values = JsonSerializer.Deserialize<Dictionary<string, object>>(kv.Value.Trim());
+                if (values != null && values.TryGetValue("username", out object value))
+                    username = (string)value;
             }
         }
 
