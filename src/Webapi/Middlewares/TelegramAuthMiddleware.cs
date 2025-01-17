@@ -82,13 +82,16 @@ public class TelegramAuthMiddleWare
                 var username = "";
                 if (CheckInitData(tgauth, botToken, out username))
                 {
+                    Console.WriteLine("tg.username=" + username);
                     var user = await db.Users.FirstOrDefaultAsync(_ => _.TelegramUserName == username);
                     if (user != null)
                     {
+                        Console.WriteLine("user found with id=" + user.Id.ToString());
                         var claims = new[] { new Claim("name", user.UserName) };
                         var identity = new ClaimsIdentity(claims, "Basic");
                         context.User = new ClaimsPrincipal(identity);
                     }
+                    else Console.WriteLine("user not found by TelegramUserName=" + username);
                 }
             }
         }
