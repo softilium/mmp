@@ -33,9 +33,22 @@ export const authStore = reactive({
 
   authHeaders() {
     if (this.isTg())
-      return { "tgauth": this.tgInitData() };
+      return { "Authorization-tg": this.tgInitData() };
     else
       return { "Authorization": "Bearer " + this.accessToken };
+  },
+
+  authHeadersAppJson() {
+    if (this.isTg())
+      return {
+        "Authorization-tg": this.tgInitData(),
+        "Content-Type": "application/json",
+      };
+    else
+      return {
+        "Authorization": "Bearer " + this.accessToken,
+        "Content-Type": "application/json",
+      };
   },
 
   SetAccessToken(newToken) {
@@ -81,7 +94,7 @@ export const authStore = reactive({
   async CheckLogged() {
 
     if (this.isTg()) {
-      let res = fetch(`${this.rbUrl()}/api/profiles/public?email=0`, { headers: this.authHeaders() });
+      let res = await fetch(`${this.rbUrl()}/api/profiles/public?email=0`, { headers: this.authHeaders() });
       if (res.ok) {
         res = await res.json();
         this.userInfo = res;

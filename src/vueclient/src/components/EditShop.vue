@@ -36,10 +36,7 @@
       try {
         let res = await fetch(authStore.rbUrl() + "/api/shops", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + authStore.accessToken
-          },
+          headers: authStore.authHeadersAppJson(),
           body: JSON.stringify({ caption: captionField.value })
         });
 
@@ -49,10 +46,7 @@
       try {
         let res = await fetch(authStore.rbUrl() + "/api/shops/" + shopId, {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + authStore.accessToken
-          },
+          headers: authStore.authHeadersAppJson(),
           body: JSON.stringify({ caption: captionField.value })
         });
 

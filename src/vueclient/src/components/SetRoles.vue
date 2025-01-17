@@ -8,10 +8,7 @@
   onMounted(async () => {
     let res = await fetch(authStore.rbUrl() + "/api/admin/allusers",
       {
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer " + authStore.accessToken
-        }
+        headers: authStore.authHeadersAppJson()
       });
     if (res.ok) {
       users.value = await res.json();
@@ -25,10 +22,7 @@
           {
             method: "PUT",
             body: JSON.stringify(u),
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": "Bearer " + authStore.accessToken
-            }
+            headers: authStore.authHeadersAppJson()
           });
       }
     });

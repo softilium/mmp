@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using mmp.Data;
-using System.Runtime.InteropServices;
 using Telegram.Bot;
 
 namespace Webapi.Controllers

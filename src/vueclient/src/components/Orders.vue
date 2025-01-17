@@ -4,7 +4,6 @@
   import { onMounted, ref } from 'vue';
   import { authStore } from './authStore.js';
   import { glob } from './globals.js';
-  import ProfileLink from './ProfileLink.vue';
 
   const orders = ref([]);
   const statuses = ref([]);
@@ -15,10 +14,7 @@
     if (showAll.value) url += "?showAll=1";
     let res = await fetch(url,
       {
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer " + authStore.accessToken
-        }
+        headers: authStore.authHeadersAppJson()
       });
 
     if (res.ok) {

@@ -35,10 +35,7 @@
     }
 
     res = await fetch(authStore.rbUrl() + "/api/orders/" + route.params.id, {
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + authStore.accessToken
-      }
+      headers: authStore.authHeadersAppJson()
     });
 
     if (res.ok) {
@@ -55,10 +52,7 @@
         {
           method: "PUT",
           body: JSON.stringify(order.value),
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + authStore.accessToken
-          }
+          headers: authStore.authHeadersAppJson()
         });
       if (req.ok) {
         router.push("/orders");
@@ -69,10 +63,7 @@
         {
           method: "PUT",
           body: JSON.stringify(order.value),
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + authStore.accessToken
-          }
+          headers: authStore.authHeadersAppJson()
         });
       if (req.ok) {
         router.push("/inc-orders");

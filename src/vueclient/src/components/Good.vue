@@ -52,10 +52,7 @@
     if (authStore.userInfo.id) {
       let res = await fetch(authStore.rbUrl() + "/api/baskets/" + good.value.ownerShop.id, {
         method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer " + authStore.accessToken
-        }
+        headers: authStore.authHeadersAppJson()
       });
       if (res.ok) {
         res = await res.json();
@@ -72,10 +69,7 @@
   const Inc = async (good) => {
     let res = await fetch(authStore.rbUrl() + "/api/baskets/increase/" + good.id, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + authStore.accessToken
-      },
+      headers: authStore.authHeadersAppJson()
     });
     if (res.ok) LoadBasket();
   }
@@ -83,10 +77,7 @@
   const Dec = async (good) => {
     let res = await fetch(authStore.rbUrl() + "/api/baskets/decrease/" + good.id, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + authStore.accessToken
-      },
+      headers: authStore.authHeadersAppJson()
     });
     if (res.ok) LoadBasket();
   }

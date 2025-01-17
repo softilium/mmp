@@ -30,10 +30,7 @@
 
     let res = await fetch(authStore.rbUrl() + "/api/baskets/" + shop.value.id, {
       mathod: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + authStore.accessToken
-      }
+      headers: authStore.authHeadersAppJson()
     });
 
     try {
@@ -53,10 +50,7 @@
   const Checkout = async () => {
     let res = await fetch(authStore.rbUrl() + "/api/orders/outbox/" + route.params.shopid, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + authStore.accessToken
-      },
+      headers: authStore.authHeadersAppJson(),
       body: customerComment.value
     });
     if (res.ok) {

@@ -71,20 +71,22 @@ public class TelegramAuthMiddleWare
 
     public async Task Invoke(HttpContext context, TelegramBotClient bot, ApplicationDbContext db)
     {
-        if (context.Request.Headers.ContainsKey("tgauth") && context.Request.Headers["tgauth"].Count > 0)
+        if (context.Request.Headers.ContainsKey("Authorization-tg") && context.Request.Headers["Authorization-tg"].Count > 0)
         {
-            var tgauth = context.Request.Headers["tgauth"][0];
+            var tgauth = context.Request.Headers["Authorization-tg"][0];
             if (!string.IsNullOrWhiteSpace(tgauth))
             {
                 var botToken = Environment.GetEnvironmentVariable("TelegramBotAPIKEY");
-                var username = "";
-                if (CheckInitData(tgauth, botToken, out username))
+                if (CheckInitData(tgauth, botToken, out string? username))
                 {
-                    var user = await db.Users.FirstOrDefaultAsync(_ => _.TelegramUserName == username);
-                    if (user != null)
+                    if (username != "")
                     {
-                        var identity = new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, username) }, "custom");
-                        context.User = new ClaimsPrincipal(identity);
+                        var user = await db.Users.FirstOrDefaultAsync(_ => _.TelegramUserName == username);
+                        if (user != null)
+                        {
+                            var identity = new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, username) }, "custom");
+                            context.User = new ClaimsPrincipal(identity);
+                        }
                     }
                 }
             }

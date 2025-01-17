@@ -19,10 +19,7 @@
 
     let res = await fetch(authStore.rbUrl() + "/api/profiles/newtelegramcode", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + authStore.accessToken
-      }
+      headers: authStore.authHeadersAppJson()
     });
     if (res.ok) Load();
 
@@ -33,10 +30,7 @@
 
     let res = await fetch(authStore.rbUrl() + "/api/profiles/checktelegramcode/" + telegramVerifyCode.value, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + authStore.accessToken
-      }
+      headers: authStore.authHeadersAppJson()
     });
     if (res.ok) Load();
 
@@ -51,10 +45,7 @@
     if (!me.value) {
       let res = await fetch(authStore.rbUrl() + "/api/profiles/" + route.params.id,
         {
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + authStore.accessToken
-          }
+          headers: authStore.authHeadersAppJson()
         });
       if (res.ok) {
         user.value = await res.json();
@@ -64,10 +55,7 @@
     else {
       let res = await fetch(authStore.rbUrl() + "/api/profiles/my",
         {
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + authStore.accessToken
-          }
+          headers: authStore.authHeadersAppJson()
         });
       if (res.ok) {
         user.value = await res.json();
@@ -87,10 +75,7 @@
       {
         method: "PUT",
         body: JSON.stringify(user.value),
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer " + authStore.accessToken
-        }
+        headers: authStore.authHeadersAppJson()
       });
     if (res.ok) {
       result.value = "Изменения записаны";
@@ -105,7 +90,7 @@
 <template>
 
   <h1>
-    Профиль пользователя {{ user.userName }}&nbsp;<button v-if="me" class="btn btn-outline-secondary"
+    Профиль пользователя {{ user.userName }}&nbsp;<button v-if="me && !authStore.isTg()" class="btn btn-outline-secondary"
       @click="authStore.Logout(); $router.push('/');">Выйти</button>
   </h1>
   <br />
@@ -133,7 +118,7 @@
     <div class="row mb-3">
       <label class="col-3 form-label">Пользователь телеграм</label>
       <div class="col-7">
-        <input class="form-control" v-model="newTelegramUserName" />
+        <input class="form-control" v-model="newTelegramUserName" :readonly="authStore.isTg()" />
       </div>
       <div class="col-1" v-if="user.telegramVerified">
         <span class="text-success"><i class="bi bi-star-fill"></i> Активно</span>

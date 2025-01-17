@@ -58,9 +58,9 @@ builder.Services.AddControllers()
 
 var app = builder.Build();
 
-app.UseMiddleware<TelegramAuthMiddleWare>();
-
 app.UseCors("MyPolicy");
+
+app.UseMiddleware<TelegramAuthMiddleWare>();
 
 app.MapGroup("identity").MapIdentityApi<User>();
 app.MapPost("/identity/logout", ctx => ctx.SignOutAsync()); // std. MapIdentityApi doesn't contains logout endpoint

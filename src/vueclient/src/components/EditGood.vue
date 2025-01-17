@@ -42,10 +42,7 @@
     if (route.params.id) {
       let res = await fetch(authStore.rbUrl() + "/api/goods/" + route.params.id, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer " + authStore.accessToken
-        },
+        headers: authStore.authHeadersAppJson(),
         body: JSON.stringify(good.value)
       });
       if (res.ok) {
@@ -53,9 +50,7 @@
           if (!imageSrc.value[i]) {
             res = await fetch(`${authStore.rbUrl()}/api/goods/images/${route.params.id}/${i}`, {
               method: "DELETE",
-              headers: {
-                "Authorization": "Bearer " + authStore.accessToken
-              }
+              headers: authStore.authHeaders()
             });
             if (!res.ok) console.log(res);
           } else {
@@ -64,9 +59,7 @@
             data.append("image", blob);
             res = await fetch(`${authStore.rbUrl()}/api/goods/images/${route.params.id}/${i}`, {
               method: "POST",
-              headers: {
-                "Authorization": "Bearer " + authStore.accessToken
-              },
+              headers: authStore.authHeaders(),
               body: data
             });
             if (!res.ok) console.log(res);
@@ -81,10 +74,7 @@
 
       let res = await fetch(authStore.rbUrl() + "/api/goods", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer " + authStore.accessToken
-        },
+        headers: authStore.authHeadersAppJson(),
         body: JSON.stringify(good.value)
       });
       if (res.ok) {
