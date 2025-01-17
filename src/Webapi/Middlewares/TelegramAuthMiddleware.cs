@@ -83,11 +83,11 @@ public class TelegramAuthMiddleWare
     {
         if (context.Request.Headers.ContainsKey("Authorization") && context.Request.Headers["Authorization"].Count > 0)
         {
-            var tgauth = context.Request.Headers["Authorization"][0];
+            var tgauth = context.Request.Headers["Authorization"][0] ?? "     ";
             tgauth = tgauth.Substring(3);
             if (!string.IsNullOrWhiteSpace(tgauth))
             {
-                var botToken = Environment.GetEnvironmentVariable("TelegramBotAPIKEY");
+                var botToken = Environment.GetEnvironmentVariable("TelegramBotAPIKEY") ?? "nobothere";
                 if (CheckInitData(tgauth, botToken, out string? username))
                 {
                     if (username != "")

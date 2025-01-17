@@ -76,11 +76,12 @@ namespace mmp.Data
                 var senderUser = UserCache.FindUserInfo(Shop.CreatedByID, db);
                 var clientUser = UserCache.FindUserInfo(CreatedByID, db);
                 var cu = db.CurrentUser();
+                if (cu == null) return;
 
                 if (cu.Id == CreatedByID)
                 {
                     if (oldCustomerComment != CustomerComment)
-                        db.NotifyAfterSave(senderUser.BotChatId, $"Заказчик {clientUser.UserName} по заказу {ID} от {CreatedOn:g} указал примечание к заказу.{DeltaTxt(oldCustomerComment, CustomerComment)}");
+                        db.NotifyAfterSave(senderUser.BotChatId, $"Заказчик {clientUser.UserName} по заказу {ID} от {CreatedOn:g} указал примечание к заказу.{DeltaTxt(oldCustomerComment ?? "", CustomerComment ?? "")}");
                 }
                 if (cu.Id == Shop.CreatedByID)
                 {
@@ -99,7 +100,7 @@ namespace mmp.Data
                         )}");
 
                     if (oldSenderComment != SenderComment)
-                        db.NotifyAfterSave(clientUser.BotChatId, $"Отправитель {senderUser.UserName} по заказу {ID} от {CreatedOn:g} указал примечание продавца.{DeltaTxt(oldSenderComment, SenderComment)}");
+                        db.NotifyAfterSave(clientUser.BotChatId, $"Отправитель {senderUser.UserName} по заказу {ID} от {CreatedOn:g} указал примечание продавца.{DeltaTxt(oldSenderComment ?? "", SenderComment ?? "")}");
                 }
             }
         }
