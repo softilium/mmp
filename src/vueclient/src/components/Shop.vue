@@ -121,20 +121,11 @@
       </thead>
       <tbody>
         <tr v-for="good in goods" v-bind:key="good.id">
-          <td class="col-9">
-            <div class="row">
-              <div class="col-11">
-                <RouterLink v-bind:to="`/good/${good.id}`"> {{ good.caption }} </RouterLink>
-              </div>
-              <div class="col-1 text-end">
-                <RouterLink v-if="isOwner" v-bind:to="`/edit-good/${shop.id}/${good.id}`">
-                  <span class="text-info"><i class="bi bi-pencil-square" /></span>
-                </RouterLink>
-              </div>
-            </div>
+          <td class="col-7">
+            <RouterLink v-bind:to="`/good/${good.id}`"> {{ good.caption }} </RouterLink>
           </td>
-          <td class="col-1 text-end">{{ good.price }}</td>
-          <td v-if="authStore.userInfo.id" class="col-2">
+          <td class="col-2 text-end">{{ good.price }}</td>
+          <td v-if="authStore.userInfo.id" class="col-3">
             <button class="btn btn-primary btn-sm" @click="Inc(good)">+</button>&nbsp;
             <span v-if="good.basked"><button class="btn btn-primary btn-sm" @click="Dec(good)">-</button>&nbsp;</span>
             {{ good.basked }}
@@ -144,6 +135,6 @@
     </table>
   </div>
 
-  <button class="btn btn-primary" v-if="isOwner" @click="router.push(`/edit-good/${route.params.id}`);">Добавить товар / услугу</button>
+  <button class="btn btn-info" v-if="isOwner" @click="router.push(`/edit-good/${route.params.id}`);">Добавить товар / услугу</button>
 
 </template>

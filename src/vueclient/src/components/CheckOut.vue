@@ -8,8 +8,7 @@
   const router = useRouter();
 
   const shop = ref({});
-  const isOwner = ref(false);
-
+  
   const basket = ref([]);
   const qtyTotal = ref(0);
   const sumTotal = ref(0);
@@ -21,7 +20,6 @@
       let res = await fetch(authStore.rbUrl() + "/api/shops/" + route.params.shopid);
       if (res.ok) {
         shop.value = await res.json();
-        isOwner.value = shop.value.createdByInfo.id == authStore.userInfo.id;
       } else router.push("/");
     } catch (err) {
       console.log(err);
@@ -62,9 +60,9 @@
 
 <template>
 
-  <h1>
-    Сформировать заказ для витрины "{{ shop.caption }}"
-  </h1>
+  <h1>Сформировать заказ для витрины "{{ shop.caption }}"</h1>
+  <RouterLink :to="`/shop/${shop.id}`">Витрина "{{shop.caption}}"</RouterLink>
+  <div>&nbsp;</div>
 
   <table class="table">
     <thead class="table-primary">
@@ -102,6 +100,5 @@
   <div class="row mb-3">
     <button class="btn btn-primary" @click="Checkout()">Оформить заказ</button>
   </div>
-  <RouterLink :to="`/shop/${shop.id}`">Витрина "{{shop.caption}}"</RouterLink>
 
 </template>

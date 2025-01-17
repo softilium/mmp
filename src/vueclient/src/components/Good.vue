@@ -8,8 +8,19 @@
   const route = useRoute()
   const router = useRouter()
 
-  const good = ref({ ownerShop: { id: 0, caption: "" }, caption: "", description: "", basked: null, id:0, price:0, article:"", url:"" });
+  const good = ref({
+    ownerShop: { id: 0, caption: "" },
+    caption: "",
+    description: "",
+    basked: null,
+    id:0,
+    price:0,
+    article:"",
+    url:"",
+    createdByID: 0
+  });
   const basketSum = ref(0);
+  const isOwner = ref(false);
 
   onMounted(async () => {
     if (route.params.id) {
@@ -17,6 +28,7 @@
         let res = await fetch(authStore.rbUrl() + "/api/goods/" + route.params.id);
         if (res.ok) {
           good.value = await res.json();
+          isOwner.value = (good.value.createdByID == authStore.userInfo.id);
           good.value.basked = null;
           basketSum.value = null;
           LoadBasket();
@@ -136,5 +148,10 @@
       <img :src="imageSrc[curImgIndex]" class="d-block w-100">
     </div>
   </div>
+
+  <RouterLink v-if="isOwner" v-bind:to="`/edit-good/${good.ownerShop.id}/${good.id}`">
+    <span class="btn btn-info">Редактировать</span>
+  </RouterLink>
+
 
 </template>
