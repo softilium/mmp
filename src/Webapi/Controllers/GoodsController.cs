@@ -105,6 +105,10 @@ namespace Webapi.Controllers
 
             await db.SaveChangesAsync();
 
+            await DeleteGoodImage(id, 1);
+            await DeleteGoodImage(id, 2);
+            await DeleteGoodImage(id, 3);
+
             return NoContent();
         }
 
