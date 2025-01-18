@@ -27,7 +27,7 @@ namespace Webapi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Good>>> GetGoods([FromQuery] long shopId)
         {
-            return await db.Goods.Where(_ => _.OwnerShop.ID == shopId).AsNoTracking().ToListAsync();
+            return await db.Goods.AsNoTracking().Where(_ => _.OwnerShop.ID == shopId && !_.IsDeleted).ToListAsync();
         }
 
         [HttpGet("{id}")]
@@ -91,7 +91,6 @@ namespace Webapi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteGood(long id)
         {
-
             var cu = db.CurrentUser();
             if (cu == null) return Unauthorized();
 
@@ -100,6 +99,10 @@ namespace Webapi.Controllers
             if (good.CreatedByID != cu.Id) return Unauthorized();
 
             good.IsDeleted = true;
+
+            // also delete uncompleted baskets
+            db.OrderLines.Where(_ => _.Good == good && _.Order == null).ExecuteDelete();
+
             await db.SaveChangesAsync();
 
             return NoContent();

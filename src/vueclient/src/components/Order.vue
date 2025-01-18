@@ -79,6 +79,8 @@
     <h1>Заказ {{ order.id }}</h1>
     <h6>{{ glob.fmtDate(order.createdOn) }}</h6>
     <h6>Витрина {{ order.shop.caption }}</h6>
+    <button :disabled="!isCustomer && !isSender" class="btn btn-primary" @click="Save()">Сохранить</button>
+    <div>&nbsp;</div>
 
     <table class="table table-sm">
       <thead class="table-primary">
@@ -141,6 +143,5 @@
       </div>
     </div>
   </div>
-  <button :disabled="!isCustomer && !isSender" class="btn btn-primary" @click="Save()">Сохранить</button>
 
 </template>

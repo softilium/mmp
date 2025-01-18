@@ -94,6 +94,15 @@
     if (res.ok) LoadBasket();
   }
 
+  const DeleteGood = async () => {
+    let res = await fetch(`${authStore.rbUrl()}/api/goods/${good.value.id}`, {
+      method: "DELETE",
+      headers: authStore.authHeadersAppJson()
+    });
+    if (res.ok) {
+      router.push("/shop/" + route.params.shopid);
+    }
+  }
 
 </script>
 
@@ -150,8 +159,9 @@
   </div>
 
   <RouterLink v-if="isOwner" v-bind:to="`/edit-good/${good.ownerShop.id}/${good.id}`">
-    <span class="btn btn-info">Редактировать</span>
+    <span class="btn btn-info btn-sm">Редактировать</span>
   </RouterLink>
-
+  &nbsp;
+  <button class="btn btn-info btn-sm" v-if="isOwner" @click="DeleteGood();" >Удалить</button>
 
 </template>

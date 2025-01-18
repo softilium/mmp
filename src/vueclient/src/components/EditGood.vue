@@ -113,7 +113,7 @@
 <template>
   <h1>Редактирование товара / услуги</h1>
   <div>&nbsp;</div>
-  <button class="btn btn-primary" @click="Save">Сохранить</button>
+  <button class="btn btn-primary btn-sm" @click="Save">Сохранить</button>
   <div>&nbsp;</div>
 
   <div class="row mb-3">
