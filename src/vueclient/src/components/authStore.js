@@ -10,12 +10,6 @@ export const authStore = reactive({
   accessToken: "",
   refreshToken: "",
 
-  // tgUserName: () => {
-  //   let r = window.Telegram.WebApp.initDataUnsafe.user.username;
-  //   if (typeof (r) != "string" || r == "") return null;
-  //   return r;
-  // },
-
   tgInitData() {
     let r = window.Telegram.WebApp.initData;
     if (typeof (r) != "string" || r == "") return null;

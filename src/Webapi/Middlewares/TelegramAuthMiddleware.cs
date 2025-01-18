@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using mmp.Data;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -78,7 +79,7 @@ public class TelegramAuthMiddleWare
         }
     }
 
-    public async Task Invoke(HttpContext context, TelegramBotClient bot, ApplicationDbContext db)
+    public async Task Invoke(HttpContext context, TelegramBotClient bot, ApplicationDbContext db, UserManager<User> um)
     {
         if (context.Request.Headers.ContainsKey("Authorization") && context.Request.Headers["Authorization"].Count > 0)
         {
@@ -93,12 +94,40 @@ public class TelegramAuthMiddleWare
                     {
                         if (username != "")
                         {
-                            var user = await db.Users.FirstOrDefaultAsync(_ => _.TelegramUserName == username);
-                            if (user != null)
+                            var user = await db.Users.FirstOrDefaultAsync(_ => _.TelegramUserName == username && _.TelegramVerified);
+                            if (user == null)
                             {
-                                var identity = new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, username) }, "custom");
-                                context.User = new ClaimsPrincipal(identity);
+                                // lets create default user record for telegram user 
+
+                                var chat = await db.BotChats.FirstOrDefaultAsync(_ => _.UserName == username) 
+                                    ?? throw new Exception("Unable to find stored chat for tg user. Does bot active? Does bot handler?");
+
+                                var newUser = new User
+                                {
+                                    TelegramUserName = username,
+                                    UserName = username,
+                                    TelegramVerified = true,
+                                    Email = username + "@telegram.tg"
+                                };
+
+                                var res = await um.CreateAsync(newUser);
+                                if (!res.Succeeded)
+                                {
+                                    throw new Exception(res.Errors.ToString());
+                                }
+
+                                var newPassword = Guid.NewGuid().ToString()[^8..];
+
+                                await um.AddPasswordAsync(newUser, newPassword);
+
+                                await db.SaveChangesAsync();
+
+                                await bot.SendMessage(chat.ChatId, 
+                                    $"Ваш пароль для входа на сайт river-stores.com: {newPassword}.\n\rВ карточке вашего профиля Вам нужно указать ваш реальный email вместо синтетического, который указан только для заполнения профиля."
+                                );
                             }
+                            var identity = new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, username) }, "custom");
+                            context.User = new ClaimsPrincipal(identity);
                         }
                     }
                 }

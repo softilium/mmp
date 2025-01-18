@@ -104,7 +104,7 @@
   <div class="row mb-3">
     <label class="col-3 form-label">Email/логин</label>
     <div class="col-7">
-      <input class="form-control" v-model="user.email" readonly />
+      <input type="email" class="form-control" v-model="user.email" />
     </div>
   </div>
 
