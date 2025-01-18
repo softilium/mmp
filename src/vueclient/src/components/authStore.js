@@ -11,6 +11,7 @@ export const authStore = reactive({
   refreshToken: "",
 
   tgInitData() {
+    if (window.Telegram == undefined || window.Telegram.WebApp == undefined) return null;
     let r = window.Telegram.WebApp.initData;
     if (typeof (r) != "string" || r == "") return null;
     return r;

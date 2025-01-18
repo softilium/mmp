@@ -135,6 +135,11 @@
     </table>
   </div>
 
-  <button class="btn btn-info" v-if="isOwner" @click="router.push(`/edit-good/${route.params.id}`);">Добавить товар / услугу</button>
+  <button class="btn btn-info btn-sm" v-if="isOwner" @click="router.push(`/edit-good/${route.params.id}`);">Добавить товар / услугу</button>
+  &nbsp;
+  <RouterLink class="btn btn-info btn-sm" v-if="authStore.userInfo.shopManage && shop.createdByInfo.id==authStore.userInfo.id" v-bind:to="`/edit-shop/${shop.id}`">
+    Редактировать витрину
+  </RouterLink>
+
 
 </template>

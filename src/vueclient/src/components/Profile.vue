@@ -90,21 +90,21 @@
 <template>
 
   <h1>
-    Профиль пользователя {{ user.userName }}&nbsp;<button v-if="me && !authStore.isTg()" class="btn btn-outline-secondary"
+    Профиль пользователя {{ user.userName }}&nbsp;<br/><button v-if="me && !authStore.isTg()" class="btn btn-outline-secondary btn-sm"
       @click="authStore.Logout(); $router.push('/');">Выйти</button>
   </h1>
   <br />
 
   <div class="row mb-3">
-    <label class="col-3 form-label">Имя пользователя</label>
+    <label class="col-4 form-label">Имя пользователя</label>
     <div class="col-7">
-      <input class="form-control" v-model="user.userName" required />
+      <input class="form-control" v-model="user.userName" required :disabled="!me" />
     </div>
   </div>
   <div class="row mb-3">
-    <label class="col-3 form-label">Email/логин</label>
+    <label class="col-4 form-label">Email/логин</label>
     <div class="col-7">
-      <input type="email" class="form-control" v-model="user.email" />
+      <input type="email" class="form-control" v-model="user.email" :disabled="!me" />
     </div>
   </div>
 
@@ -116,12 +116,12 @@
       <a href="https://t.me/RiverStoresBot" target="_blank">нашего бота</a>. После этого укажите ваше имя пользователя из Telegram ниже.
     </h4>
     <div class="row mb-3">
-      <label class="col-3 form-label">Пользователь телеграм</label>
+      <label class="col-4 form-label">Пользователь телеграм</label>
       <div class="col-7">
         <input class="form-control" v-model="newTelegramUserName" :readonly="authStore.isTg()" />
       </div>
-      <div class="col-1" v-if="user.telegramVerified">
-        <span class="text-success"><i class="bi bi-star-fill"></i> Активно</span>
+      <div class="col-1">
+        <span class="text-success"><i class="bi bi-star-fill"></i></span>
       </div>
     </div>
     <div class="row mb-3 text-danger" v-if="user.telegramUserName && !user.botChatId">
@@ -145,7 +145,7 @@
     </div>
 
     <div v-if="!route.params.id">
-      <button class="btn btn-primary" @click="Save">Сохранить</button>
+      <button class="btn btn-secondary btn-sm" @click="Save">Сохранить</button>
     </div>
     <div v-if="result" class="alert alert-primary">
       {{ result }}

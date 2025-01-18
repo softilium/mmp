@@ -8,7 +8,7 @@
   const router = useRouter();
 
   const shop = ref({});
-  
+
   const basket = ref([]);
   const qtyTotal = ref(0);
   const sumTotal = ref(0);
@@ -90,15 +90,15 @@
 
   <div class="row mb-3">
     <div class="form-group form-group-sm row">
-      <label class="col-3 form-label">Примечание к заказу</label>
-      <div class="col-9">
+      <label class="col-4 form-label">Примечание к заказу</label>
+      <div class="col-8">
         <textarea class="form-control" v-model="customerComment" rows="5" />
       </div>
     </div>
   </div>
 
   <div class="row mb-3">
-    <button class="btn btn-primary" @click="Checkout()">Оформить заказ</button>
+    <button class="btn btn-primary btn-sm" @click="Checkout()">Оформить заказ</button>
   </div>
 
 </template>

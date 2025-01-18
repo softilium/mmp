@@ -40,7 +40,6 @@
   </div>
 
   <br />
-  <br />
   <footer class="border-top footer text-muted">
     <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow.mb-3">
       <div class="container-fluid">

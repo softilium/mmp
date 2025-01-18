@@ -33,16 +33,7 @@
       <tbody>
         <tr v-for="item in shops" v-bind:key="item.id">
           <td class="col-9">
-            <div class="row">
-              <div class="col-11">
-                <RouterLink v-bind:to="`/shop/${item.id}`">{{ item.caption }}</RouterLink>
-              </div>
-              <div class="col-1 text-end">
-                <RouterLink v-if="authStore.userInfo.shopManage && item.createdByInfo.id==authStore.userInfo.id" v-bind:to="`/edit-shop/${item.id}`">
-                  <span class="text-info"><i class="bi bi-pencil-square" /></span>
-                </RouterLink>
-              </div>
-            </div>
+            <RouterLink v-bind:to="`/shop/${item.id}`">{{ item.caption }}</RouterLink>
           </td>
           <td class="col-2"><ProfileLink :userInfo="item.createdByInfo"></ProfileLink></td>
         </tr>
@@ -50,6 +41,6 @@
     </table>
   </div>
   <br />
-  <button class="btn btn-info" v-if="authStore.userInfo.id && authStore.userInfo.shopManage" @click="$router.push('/edit-shop');">Добавить витрину</button>
+  <button class="btn btn-info btn-sm" v-if="authStore.userInfo.id && authStore.userInfo.shopManage" @click="$router.push('/edit-shop');">Добавить витрину</button>
 
 </template>
