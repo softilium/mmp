@@ -94,7 +94,7 @@ public class TelegramAuthMiddleWare
                     {
                         if (username != "")
                         {
-                            var user = await db.Users.FirstOrDefaultAsync(_ => _.TelegramUserName == username && _.TelegramVerified);
+                            var user = await db.Users.AsNoTracking().FirstOrDefaultAsync(_ => _.TelegramUserName == username && _.TelegramVerified);
                             if (user == null)
                             {
                                 // lets create default user record for telegram user 
@@ -125,8 +125,9 @@ public class TelegramAuthMiddleWare
                                 await bot.SendMessage(chat.ChatId, 
                                     $"Ваш пароль для входа на сайт river-stores.com: {newPassword}.\n\rВ карточке вашего профиля Вам нужно указать ваш реальный email вместо синтетического, который указан только для заполнения профиля."
                                 );
+                                user = newUser;
                             }
-                            var identity = new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, username) }, "custom");
+                            var identity = new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, user.UserName) }, "custom");
                             context.User = new ClaimsPrincipal(identity);
                         }
                     }
