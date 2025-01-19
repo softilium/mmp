@@ -31,6 +31,16 @@
       let res = await fetch(authStore.rbUrl() + "/api/goods?shopid=" + route.params.id, { signal: AbortSignal.timeout(5000), });
       if (res.ok) {
         goods.value = await res.json();
+
+        goods.value.forEach(async g => {
+          let res = await fetch(`${authStore.rbUrl()}/api/goods/images/${g.id}/0`, { method: "GET" });
+          if (res.status == 200) { // status 204 means no image
+            let b = await res.blob();
+            const src = URL.createObjectURL(b);
+            g.thumb = src;
+          }
+        });
+
       }
     } catch (err) { console.log(err); }
 
@@ -122,8 +132,7 @@
       <tbody>
         <tr v-for="good in goods" v-bind:key="good.id">
           <td class="col-7">
-            <RouterLink v-bind:to="`/good/${good.id}`"> {{ good.caption }} </RouterLink>
-          </td>
+            <RouterLink v-if="good.thumb" v-bind:to="`/good/${good.id}`"><img :src="good.thumb" class="img-fluid img-thumbnail" height="60" width="60"></RouterLink>&nbsp;<RouterLink v-bind:to="`/good/${good.id}`">{{ good.caption }}</RouterLink></td>
           <td class="col-2 text-end">{{ good.price }}</td>
           <td v-if="authStore.userInfo.id" class="col-3">
             <button class="btn btn-primary btn-sm" @click="Inc(good)">+</button>&nbsp;
