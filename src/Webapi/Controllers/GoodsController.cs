@@ -104,14 +104,14 @@ namespace Webapi.Controllers
             if (good == null) return NotFound();
             if (good.CreatedByID != cu.Id) return Unauthorized();
 
-            if (await DeleteGoodImage(id, 1) is StatusCodeResult r1)
-                Console.WriteLine($"Deleting good {id}. image 1 deleting result {r1.StatusCode}");
-
-            if (await DeleteGoodImage(id, 1) is StatusCodeResult r2)
-                Console.WriteLine($"Deleting good {id}. image 1 deleting result {r2.StatusCode}");
-
-            if (await DeleteGoodImage(id, 1) is StatusCodeResult r3)
-                Console.WriteLine($"Deleting good {id}. image 1 deleting result {r3.StatusCode}");
+            for (var i = 0; i < 3; i++)
+            {
+                var r0 = await DeleteGoodImage(id, i);
+                if (r0 is StatusCodeResult r)
+                    Console.WriteLine($"Deleting good {id}. image {i} deleting result {r.StatusCode}");
+                else
+                    Console.WriteLine($"Deleting good {id}. image {i}. response type is {r0.GetType().ToString()}");
+            }
 
             good.IsDeleted = true;
 
@@ -185,13 +185,13 @@ namespace Webapi.Controllers
         public async Task<IActionResult> DeleteGoodImage(long goodId, int num)
         {
             var cu = db.CurrentUser();
-            if (cu == null) return Unauthorized();
+            if (cu == null) return Unauthorized("Unable to get authenticated user");
 
             var good = await db.Goods.
                 Include(_ => _.OwnerShop)
                 .FirstOrDefaultAsync(_ => _.ID == goodId && !_.IsDeleted);
-            if (good == null) return NotFound();
-            if (good.OwnerShop.CreatedByID != cu.Id) return Unauthorized();
+            if (good == null) return NotFound("Good isn't found");
+            if (good.OwnerShop.CreatedByID != cu.Id) return Unauthorized("Good isn't your. Only owner can delete");
 
             if (!UseAzureBlobs)
             {
