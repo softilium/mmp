@@ -1,6 +1,7 @@
 ﻿using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Azure;
 using mmp.Data;
 
 namespace Webapi.Controllers
@@ -11,15 +12,17 @@ namespace Webapi.Controllers
     {
         private readonly ApplicationDbContext db;
         private IHostEnvironment host;
+        IHttpContextAccessor httpCtx;
 
         private readonly BlobContainerClient blobContainer;
 
         private bool UseAzureBlobs => !host.IsDevelopment();
 
-        public GoodsController(ApplicationDbContext _db, IHostEnvironment hostEnvironment, BlobServiceClient _blobServiceClient)
+        public GoodsController(ApplicationDbContext _db, IHostEnvironment hostEnvironment, BlobServiceClient _blobServiceClient, IHttpContextAccessor _httpCtx)
         {
             db = _db;
             host = hostEnvironment;
+            httpCtx = _httpCtx;
             if (UseAzureBlobs && _blobServiceClient != null)
                 blobContainer = _blobServiceClient.GetBlobContainerClient("goodimages");
         }
@@ -103,9 +106,14 @@ namespace Webapi.Controllers
             // also delete uncompleted baskets
             db.OrderLines.Where(_ => _.Good == good && _.Order == null).ExecuteDelete();
 
-            await DeleteGoodImage(id, 1);
-            await DeleteGoodImage(id, 2);
-            await DeleteGoodImage(id, 3);
+            if (await DeleteGoodImage(id, 1) is StatusCodeResult r1) 
+                Console.WriteLine($"Deleting good {id}. image 1 deleting result {r1.StatusCode}");
+
+            if (await DeleteGoodImage(id, 1) is StatusCodeResult r2) 
+                Console.WriteLine($"Deleting good {id}. image 1 deleting result {r2.StatusCode}");
+
+            if (await DeleteGoodImage(id, 1) is StatusCodeResult r3) 
+                Console.WriteLine($"Deleting good {id}. image 1 deleting result {r3.StatusCode}");
 
             await db.SaveChangesAsync();
 
