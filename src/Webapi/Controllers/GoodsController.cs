@@ -34,9 +34,12 @@ namespace Webapi.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Good>> GetGood(long id)
+        public async Task<ActionResult<Good>> GetGood(long id, [FromQuery] bool showDeleted = false)
         {
-            var good = await db.Goods.Include(_ => _.OwnerShop).AsNoTracking().FirstOrDefaultAsync(_ => _.ID == id);
+            var good = await db.Goods
+                .Include(_ => _.OwnerShop)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(_ => _.ID == id && (!_.IsDeleted || showDeleted));
             if (good == null) return NotFound();
             return good;
         }
