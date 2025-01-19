@@ -103,11 +103,11 @@ namespace Webapi.Controllers
             // also delete uncompleted baskets
             db.OrderLines.Where(_ => _.Good == good && _.Order == null).ExecuteDelete();
 
-            await db.SaveChangesAsync();
-
             await DeleteGoodImage(id, 1);
             await DeleteGoodImage(id, 2);
             await DeleteGoodImage(id, 3);
+
+            await db.SaveChangesAsync();
 
             return NoContent();
         }
