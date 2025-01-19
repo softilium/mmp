@@ -92,7 +92,8 @@
       </thead>
       <tbody>
         <tr v-for="line in order.lines" v-bind:key="line.id">
-          <td>{{line.good.caption}}</td>
+          <td v-if="line.good.isDeleted==true">{{line.good.caption}} (удалено)</td>
+          <td v-if="line.good.isDeleted==false"><RouterLink :to="`/good/${line.good.id}`">{{line.good.caption}}</RouterLink></td>
           <td>{{line.qty}}</td>
           <td>{{line.sum}}</td>
         </tr>
