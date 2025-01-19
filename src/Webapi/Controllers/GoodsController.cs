@@ -104,19 +104,20 @@ namespace Webapi.Controllers
             if (good == null) return NotFound();
             if (good.CreatedByID != cu.Id) return Unauthorized();
 
+            if (await DeleteGoodImage(id, 1) is StatusCodeResult r1)
+                Console.WriteLine($"Deleting good {id}. image 1 deleting result {r1.StatusCode}");
+
+            if (await DeleteGoodImage(id, 1) is StatusCodeResult r2)
+                Console.WriteLine($"Deleting good {id}. image 1 deleting result {r2.StatusCode}");
+
+            if (await DeleteGoodImage(id, 1) is StatusCodeResult r3)
+                Console.WriteLine($"Deleting good {id}. image 1 deleting result {r3.StatusCode}");
+
             good.IsDeleted = true;
 
             // also delete uncompleted baskets
             db.OrderLines.Where(_ => _.Good == good && _.Order == null).ExecuteDelete();
 
-            if (await DeleteGoodImage(id, 1) is StatusCodeResult r1) 
-                Console.WriteLine($"Deleting good {id}. image 1 deleting result {r1.StatusCode}");
-
-            if (await DeleteGoodImage(id, 1) is StatusCodeResult r2) 
-                Console.WriteLine($"Deleting good {id}. image 1 deleting result {r2.StatusCode}");
-
-            if (await DeleteGoodImage(id, 1) is StatusCodeResult r3) 
-                Console.WriteLine($"Deleting good {id}. image 1 deleting result {r3.StatusCode}");
 
             await db.SaveChangesAsync();
 
