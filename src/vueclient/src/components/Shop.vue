@@ -110,9 +110,36 @@
     }
   }
 
+  const DeleteShop = async () => {
+
+    if (!confirm("Удалить витрину, вы уверены?")) return;
+
+    let res = await fetch(`${authStore.rbUrl()}/api/shops/${route.params.id}`,
+      {
+        method: "DELETE",
+        headers: authStore.authHeaders()
+      }
+    );
+    if (res.ok) {
+      router.push("/");
+    } else {
+      var err = await res.text();
+      alert(err);
+    }
+  }
+
 </script>
 
 <template>
+  <nav>
+    <button class="btn btn-info btn-sm" v-if="isOwner" @click="router.push(`/edit-good/${route.params.id}`);">Добавить товар / услугу</button>
+    &nbsp;
+    <RouterLink class="btn btn-info btn-sm" v-if="isOwner" v-bind:to="`/edit-shop/${shop.id}`">
+      Редактировать витрину
+    </RouterLink>
+    &nbsp;
+    <button class="btn btn-info btn-sm" v-if="isOwner" @click="DeleteShop();">Удалить витрину</button>
+  </nav>
 
   <h1>{{ shop.caption }}</h1>
 
@@ -132,7 +159,8 @@
       <tbody>
         <tr v-for="good in goods" v-bind:key="good.id">
           <td class="col-7">
-            <RouterLink v-if="good.thumb" v-bind:to="`/good/${good.id}`"><img :src="good.thumb" class="img-fluid img-thumbnail" height="60" width="60"></RouterLink>&nbsp;<RouterLink v-bind:to="`/good/${good.id}`">{{ good.caption }}</RouterLink></td>
+            <RouterLink v-if="good.thumb" v-bind:to="`/good/${good.id}`"><img :src="good.thumb" class="img-fluid img-thumbnail" height="60" width="60"></RouterLink>&nbsp;<RouterLink v-bind:to="`/good/${good.id}`">{{ good.caption }}</RouterLink>
+          </td>
           <td class="col-2 text-end">{{ good.price }}</td>
           <td v-if="authStore.userInfo.id" class="col-3">
             <button class="btn btn-primary btn-sm" @click="Inc(good)">+</button>&nbsp;
@@ -143,12 +171,5 @@
       </tbody>
     </table>
   </div>
-
-  <button class="btn btn-info btn-sm" v-if="isOwner" @click="router.push(`/edit-good/${route.params.id}`);">Добавить товар / услугу</button>
-  &nbsp;
-  <RouterLink class="btn btn-info btn-sm" v-if="authStore.userInfo.shopManage && shop.createdByInfo.id==authStore.userInfo.id" v-bind:to="`/edit-shop/${shop.id}`">
-    Редактировать витрину
-  </RouterLink>
-
 
 </template>

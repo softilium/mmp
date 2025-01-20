@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Azure.Storage.Blobs;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using mmp.Data;
 
@@ -9,10 +10,18 @@ namespace Webapi.Controllers
     public class ShopsController : ControllerBase
     {
         private readonly ApplicationDbContext db;
+        private IHostEnvironment he;
+        private BlobServiceClient blobServiceClient;
+        private IHttpContextAccessor httpCtx;
+        private IServiceProvider sp;
 
-        public ShopsController(ApplicationDbContext context)
+        public ShopsController(ApplicationDbContext context, IHostEnvironment _he, BlobServiceClient _blobServiceClient, IHttpContextAccessor _httpCtx, IServiceProvider _sp)
         {
             db = context;
+            he = _he;
+            blobServiceClient = _blobServiceClient;
+            httpCtx = _httpCtx;
+            sp = _sp;
         }
 
         private IQueryable<long> shopManagers()
@@ -89,6 +98,22 @@ namespace Webapi.Controllers
             var shop = await db.Shops.FirstOrDefaultAsync(_ => _.IsDeleted == false && _.ID == id);
             if (shop == null) return NotFound();
             if (shop.CreatedByID != cu.Id) return Unauthorized();
+
+            var clStatuses = new[] { OrderStatuses.Canceled, OrderStatuses.Done };
+            var foo = db.Orders.Where(_ => _.Shop == shop && !_.IsDeleted && !clStatuses.Contains(_.Status)).FirstOrDefault();
+            if (foo != null) return BadRequest("Перед удалением витрины нужно закрыть все заказы по ней");
+
+            var goods = db.Goods.Where(_ => _.OwnerShop == shop && !_.IsDeleted);
+
+            using (var scope = sp.CreateScope())
+            {
+                var gc = new GoodsController(scope.ServiceProvider.GetRequiredService<ApplicationDbContext>(), he, blobServiceClient, httpCtx);
+                foreach (var g in goods)
+                {
+                    var t = gc.DeleteGood(g.ID);
+                    t.Wait();
+                }
+            }
 
             shop.IsDeleted = true;
             await db.SaveChangesAsync();

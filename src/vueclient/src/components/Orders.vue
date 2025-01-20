@@ -51,7 +51,8 @@
       </thead>
       <tr v-for="order in orders" v-bind:key="order.id">
         <td>
-          <RouterLink :to="`/order/${order.id}`">{{ order.shop.caption }}</RouterLink>
+          <RouterLink v-if="order.shop.isDeleted" :to="`/order/${order.id}`">{{ order.shop.caption }} (удалено)</RouterLink>
+          <RouterLink v-if="!order.shop.isDeleted" :to="`/order/${order.id}`">{{ order.shop.caption }}</RouterLink>
         </td>
         <td>
           <RouterLink :to="`/order/${order.id}`">{{ order.shop.createdByInfo.userName }} </RouterLink>

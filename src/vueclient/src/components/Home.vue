@@ -19,6 +19,9 @@
 </script>
 
 <template>
+  <nav>
+    <button class="btn btn-info btn-sm" v-if="authStore.userInfo.id && authStore.userInfo.shopManage" @click="$router.push('/edit-shop');">Добавить витрину</button>
+  </nav>
 
   <h1>Витрины</h1>
 
@@ -41,6 +44,5 @@
     </table>
   </div>
   <br />
-  <button class="btn btn-info btn-sm" v-if="authStore.userInfo.id && authStore.userInfo.shopManage" @click="$router.push('/edit-shop');">Добавить витрину</button>
 
 </template>

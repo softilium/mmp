@@ -13,10 +13,10 @@
     caption: "",
     description: "",
     basked: null,
-    id:0,
-    price:0,
-    article:"",
-    url:"",
+    id: 0,
+    price: 0,
+    article: "",
+    url: "",
     createdByID: 0
   });
   const basketSum = ref(0);
@@ -95,6 +95,9 @@
   }
 
   const DeleteGood = async () => {
+
+    if (!confirm('Удалить товар, вы уверены?')) return;
+
     let res = await fetch(`${authStore.rbUrl()}/api/goods/${good.value.id}`, {
       method: "DELETE",
       headers: authStore.authHeadersAppJson()
@@ -107,6 +110,13 @@
 </script>
 
 <template>
+  <nav>
+    <RouterLink v-if="isOwner" v-bind:to="`/edit-good/${good.ownerShop.id}/${good.id}`">
+      <span class="btn btn-info btn-sm">Редактировать товар</span>
+    </RouterLink>
+    &nbsp;
+    <button class="btn btn-info btn-sm" v-if="isOwner" @click="DeleteGood();">Удалить товар</button>
+  </nav>
   <h1>{{good.caption}}</h1>
   <RouterLink :to="`/shop/${good.ownerShop.id}`">Витрина "{{good.ownerShop.caption}}"</RouterLink>
   <div>&nbsp;</div>
@@ -157,11 +167,5 @@
       <img :src="imageSrc[curImgIndex]" class="d-block w-100">
     </div>
   </div>
-
-  <RouterLink v-if="isOwner" v-bind:to="`/edit-good/${good.ownerShop.id}/${good.id}`">
-    <span class="btn btn-info btn-sm">Редактировать</span>
-  </RouterLink>
-  &nbsp;
-  <button class="btn btn-info btn-sm" v-if="isOwner" @click="DeleteGood();" >Удалить</button>
 
 </template>
