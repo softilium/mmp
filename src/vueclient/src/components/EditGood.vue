@@ -8,6 +8,7 @@
   const router = useRouter()
 
   const good = ref({ ownerShop: { id: 0 }, caption: "", description: "", article: "", url: "", price: 0 });
+  const isImageLoading = ref(true);
 
   onMounted(async () => {
     if (route.params.id) {
@@ -21,11 +22,9 @@
         console.log(err);
         router.push("/shop/" + route.params.shopid);
       }
-
-    }
+    } else isImageLoading.value = false;
   });
 
-  const isImageLoading = ref(true);
   const LoadImages = async () => {
     for (let i = 0; i < maxImagesCnt.value; i++) {
       let res = await fetch(`${authStore.rbUrl()}/api/goods/images/${route.params.id}/${i}`, { method: "GET" });
@@ -38,6 +37,28 @@
     isImageLoading.value = false;
   }
 
+  const SaveImages = async (gid) => {
+    for (let i = 0; i <= maxImagesCnt.value - 1; i++) {
+      if (!imageSrc.value[i]) {
+        let res = await fetch(`${authStore.rbUrl()}/api/goods/images/${gid}/${i}`, {
+          method: "DELETE",
+          headers: authStore.authHeaders()
+        });
+        if (!res.ok) console.log(res);
+      } else {
+        let blob = await fetch(imageSrc.value[i]).then(r => r.blob()); // load image from blob url
+        let data = new FormData();
+        data.append("image", blob);
+        let res = await fetch(`${authStore.rbUrl()}/api/goods/images/${gid}/${i}`, {
+          method: "POST",
+          headers: authStore.authHeaders(),
+          body: data
+        });
+        if (!res.ok) console.log(res);
+      }
+    }
+  }
+
   const Save = async () => {
     if (route.params.id) {
       let res = await fetch(authStore.rbUrl() + "/api/goods/" + route.params.id, {
@@ -46,38 +67,19 @@
         body: JSON.stringify(good.value)
       });
       if (res.ok) {
-        for (let i = 0; i <= maxImagesCnt.value - 1; i++) {
-          if (!imageSrc.value[i]) {
-            res = await fetch(`${authStore.rbUrl()}/api/goods/images/${route.params.id}/${i}`, {
-              method: "DELETE",
-              headers: authStore.authHeaders()
-            });
-            if (!res.ok) console.log(res);
-          } else {
-            let blob = await fetch(imageSrc.value[i]).then(r => r.blob()); // load image from blob url
-            let data = new FormData();
-            data.append("image", blob);
-            res = await fetch(`${authStore.rbUrl()}/api/goods/images/${route.params.id}/${i}`, {
-              method: "POST",
-              headers: authStore.authHeaders(),
-              body: data
-            });
-            if (!res.ok) console.log(res);
-          }
-        }
+        await SaveImages(route.params.id);
         router.push("/shop/" + route.params.shopid);
       }
-
     } else {
-      //TODO get id after post and upload images for new good
       good.value.ownerShop.id = route.params.shopid;
-
       let res = await fetch(authStore.rbUrl() + "/api/goods", {
         method: "POST",
         headers: authStore.authHeadersAppJson(),
         body: JSON.stringify(good.value)
       });
       if (res.ok) {
+        res = await res.json();
+        await SaveImages(res.id);
         router.push("/shop/" + route.params.shopid);
       }
     }
@@ -161,7 +163,9 @@
     <div class="col-1">
       <span v-for="(src, index) in imageSrc" :key="index">
         <button :class="`${index == curImgIndex ? 'btn btn-secondary btn-sm' : 'btn btn-outline-secondary btn-sm'}`"
-          @click="curImgIndex = index">{{ index + 1 }}</button>&nbsp;
+                @click="curImgIndex = index">
+          {{ index + 1 }}
+        </button>&nbsp;
       </span>
     </div>
     <div class="col">
