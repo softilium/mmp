@@ -145,7 +145,7 @@
 
   <div class="row">
     <table class="table">
-      <thead class="table-primary">
+      <thead class="table-primary" style="position: sticky; top: 0; z-index: 1; background-color: white;">
         <tr>
           <th>Товар или услуга</th>
           <th class="text-end">Цена</th>
