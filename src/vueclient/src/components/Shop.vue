@@ -158,18 +158,18 @@
       </thead>
       <tbody>
         <tr v-for="good in goods" v-bind:key="good.id">
-          <td class="col-7">
+          <td class="col-8">
             <div class="row">
-              <div class="col-auto" v-if="good.thumb">
+              <div class="col-4" v-if="good.thumb">
                 <RouterLink v-bind:to="`/good/${good.id}`"><img :src="good.thumb" class="img-fluid img-thumbnail" height="60" width="60"></RouterLink>
               </div>
-              <div class="col">
+              <div class="col-8">
                 &nbsp;<RouterLink v-bind:to="`/good/${good.id}`">{{ good.caption }}</RouterLink>
               </div>
             </div>
           </td>
-          <td class="col-2 text-end">{{ good.price }}</td>
-          <td v-if="authStore.userInfo.id" class="col-3">
+          <td class="text-end">{{ good.price }}</td>
+          <td v-if="authStore.userInfo.id" class="col-4">
             <button class="btn btn-primary btn-sm" @click="Inc(good)">+</button>&nbsp;
             <span v-if="good.basked"><button class="btn btn-primary btn-sm" @click="Dec(good)">-</button>&nbsp;</span>
             {{ good.basked }}
