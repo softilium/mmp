@@ -147,7 +147,7 @@
     <table class="table">
       <thead class="table-primary">
         <tr>
-          <th>Товар или Услуга</th>
+          <th>Товар или услуга</th>
           <th class="text-end">Цена</th>
           <th>
             <button class="btn btn-outline-success btn-sm" v-if="basketSum" @click="$router.push(`/checkout/${shop.id}`);">
@@ -159,7 +159,14 @@
       <tbody>
         <tr v-for="good in goods" v-bind:key="good.id">
           <td class="col-7">
-            <RouterLink v-if="good.thumb" v-bind:to="`/good/${good.id}`"><img :src="good.thumb" class="img-fluid img-thumbnail" height="60" width="60"></RouterLink>&nbsp;<RouterLink v-bind:to="`/good/${good.id}`">{{ good.caption }}</RouterLink>
+            <div class="row">
+              <div class="col-auto" v-if="good.thumb">
+                <RouterLink v-bind:to="`/good/${good.id}`"><img :src="good.thumb" class="img-fluid img-thumbnail" height="60" width="60"></RouterLink>
+              </div>
+              <div class="col">
+                &nbsp;<RouterLink v-bind:to="`/good/${good.id}`">{{ good.caption }}</RouterLink>
+              </div>
+            </div>
           </td>
           <td class="col-2 text-end">{{ good.price }}</td>
           <td v-if="authStore.userInfo.id" class="col-3">
