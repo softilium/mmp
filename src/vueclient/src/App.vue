@@ -51,11 +51,11 @@
         </span>
       </div>
     </nav>
-    <div class="row">
-      <div class="col">
-        <p>
-          &copy; 2024-2025,
-        </p>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col">
+          <span>&copy;2024-2025,</span>
+        </div>
       </div>
     </div>
   </footer>

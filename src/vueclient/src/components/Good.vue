@@ -117,42 +117,39 @@
     &nbsp;
     <button class="btn btn-info btn-sm" v-if="isOwner" @click="DeleteGood();">Удалить товар</button>
   </nav>
-  <h1>{{good.caption}}</h1>
   <RouterLink :to="`/shop/${good.ownerShop.id}`">Витрина "{{good.ownerShop.caption}}"</RouterLink>
   <div>&nbsp;</div>
+  <h1>{{good.caption}}</h1>
 
-  <table class="table">
-    <tbody>
-      <tr v-if="authStore.userInfo.id">
-        <td>В корзине</td>
-        <td>
-          <button class="btn btn-primary btn-sm" @click="Inc(good)">+</button>&nbsp;
-          <span v-if="good.basked">
-            <button class="btn btn-primary btn-sm" @click="Dec(good)">-</button>&nbsp; {{ basketSum }}
-            <button class="btn btn-outline-success btn-sm" @click="$router.push(`/checkout/${good.ownerShop.id}`);">
-              <i class="bi bi-basket2-fill"></i>
-            </button>
-          </span>
-        </td>
-      </tr>
-      <tr>
-        <td class="col-2">Артикул</td>
-        <td>{{good.article}}</td>
-      </tr>
-      <tr>
-        <td class="col-2">Ссылка</td>
-        <td>{{good.url}}</td>
-      </tr>
-      <tr>
-        <td class="col-2">Описание</td>
-        <td>{{good.description}}</td>
-      </tr>
-      <tr>
-        <td class="col-2">Цена</td>
-        <td>{{good.price}}</td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="row">
+    <div class="col-6 col-md-3">
+      Положить в корзину
+    </div>
+    <div class="col-6 col-md-9">
+      <button class="btn btn-primary btn-sm" @click="Inc(good)">+</button>&nbsp;
+      <span v-if="good.basked">
+        <button class="btn btn-primary btn-sm" @click="Dec(good)">-</button>&nbsp; {{ basketSum }}
+        <button class="btn btn-outline-success btn-sm" @click="$router.push(`/checkout/${good.ownerShop.id}`);">
+          <i class="bi bi-basket2-fill"></i>
+        </button>
+      </span>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-6 col-md-3">Цена</div>
+    <div class="col-6 col-md-9">{{good.price}}</div>
+  </div>
+  <div class="row mb-3">
+    <div class="col-6 col-md-3">Артикул</div>
+    <div class="col-6 col-md-9">{{good.article}}</div>
+  </div>
+  <div v-if="good.url" class="row mb-3">
+    <div class="col"><a :href="good.url" target="_blank">{{good.url}}</a></div>
+  </div>
+
+  <div class="row-mb3">
+    <div class="col">{{good.description}}</div>
+  </div>
 
   <div class="row mb-3" v-if="imageSrc.length>1">
     <div class="col">
