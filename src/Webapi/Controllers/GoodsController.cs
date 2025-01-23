@@ -45,7 +45,7 @@ namespace Webapi.Controllers
             return good;
         }
 
-        private async Task ClearGoodsCache() => await cache.EvictByTagAsync("goods", default);
+        private async Task ClearCache() => await cache.EvictByTagAsync("goods", default);
 
         [HttpPut("{id}")]
         public async Task<IActionResult> PutGood(long id, Good good)
@@ -66,7 +66,7 @@ namespace Webapi.Controllers
             dbGood.Url = good.Url;
 
             await db.SaveChangesAsync();
-            await ClearGoodsCache();
+            await ClearCache();
 
             return NoContent();
         }
@@ -94,7 +94,7 @@ namespace Webapi.Controllers
 
             db.Goods.Add(dbGood);
             await db.SaveChangesAsync();
-            await ClearGoodsCache();
+            await ClearCache();
 
             return CreatedAtAction("GetGood", new { id = dbGood.ID }, dbGood);
         }
@@ -124,7 +124,7 @@ namespace Webapi.Controllers
             db.OrderLines.Where(_ => _.Good == good && _.Order == null).ExecuteDelete();
 
             await db.SaveChangesAsync();
-            await ClearGoodsCache();
+            await ClearCache();
 
             return NoContent();
         }
@@ -183,7 +183,7 @@ namespace Webapi.Controllers
                 memoryStream.Position = 0;
                 await handler.UploadAsync(memoryStream);
             }
-            await ClearGoodsCache();
+            await ClearCache();
             return NoContent();
         }
 
@@ -208,7 +208,7 @@ namespace Webapi.Controllers
             {
                 await blobContainer.DeleteBlobIfExistsAsync(BlobName(goodId, num));
             }
-            await ClearGoodsCache();
+            await ClearCache();
             return NoContent();
         }
 

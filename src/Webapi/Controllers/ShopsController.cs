@@ -8,6 +8,7 @@ namespace Webapi.Controllers
 {
     [Route("api/shops")]
     [ApiController]
+    [OutputCache(Tags = ["shops"])]
     public class ShopsController : ControllerBase
     {
         private readonly ApplicationDbContext db;
@@ -15,6 +16,8 @@ namespace Webapi.Controllers
         private BlobServiceClient blobServiceClient;
         private IServiceProvider sp;
         private IOutputCacheStore cache;
+
+        private async Task ClearCache() => await cache.EvictByTagAsync("shops", default);
 
         public ShopsController(ApplicationDbContext context, IHostEnvironment _he, BlobServiceClient _blobServiceClient, IServiceProvider _sp, IOutputCacheStore _cache)
         {
@@ -70,6 +73,7 @@ namespace Webapi.Controllers
             dbobj.Caption = shop.Caption;
 
             await db.SaveChangesAsync();
+            await ClearCache();
 
             return NoContent();
         }
@@ -86,6 +90,7 @@ namespace Webapi.Controllers
 
             db.Shops.Add(dbobj);
             await db.SaveChangesAsync();
+            await ClearCache();
 
             return CreatedAtAction("GetShop", new { id = dbobj.ID }, dbobj);
         }
@@ -118,6 +123,7 @@ namespace Webapi.Controllers
 
             shop.IsDeleted = true;
             await db.SaveChangesAsync();
+            await ClearCache();
 
             return NoContent();
         }
