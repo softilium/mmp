@@ -1,28 +1,29 @@
 ﻿using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Azure;
 using mmp.Data;
 
 namespace Webapi.Controllers
 {
     [Route("api/goods")]
     [ApiController]
+    [OutputCache(Tags = ["goods"])]
     public class GoodsController : ControllerBase
     {
         private readonly ApplicationDbContext db;
         private IHostEnvironment host;
-        IHttpContextAccessor httpCtx;
+        private IOutputCacheStore cache;
 
         private readonly BlobContainerClient blobContainer;
 
         private bool UseAzureBlobs => !host.IsDevelopment();
 
-        public GoodsController(ApplicationDbContext _db, IHostEnvironment hostEnvironment, BlobServiceClient _blobServiceClient, IHttpContextAccessor _httpCtx)
+        public GoodsController(ApplicationDbContext _db, IHostEnvironment hostEnvironment, BlobServiceClient _blobServiceClient, IOutputCacheStore _cache)
         {
             db = _db;
             host = hostEnvironment;
-            httpCtx = _httpCtx;
+            cache = _cache;
             if (UseAzureBlobs && _blobServiceClient != null)
                 blobContainer = _blobServiceClient.GetBlobContainerClient("goodimages");
         }
@@ -44,6 +45,8 @@ namespace Webapi.Controllers
             return good;
         }
 
+        private async Task ClearGoodsCache() => await cache.EvictByTagAsync("goods", default);
+
         [HttpPut("{id}")]
         public async Task<IActionResult> PutGood(long id, Good good)
         {
@@ -63,6 +66,7 @@ namespace Webapi.Controllers
             dbGood.Url = good.Url;
 
             await db.SaveChangesAsync();
+            await ClearGoodsCache();
 
             return NoContent();
         }
@@ -90,6 +94,7 @@ namespace Webapi.Controllers
 
             db.Goods.Add(dbGood);
             await db.SaveChangesAsync();
+            await ClearGoodsCache();
 
             return CreatedAtAction("GetGood", new { id = dbGood.ID }, dbGood);
         }
@@ -118,8 +123,8 @@ namespace Webapi.Controllers
             // also delete uncompleted baskets
             db.OrderLines.Where(_ => _.Good == good && _.Order == null).ExecuteDelete();
 
-
             await db.SaveChangesAsync();
+            await ClearGoodsCache();
 
             return NoContent();
         }
@@ -178,6 +183,7 @@ namespace Webapi.Controllers
                 memoryStream.Position = 0;
                 await handler.UploadAsync(memoryStream);
             }
+            await ClearGoodsCache();
             return NoContent();
         }
 
@@ -202,6 +208,7 @@ namespace Webapi.Controllers
             {
                 await blobContainer.DeleteBlobIfExistsAsync(BlobName(goodId, num));
             }
+            await ClearGoodsCache();
             return NoContent();
         }
 

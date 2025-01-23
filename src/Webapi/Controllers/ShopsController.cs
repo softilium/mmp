@@ -1,5 +1,6 @@
 ﻿using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.EntityFrameworkCore;
 using mmp.Data;
 
@@ -12,16 +13,16 @@ namespace Webapi.Controllers
         private readonly ApplicationDbContext db;
         private IHostEnvironment he;
         private BlobServiceClient blobServiceClient;
-        private IHttpContextAccessor httpCtx;
         private IServiceProvider sp;
+        private IOutputCacheStore cache;
 
-        public ShopsController(ApplicationDbContext context, IHostEnvironment _he, BlobServiceClient _blobServiceClient, IHttpContextAccessor _httpCtx, IServiceProvider _sp)
+        public ShopsController(ApplicationDbContext context, IHostEnvironment _he, BlobServiceClient _blobServiceClient, IServiceProvider _sp, IOutputCacheStore _cache)
         {
             db = context;
             he = _he;
             blobServiceClient = _blobServiceClient;
-            httpCtx = _httpCtx;
             sp = _sp;
+            cache = _cache;
         }
 
         private IQueryable<long> shopManagers()
@@ -107,7 +108,7 @@ namespace Webapi.Controllers
 
             using (var scope = sp.CreateScope())
             {
-                var gc = new GoodsController(scope.ServiceProvider.GetRequiredService<ApplicationDbContext>(), he, blobServiceClient, httpCtx);
+                var gc = new GoodsController(scope.ServiceProvider.GetRequiredService<ApplicationDbContext>(), he, blobServiceClient, cache);
                 foreach (var g in goods)
                 {
                     var t = gc.DeleteGood(g.ID);
