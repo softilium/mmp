@@ -56,7 +56,8 @@
     <div class="container-fluid">
       <div class="row">
         <div class="col">
-          <span>&copy;2024-2025, </span><a v-if="authStore.isTg()" :href="myurl" target="_blank">Открыть страницу в браузере</a>
+          <span>&copy;2024-2025, </span>
+          <div v-if="authStore.isTg() && authStore.userInfo.shopManage">Адрес страницы для браузера: <input v-model="myurl" /></div>
         </div>
       </div>
     </div>
