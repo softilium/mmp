@@ -1,18 +1,34 @@
 <script setup lang="ts">
 
-  import { onMounted, ref } from 'vue';
+  import { onMounted, ref, watch } from 'vue';
   import { authStore } from './components/authStore.js';
-  import { useRoute } from 'vue-router'
+  import { useRoute } from 'vue-router';
 
   const route = useRoute();
 
-  const myurl = ref(window.location.href);
+  const myurl = ref("");
+
+  const updateMyUrl = () => {
+    // telegram hash param delete from URL
+    const url = new URL(window.location.href);
+    url.hash = "";
+    myurl.value = url.href;
+  }
 
   onMounted(() => {
     authStore.SetAccessToken(localStorage.getItem("accessToken"));
     authStore.SetRefreshToken(localStorage.getItem("refreshToken"));
     authStore.CheckLogged();
+    updateMyUrl();
   });
+
+  // update myurl when user navigate within SPA
+  watch(
+    () => route.fullPath,
+    async newId => {
+      updateMyUrl();
+    }
+  )
 
 </script>
 
@@ -57,7 +73,7 @@
       <div class="row">
         <div class="col">
           <span>&copy;2024-2025, </span>
-          <div v-if="authStore.isTg() && authStore.userInfo.shopManage">Адрес страницы для браузера: <input v-model="myurl" /></div>
+          <div v-if="authStore.isTg() && authStore.userInfo.shopManage">Адрес страницы для браузера: <input class="form-control sm" v-model="myurl" /></div>
         </div>
       </div>
     </div>
