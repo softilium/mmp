@@ -86,7 +86,7 @@
     <div class="form-group form-group-sm row">
       <label class="col-3 form-label">Подробное описание витрины</label>
       <div class="col-7">
-        <textarea class="form-control" v-model="shop.description" rows="5" />
+        <textarea class="form-control" v-model="shop.description" rows="5" placeholder="Это описание будет показано вверху под заголовком витрины." />
       </div>
     </div>
   </div>
@@ -95,7 +95,7 @@
     <div class="form-group form-group-sm row">
       <label class="col-3 form-label">Условия доставки, возврата и проч. (показывается при формировании заказа)</label>
       <div class="col-7">
-        <textarea class="form-control" v-model="shop.deliveryConditions" rows="5" />
+        <textarea class="form-control" v-model="shop.deliveryConditions" rows="5" placeholder="Этот текст с условиями, сроками доставки, условиями возврата и другой важной информацией будет показан на странице перед заказом" />
       </div>
     </div>
   </div>

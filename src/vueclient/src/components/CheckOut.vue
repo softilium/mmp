@@ -3,6 +3,7 @@
   import { onMounted, ref } from 'vue';
   import { useRoute, useRouter } from 'vue-router'
   import { authStore } from './authStore.js';
+  import linkifyHtml from 'linkify-html';
 
   const route = useRoute();
   const router = useRouter();
@@ -14,12 +15,15 @@
   const sumTotal = ref(0);
   const customerComment = ref("");
 
+  const okConditions = ref(false);
+
   onMounted(async () => {
 
     try {
       let res = await fetch(authStore.rbUrl() + "/api/shops/" + route.params.shopid);
       if (res.ok) {
         shop.value = await res.json();
+        shop.value.deliveryConditions = linkifyHtml(shop.value.deliveryConditions);
       } else router.push("/");
     } catch (err) {
       console.log(err);
@@ -97,8 +101,26 @@
     </div>
   </div>
 
+  <div v-if="shop.deliveryConditions" class="text-center">
+    <div class="row mb-3">
+      <div class="col">
+        Условия доставки, важно прочитать перед заказом:<br />
+        <strong>
+          <span v-html="shop.deliveryConditions"></span>
+        </strong>
+        <br />
+        <br />
+      </div>
+      <div class="row mb-3">
+        <div class="col">
+          Условия понятны <input v-model="okConditions" type="checkbox" />
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="row mb-3">
-    <button class="btn btn-primary btn-sm" @click="Checkout()">Оформить заказ</button>
+    <button :disabled="!okConditions" class="btn btn-primary btn-sm" @click="Checkout()">Оформить заказ</button>
   </div>
 
 </template>
