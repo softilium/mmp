@@ -4,11 +4,13 @@
   import { onMounted, ref, nextTick } from 'vue';
   import { useRoute, useRouter } from 'vue-router'
   import { authStore } from './authStore.js';
+  import linkifyHtml from 'linkify-html';
 
   const route = useRoute();
   const router = useRouter();
 
-  const shop = ref({ id: 0, caption: "", createdByInfo: { id: 0 } });
+  const shop = ref({ id: 0, caption: "", description: "", createdByInfo: { id: 0 } });
+  const shopDescription = ref("");
 
   const goods = ref([]);
 
@@ -21,6 +23,7 @@
       if (res.ok) {
         shop.value = await res.json();
         isOwner.value = shop.value.createdByInfo.id == authStore.userInfo.id && authStore.userInfo.shopManage;
+        shopDescription.value = linkifyHtml(shop.value.description);
       } else router.push("/");
     } catch (err) {
       console.log(err);
@@ -142,7 +145,11 @@
   </nav>
 
   <h1>{{ shop.caption }}</h1>
-
+  <div class="col">&nbsp;</div>
+  <div v-if="shop.description" class="row-mb3">
+    <div class="col"><span v-html="shopDescription"></span></div>
+    <div class="col">&nbsp;</div>
+  </div>
   <div class="row">
     <table class="table">
       <thead class="table-primary" style="position: sticky; top: 0; z-index: 1; background-color: white;">

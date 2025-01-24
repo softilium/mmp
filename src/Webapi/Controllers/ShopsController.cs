@@ -61,7 +61,6 @@ namespace Webapi.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutShop(long id, Shop shop)
         {
-
             var cu = db.CurrentUser();
             if (cu == null) return Unauthorized();
 
@@ -69,8 +68,10 @@ namespace Webapi.Controllers
             if (dbobj == null) return NotFound();
 
             if (dbobj.CreatedByID != cu.Id) return Unauthorized();
-
+        
             dbobj.Caption = shop.Caption;
+            dbobj.Description = shop.Description;
+            dbobj.DeliveryConditions = shop.DeliveryConditions;
 
             await db.SaveChangesAsync();
             await ClearCache();
@@ -86,7 +87,11 @@ namespace Webapi.Controllers
 
             if (!shopManagers().Contains(cu.Id)) return Unauthorized();
 
-            var dbobj = new Shop { Caption = shop.Caption };
+            var dbobj = new Shop { 
+                Caption = shop.Caption,
+                Description = shop.Description,
+                DeliveryConditions = shop.DeliveryConditions
+            };
 
             db.Shops.Add(dbobj);
             await db.SaveChangesAsync();
