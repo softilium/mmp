@@ -1,10 +1,12 @@
 <script setup lang="ts">
 
-  import { onMounted } from 'vue';
+  import { onMounted, ref } from 'vue';
   import { authStore } from './components/authStore.js';
   import { useRoute } from 'vue-router'
 
   const route = useRoute();
+
+  const myurl = ref(window.location.href);
 
   onMounted(() => {
     authStore.SetAccessToken(localStorage.getItem("accessToken"));
@@ -54,7 +56,7 @@
     <div class="container-fluid">
       <div class="row">
         <div class="col">
-          <span>&copy;2024-2025,</span>
+          <span>&copy;2024-2025, </span><a v-if="authStore.isTg()" :href="myurl" target="_blank">Открыть страницу в браузере</a>
         </div>
       </div>
     </div>

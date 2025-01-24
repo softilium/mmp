@@ -4,7 +4,7 @@
   import { onMounted, ref, nextTick } from 'vue';
   import { useRoute, useRouter } from 'vue-router'
   import { authStore } from './authStore.js';
-  import linkifyHtml from 'linkify-html';
+  import { glob } from './globals.js';
 
   const route = useRoute();
   const router = useRouter();
@@ -23,7 +23,7 @@
       if (res.ok) {
         shop.value = await res.json();
         isOwner.value = shop.value.createdByInfo.id == authStore.userInfo.id && authStore.userInfo.shopManage;
-        shopDescription.value = linkifyHtml(shop.value.description);
+        shopDescription.value = glob.linkify(shop.value.description);
       } else router.push("/");
     } catch (err) {
       console.log(err);

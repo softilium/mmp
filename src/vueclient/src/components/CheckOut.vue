@@ -3,7 +3,7 @@
   import { onMounted, ref } from 'vue';
   import { useRoute, useRouter } from 'vue-router'
   import { authStore } from './authStore.js';
-  import linkifyHtml from 'linkify-html';
+  import { glob } from './globals.js';
 
   const route = useRoute();
   const router = useRouter();
@@ -23,7 +23,7 @@
       let res = await fetch(authStore.rbUrl() + "/api/shops/" + route.params.shopid);
       if (res.ok) {
         shop.value = await res.json();
-        shop.value.deliveryConditions = linkifyHtml(shop.value.deliveryConditions);
+        shop.value.deliveryConditions = glob.linkify(shop.value.deliveryConditions);
       } else router.push("/");
     } catch (err) {
       console.log(err);
