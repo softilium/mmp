@@ -167,8 +167,8 @@
         <tr v-for="good in goods" v-bind:key="good.id">
           <td class="col-8">
             <div class="row">
-              <div class="col-4" v-if="good.thumb">
-                <RouterLink v-bind:to="`/good/${good.id}`"><img :src="good.thumb" class="img-fluid img-thumbnail" height="60" width="60"></RouterLink>
+              <div class="col-4">
+                <RouterLink v-if="good.thumb" v-bind:to="`/good/${good.id}`"><img :src="good.thumb" class="img-fluid img-thumbnail" height="60" width="60"></RouterLink>
               </div>
               <div class="col-8">
                 &nbsp;<RouterLink v-bind:to="`/good/${good.id}`">{{ good.caption }}</RouterLink>

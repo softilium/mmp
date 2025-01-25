@@ -122,7 +122,7 @@
     <div class="form-group form-group-sm row">
       <label class="col-3 form-label">Название</label>
       <div class="col-7">
-        <input class="form-control" v-model="good.caption" required />
+        <input class="form-control" v-model="good.caption" required maxlength="100" />
       </div>
     </div>
   </div>
@@ -130,7 +130,7 @@
     <div class="form-group form-group-sm row">
       <label class="col-3 form-label">Артикул</label>
       <div class="col-7">
-        <input class="form-control" v-model="good.article" />
+        <input class="form-control" v-model="good.article" maxlength="50" />
       </div>
     </div>
   </div>
@@ -138,7 +138,7 @@
     <div class="form-group form-group-sm row">
       <label class="col-3 form-label">Ссылка</label>
       <div class="col-7">
-        <input class="form-control" v-model="good.url" />
+        <input class="form-control" v-model="good.url"  maxlength="900"/>
       </div>
     </div>
   </div>
