@@ -1,6 +1,5 @@
 ﻿using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.EntityFrameworkCore;
 using mmp.Data;
 
@@ -8,24 +7,19 @@ namespace Webapi.Controllers
 {
     [Route("api/shops")]
     [ApiController]
-    [OutputCache(Tags = ["shops"])]
     public class ShopsController : ControllerBase
     {
         private readonly ApplicationDbContext db;
         private IHostEnvironment he;
         private BlobServiceClient blobServiceClient;
         private IServiceProvider sp;
-        private IOutputCacheStore cache;
-
-        private async Task ClearCache() => await cache.EvictByTagAsync("shops", default);
-
-        public ShopsController(ApplicationDbContext context, IHostEnvironment _he, BlobServiceClient _blobServiceClient, IServiceProvider _sp, IOutputCacheStore _cache)
+                
+        public ShopsController(ApplicationDbContext context, IHostEnvironment _he, BlobServiceClient _blobServiceClient, IServiceProvider _sp)
         {
             db = context;
             he = _he;
             blobServiceClient = _blobServiceClient;
             sp = _sp;
-            cache = _cache;
         }
 
         private IQueryable<long> shopManagers()
@@ -74,7 +68,6 @@ namespace Webapi.Controllers
             dbobj.DeliveryConditions = shop.DeliveryConditions;
 
             await db.SaveChangesAsync();
-            await ClearCache();
 
             return NoContent();
         }
@@ -95,7 +88,6 @@ namespace Webapi.Controllers
 
             db.Shops.Add(dbobj);
             await db.SaveChangesAsync();
-            await ClearCache();
 
             return CreatedAtAction("GetShop", new { id = dbobj.ID }, dbobj);
         }
@@ -118,7 +110,7 @@ namespace Webapi.Controllers
 
             using (var scope = sp.CreateScope())
             {
-                var gc = new GoodsController(scope.ServiceProvider.GetRequiredService<ApplicationDbContext>(), he, blobServiceClient, cache);
+                var gc = new GoodsController(scope.ServiceProvider.GetRequiredService<ApplicationDbContext>(), he, blobServiceClient);
                 foreach (var g in goods)
                 {
                     var t = gc.DeleteGood(g.ID);
@@ -128,7 +120,6 @@ namespace Webapi.Controllers
 
             shop.IsDeleted = true;
             await db.SaveChangesAsync();
-            await ClearCache();
 
             return NoContent();
         }

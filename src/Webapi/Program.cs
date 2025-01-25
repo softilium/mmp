@@ -7,9 +7,6 @@ using Telegram.Bot;
 using Telegram.Bot.Types.Enums;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddOutputCache(opt => {
-    opt.DefaultExpirationTimeSpan = TimeSpan.FromSeconds(3600);
-    });
 builder.Configuration.AddEnvironmentVariables(); // azure uses env.variables for app config
 
 {
@@ -72,8 +69,6 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 else
     app.UseHttpsRedirection();
-
-app.UseOutputCache();
 
 app.MapControllers();
 
