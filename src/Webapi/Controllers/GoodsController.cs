@@ -31,7 +31,11 @@ namespace Webapi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Good>>> GetGoods([FromQuery] long shopId)
         {
-            return await db.Goods.AsNoTracking().Where(_ => _.OwnerShop.ID == shopId && !_.IsDeleted).ToListAsync();
+            return await db.Goods
+                .AsNoTracking()
+                .Where(_ => _.OwnerShop.ID == shopId && !_.IsDeleted)
+                .OrderBy(_ => _.Caption)
+                .ToListAsync();
         }
 
         [HttpGet("{id}")]
