@@ -34,7 +34,8 @@ namespace Webapi.Controllers
             return await db.Goods
                 .AsNoTracking()
                 .Where(_ => _.OwnerShop.ID == shopId && !_.IsDeleted)
-                .OrderBy(_ => _.Caption)
+                .OrderBy(_ => _.OrderInShop)
+                .ThenBy(_=>_.Caption)
                 .ToListAsync();
         }
 
@@ -68,6 +69,7 @@ namespace Webapi.Controllers
             dbGood.Price = good.Price;
             dbGood.Article = good.Article;
             dbGood.Url = good.Url;
+            dbGood.OrderInShop = good.OrderInShop;
 
             await db.SaveChangesAsync();
             await ClearCache();
@@ -93,7 +95,8 @@ namespace Webapi.Controllers
                 Description = good.Description,
                 Price = good.Price,
                 Article = good.Article,
-                Url = good.Url
+                Url = good.Url,
+                OrderInShop = good.OrderInShop
             };
 
             db.Goods.Add(dbGood);

@@ -23,5 +23,7 @@ namespace mmp.Data
         
         [Precision(15, 2)] 
         public decimal Price { get; set; }
+        
+        public int OrderInShop { get; set; } = 100;
     }
 }

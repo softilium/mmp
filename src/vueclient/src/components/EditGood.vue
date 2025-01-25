@@ -7,7 +7,7 @@
   const route = useRoute()
   const router = useRouter()
 
-  const good = ref({ ownerShop: { id: 0 }, caption: "", description: "", article: "", url: "", price: 0 });
+  const good = ref({ ownerShop: { id: 0 }, caption: "", description: "", article: "", url: "", price: 0, orderInShop: 100 });
   const isImageLoading = ref(true);
 
   onMounted(async () => {
@@ -155,6 +155,15 @@
       <label class="col-3 form-label">Цена</label>
       <div class="col-7">
         <input class="form-control" v-model="good.price" />
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-3">
+    <div class="form-group form-group-sm row">
+      <label class="col-3 form-label">Порядок на витрине (меньше = выше)</label>
+      <div class="col-7">
+        <input class="form-control" v-model="good.orderInShop" />
       </div>
     </div>
   </div>
