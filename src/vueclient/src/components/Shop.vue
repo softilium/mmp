@@ -36,7 +36,7 @@
         goods.value = await res.json();
 
         goods.value.forEach(async g => {
-          let res = await fetch(`${authStore.rbUrl()}/api/goods/images/${g.id}/0`, { method: "GET" });
+          let res = await fetch(`${authStore.rbUrl()}/api/goods/thumbs/${g.id}/0`, { method: "GET" });
           if (res.status == 200) { // status 204 means no image
             let b = await res.blob();
             const src = URL.createObjectURL(b);

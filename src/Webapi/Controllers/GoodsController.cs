@@ -3,6 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using mmp.Data;
 using ZiggyCreatures.Caching.Fusion;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
+using SixLabors.ImageSharp.Formats.Jpeg;
+
 
 namespace Webapi.Controllers
 {
@@ -11,8 +15,8 @@ namespace Webapi.Controllers
     public class GoodsController : ControllerBase
     {
         private readonly ApplicationDbContext db;
-        private IHostEnvironment host;
-        private IFusionCache cache;
+        private readonly IHostEnvironment host;
+        private readonly IFusionCache cache;
 
         private readonly BlobContainerClient blobContainer;
 
@@ -143,7 +147,7 @@ namespace Webapi.Controllers
         [HttpGet("images/{goodId:long}/{num:int}")]
         public async Task<IActionResult> GetGoodImage(long goodId, int num)
         {
-            var res = await cache.GetOrSetAsync<FileContentResult>(
+            var res = await cache.GetOrSetAsync(
                 $"goodImage:{goodId}:{num}",
                 async (ctx) =>
                 {
@@ -169,6 +173,34 @@ namespace Webapi.Controllers
                 tags: cacheTags
             );
 
+            if (res == null) return NoContent();
+            return res;
+        }
+
+        [HttpGet("thumbs/{goodId:long}/{num:int}")]
+        public async Task<IActionResult> GetGoodThumb(long goodId, int num)
+        {
+            var res = await cache.GetOrSetAsync(
+                $"goodThumb:{goodId}:{num}",
+                async (ctx) =>
+                {
+                    var res = await GetGoodImage(goodId, num);
+                    if (res is NoContentResult) return null;
+                    if (res is not FileContentResult imgCnt) return null;
+
+                    var ms = new MemoryStream(imgCnt.FileContents);
+
+                    var img = Image.Load(ms);
+                    img.Mutate(x => x.Resize(60, 60));
+                    ms = new MemoryStream();
+
+                    img.Save(ms, new JpegEncoder());
+                    ms.Position = 0;
+                    return File(ms.ToArray(), "image/jpeg");
+
+                },
+                tags: cacheTags
+            );
             if (res == null) return NoContent();
             return res;
         }
@@ -204,7 +236,6 @@ namespace Webapi.Controllers
             }
 
             ClearCache();
-
             return NoContent();
         }
 
