@@ -155,7 +155,6 @@
       <thead class="table-primary" style="position: sticky; top: 0; z-index: 1; background-color: white;">
         <tr>
           <th>Товар или услуга</th>
-          <th class="text-end">Цена</th>
           <th>
             <button class="btn btn-outline-success btn-sm" v-if="basketSum" @click="$router.push(`/checkout/${shop.id}`);">
               <i class="bi bi-basket2-fill"></i> {{ basketSum }}
@@ -175,11 +174,12 @@
               </div>
             </div>
           </td>
-          <td class="text-end">{{ good.price }}</td>
-          <td v-if="authStore.userInfo.id" class="col-4">
-            <button class="btn btn-primary btn-sm" @click="Inc(good)">+</button>&nbsp;
-            <span v-if="good.basked"><button class="btn btn-primary btn-sm" @click="Dec(good)">-</button>&nbsp;</span>
-            {{ good.basked }}
+          <td class="col-4">
+            {{ good.price }}
+            <p v-if="authStore.userInfo.id">
+              <button class="btn btn-primary btn-sm" @click="Inc(good)">+</button>&nbsp;
+              <span v-if="good.basked"><button class="btn btn-primary btn-sm" @click="Dec(good)">-</button>&nbsp;{{ good.basked }}</span>
+            </p>
           </td>
         </tr>
       </tbody>
