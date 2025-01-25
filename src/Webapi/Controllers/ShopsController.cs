@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using mmp.Data;
+using ZiggyCreatures.Caching.Fusion;
 
 namespace Webapi.Controllers
 {
@@ -13,13 +14,14 @@ namespace Webapi.Controllers
         private IHostEnvironment he;
         private BlobServiceClient blobServiceClient;
         private IServiceProvider sp;
-                
-        public ShopsController(ApplicationDbContext context, IHostEnvironment _he, BlobServiceClient _blobServiceClient, IServiceProvider _sp)
+        private IFusionCache cache;
+        public ShopsController(ApplicationDbContext context, IHostEnvironment _he, BlobServiceClient _blobServiceClient, IServiceProvider _sp, IFusionCache _cache)
         {
             db = context;
             he = _he;
             blobServiceClient = _blobServiceClient;
             sp = _sp;
+            cache = _cache;
         }
 
         private IQueryable<long> shopManagers()
@@ -110,7 +112,7 @@ namespace Webapi.Controllers
 
             using (var scope = sp.CreateScope())
             {
-                var gc = new GoodsController(scope.ServiceProvider.GetRequiredService<ApplicationDbContext>(), he, blobServiceClient);
+                var gc = new GoodsController(scope.ServiceProvider.GetRequiredService<ApplicationDbContext>(), he, blobServiceClient, cache);
                 foreach (var g in goods)
                 {
                     var t = gc.DeleteGood(g.ID);

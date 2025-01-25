@@ -5,8 +5,13 @@ using System.Text.Json.Serialization;
 using Azure.Storage.Blobs;
 using Telegram.Bot;
 using Telegram.Bot.Types.Enums;
+using ZiggyCreatures.Caching.Fusion;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddFusionCache()
+    .WithDefaultEntryOptions(opt => { opt.Duration = TimeSpan.FromHours(1); });
+
 builder.Configuration.AddEnvironmentVariables(); // azure uses env.variables for app config
 
 {

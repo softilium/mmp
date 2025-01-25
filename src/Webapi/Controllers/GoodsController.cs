@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using mmp.Data;
+using ZiggyCreatures.Caching.Fusion;
 
 namespace Webapi.Controllers
 {
@@ -11,15 +12,22 @@ namespace Webapi.Controllers
     {
         private readonly ApplicationDbContext db;
         private IHostEnvironment host;
+        private IFusionCache cache;
 
         private readonly BlobContainerClient blobContainer;
 
         private bool UseAzureBlobs => !host.IsDevelopment();
 
-        public GoodsController(ApplicationDbContext _db, IHostEnvironment hostEnvironment, BlobServiceClient _blobServiceClient)
+        private static readonly string[] cacheTags = ["goodImages"];
+
+        private void ClearCache() => cache.RemoveByTag(cacheTags);
+
+        public GoodsController(ApplicationDbContext _db, IHostEnvironment hostEnvironment, BlobServiceClient _blobServiceClient, IFusionCache _cache)
         {
             db = _db;
             host = hostEnvironment;
+            cache = _cache;
+
             if (UseAzureBlobs && _blobServiceClient != null)
                 blobContainer = _blobServiceClient.GetBlobContainerClient("goodimages");
         }
@@ -31,7 +39,7 @@ namespace Webapi.Controllers
                 .AsNoTracking()
                 .Where(_ => _.OwnerShop.ID == shopId && !_.IsDeleted)
                 .OrderBy(_ => _.OrderInShop)
-                .ThenBy(_=>_.Caption)
+                .ThenBy(_ => _.Caption)
                 .ToListAsync();
         }
 
@@ -135,21 +143,34 @@ namespace Webapi.Controllers
         [HttpGet("images/{goodId:long}/{num:int}")]
         public async Task<IActionResult> GetGoodImage(long goodId, int num)
         {
-            if (!UseAzureBlobs)
-            {
-                var fs = DevBlobStorageFolder + BlobName(goodId, num);
-                if (!System.IO.File.Exists(fs)) return NoContent();
-                return PhysicalFile(fs, "image/jpeg");
-            }
-            else
-            {
-                var handler = blobContainer.GetBlobClient(BlobName(goodId, num));
-                if (!handler.Exists()) return NoContent();
-                using var memoryStream = new MemoryStream();
-                await handler.DownloadToAsync(memoryStream);
-                memoryStream.Position = 0;
-                return File(memoryStream.ToArray(), "image/jpeg");
-            }
+            var res = await cache.GetOrSetAsync<FileContentResult>(
+                $"goodImage:{goodId}:{num}",
+                async (ctx) =>
+                {
+                    if (!UseAzureBlobs)
+                    {
+                        var fs = DevBlobStorageFolder + BlobName(goodId, num);
+                        if (!System.IO.File.Exists(fs)) return null;
+                        using var fstream = new FileStream(fs, FileMode.Open);
+                        using var mstream = new MemoryStream();
+                        fstream.CopyTo(mstream);
+                        return File(mstream.ToArray(), "image/jpeg");
+                    }
+                    else
+                    {
+                        var handler = blobContainer.GetBlobClient(BlobName(goodId, num));
+                        if (!handler.Exists()) return null;
+                        using var memoryStream = new MemoryStream();
+                        await handler.DownloadToAsync(memoryStream);
+                        memoryStream.Position = 0;
+                        return File(memoryStream.ToArray(), "image/jpeg");
+                    }
+                },
+                tags: cacheTags
+            );
+
+            if (res == null) return NoContent();
+            return res;
         }
 
         [HttpPost("images/{goodId:long}/{num:int}")]
@@ -181,6 +202,9 @@ namespace Webapi.Controllers
                 memoryStream.Position = 0;
                 await handler.UploadAsync(memoryStream);
             }
+
+            ClearCache();
+
             return NoContent();
         }
 
@@ -205,6 +229,8 @@ namespace Webapi.Controllers
             {
                 await blobContainer.DeleteBlobIfExistsAsync(BlobName(goodId, num));
             }
+
+            ClearCache();
             return NoContent();
         }
 
