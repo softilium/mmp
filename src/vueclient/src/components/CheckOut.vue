@@ -15,7 +15,7 @@
   const sumTotal = ref(0);
   const customerComment = ref("");
 
-  const okConditions = ref(false);
+  const okConditions = ref(true);
 
   onMounted(async () => {
 
@@ -23,6 +23,7 @@
       let res = await fetch(authStore.rbUrl() + "/api/shops/" + route.params.shopid);
       if (res.ok) {
         shop.value = await res.json();
+        if (shop.value.deliveryConditions) okConditions.value = false;
         shop.value.deliveryConditions = glob.linkify(shop.value.deliveryConditions);
       } else router.push("/");
     } catch (err) {
