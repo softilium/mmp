@@ -37,7 +37,7 @@
 <template>
 
   <header>
-    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow.mb-3">
+    <nav class="navbar fixed-top navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow.mb-3">
       <div class="container-fluid">
         <RouterLink class="btn btn-outline-secondary btn-sm" to="/">Витрины</RouterLink>&nbsp;&nbsp;
         <span v-if="!authStore.userInfo.id">
@@ -54,6 +54,8 @@
     </nav>
   </header>
 
+  <br />
+  <br />
   <br />
   <div class="container-fluid">
     <RouterView :key="route.fullPath" />

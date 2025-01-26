@@ -148,12 +148,12 @@
   </div>
   <div class="row">
     <table class="table">
-      <thead class="table-primary" style="position: sticky; top: 0; z-index: 1; background-color: white;">
+      <!--<thead class="table-primary" style="position: sticky; top: 0; z-index: 1; background-color: white;">
         <tr>
           <th>Товар или услуга</th>
           <th>Цена</th>
         </tr>
-      </thead>
+      </thead>-->
       <tbody>
         <tr v-for="good in goods" v-bind:key="good.id">
           <td class="col-9">
