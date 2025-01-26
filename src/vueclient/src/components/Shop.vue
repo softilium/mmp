@@ -9,7 +9,7 @@
   const route = useRoute();
   const router = useRouter();
 
-  const shop = ref({ id: 0, caption: "", description: "", createdByInfo: { id: 0 } });
+  const shop = ref({ id: 0, caption: "", description: "", createdByInfo: { id: 0, desription: "" } });
   const shopDescription = ref("");
 
   const goods = ref([]);

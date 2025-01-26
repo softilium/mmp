@@ -17,7 +17,7 @@
     createdOn: "",
     senderID: 0,
     senderInfo: { id:0, userName: "" },
-    createdByInfo: { id:0, userName: "" },
+    createdByInfo: { id:0, userName: "", description: "" },
     status: 0,
     id: 0,
     lines: [],

@@ -10,7 +10,7 @@
   let title = "Новая витрина";
   if (route.params.id) title = "Редактировать витрину";
 
-  let shop = ref({ id: 0, caption: "", description: "", deliveryConditions: "", createdByInfo: { id: 0, userName: "" } })
+  let shop = ref({ id: 0, caption: "", description: "", deliveryConditions: "", createdByInfo: { id: 0, userName: "", description: "" } })
 
   let shopId = null;
 
