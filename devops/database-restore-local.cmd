@@ -8,4 +8,4 @@ rar x rsdata.rar
 "%PGPATH%\psql.exe" -U postgres -c "create database rsdata"
 "%PGPATH%\psql.exe" --dbname=rsdata -U postgres < "backup.sql"
 
-delete backup.sql
+del backup.sql

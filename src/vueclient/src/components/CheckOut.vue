@@ -3,6 +3,7 @@
   import { onMounted, ref } from 'vue';
   import { useRouter } from 'vue-router'
   import { authStore } from './authStore.js';
+  import ProfileLink from './ProfileLink.vue';
 
   const router = useRouter();
 
@@ -80,13 +81,9 @@
 
 <template>
 
-  <!--<h1>Сформировать заказ для витрины "{{ shop.caption }}"</h1>
-  <RouterLink :to="`/shop/${shop.id}`">Витрина "{{shop.caption}}"</RouterLink>
-  <div>&nbsp;</div>-->
-
   <div v-for="sender in basket">
-    <h1>
-      Отправитель <RouterLink :to="`/profile/${sender.senderInfo.id}`">{{sender.senderInfo.userName}}</RouterLink>
+    <h1>     
+      Отправитель <ProfileLink :userInfo="sender.senderInfo"></ProfileLink>
     </h1>
 
     <table class="table table-sm">
@@ -131,23 +128,5 @@
     </div>
 
   </div>
-
-  <!--<div v-if="shop.deliveryConditions" class="text-center">
-    <div class="row mb-3">
-      <div class="col">
-        Условия доставки, важно прочитать перед заказом:<br />
-        <strong>
-          <span v-html="shop.deliveryConditions"></span>
-        </strong>
-        <br />
-        <br />
-      </div>
-      <div class="row mb-3">
-        <div class="col">
-          Условия понятны <input v-model="okConditions" type="checkbox" />
-        </div>
-      </div>
-    </div>
-  </div>-->
 
 </template>
