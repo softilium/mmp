@@ -4,6 +4,7 @@
   import { onMounted, ref } from 'vue';
   import { useRoute } from 'vue-router'
   import { authStore } from './authStore.js';
+  import { glob } from './globals.js';
 
   const route = useRoute();
 
@@ -12,6 +13,7 @@
   const newTelegramUserName = ref("");
   const telegramVerifyCode = ref("");
   const result = ref("");
+  const userDescription = ref("");
 
   const NewTelegramCode = async () => {
 
@@ -49,6 +51,7 @@
         });
       if (res.ok) {
         user.value = await res.json();
+        userDescription.value = glob.linkify(user.value.description);
         me.value = !route.params.id;
       }
     }
@@ -106,6 +109,14 @@
     <label class="col-4 form-label">Email/логин</label>
     <div class="col-7">
       <input type="email" class="form-control" v-model="user.email" />
+    </div>
+  </div>
+
+  <div class="row mb-3">
+    <label class="col-4 form-label">Обо мне</label>
+    <div class="col-7">
+      <span v-if="!me" v-html="userDescription"></span>
+      <textarea v-if="me" class="form-control" v-model="user.description" rows="7" maxlength="300" />
     </div>
   </div>
 

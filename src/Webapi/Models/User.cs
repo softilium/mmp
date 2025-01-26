@@ -16,6 +16,8 @@ namespace mmp.Data
         public long BotChatId { get; set; }
         public long Id { get; set; }
 
+        public string Description { get; set; } // by def we don't put value here except public profiles page
+
         public UserInfo(User src)
         {
             ArgumentNullException.ThrowIfNull(src);
@@ -56,6 +58,10 @@ namespace mmp.Data
 
         [NotMapped]
         public long BotChatId { get; set; } = 0; // shows according chatId from BotChats (for profile page)
+
+        [MaxLength(300)]
+        public string Description { get; set; } = "";
+
     }
 
     public static class UserCache

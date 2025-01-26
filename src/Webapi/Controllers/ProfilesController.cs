@@ -33,7 +33,11 @@ namespace Webapi.Controllers
         {
             var user = await db.Users.FindAsync(id);
             if (user == null) return NotFound();
-            return UserCache.FindUserInfo(id, db);
+
+            var r = UserCache.FindUserInfo(id, db);
+            r.Description = user.Description;
+
+            return r;
         }
 
         [HttpGet("public")]
@@ -70,6 +74,7 @@ namespace Webapi.Controllers
             cu.TelegramUserName = user.TelegramUserName;
             cu.TelegramVerified = user.TelegramVerified;
             cu.TelegramCheckCode = user.TelegramCheckCode;
+            cu.Description = user.Description;
 
             await db.SaveChangesAsync();
 
