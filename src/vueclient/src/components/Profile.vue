@@ -102,10 +102,10 @@
       <input class="form-control" v-model="user.userName" required :disabled="!me" />
     </div>
   </div>
-  <div class="row mb-3">
+  <div class="row mb-3" v-if="me">
     <label class="col-4 form-label">Email/логин</label>
     <div class="col-7">
-      <input type="email" class="form-control" v-model="user.email" :disabled="!me" />
+      <input type="email" class="form-control" v-model="user.email" />
     </div>
   </div>
 
