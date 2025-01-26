@@ -14,7 +14,9 @@
     senderComment: "",
     expectedDeliveryDate: "",
     createdOn: "",
-    shop: { caption: "", createdByID: 0 },
+    senderID: 0,
+    senderInfo: { id:0, userName: "" },
+    createdByInfo: { id:0, userName: "" },
     status: 0,
     id: 0,
     lines: [],
@@ -41,11 +43,14 @@
     if (res.ok) {
       order.value = await res.json();
       isCustomer.value = order.value.createdByID == authStore.userInfo.id;
-      isSender.value = order.value.shop.createdByID == authStore.userInfo.id;
+      isSender.value = order.value.senderID == authStore.userInfo.id;
     }
   });
 
   const Save = async () => {
+
+    //order.value.senderInfo = null;
+    //order.value.createdByInfo = null;
 
     if (isCustomer.value) {
       let req = await fetch(`${authStore.rbUrl()}/api/orders/outbox/${route.params.id}`,
@@ -76,10 +81,11 @@
 <template>
 
   <div v-if="order">
+    <button :disabled="!isCustomer && !isSender" class="btn btn-primary" @click="Save()">Сохранить</button>
     <h1>Заказ {{ order.id }}</h1>
     <h6>{{ glob.fmtDate(order.createdOn) }}</h6>
-    <h6>Витрина {{ order.shop.caption }}</h6>
-    <button :disabled="!isCustomer && !isSender" class="btn btn-primary" @click="Save()">Сохранить</button>
+    <h6>Отправитель <RouterLink :to="`/profile/${order.senderInfo.id}`">{{ order.senderInfo.userName }}</RouterLink></h6>
+    <h6>Заказчик <RouterLink :to="`/profile/${order.createdByInfo.id}`">{{ order.createdByInfo.userName }}</RouterLink></h6>
     <div>&nbsp;</div>
 
     <table class="table table-sm">

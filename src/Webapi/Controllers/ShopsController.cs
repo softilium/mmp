@@ -64,7 +64,7 @@ namespace Webapi.Controllers
             if (dbobj == null) return NotFound();
 
             if (dbobj.CreatedByID != cu.Id) return Unauthorized();
-        
+
             dbobj.Caption = shop.Caption;
             dbobj.Description = shop.Description;
             dbobj.DeliveryConditions = shop.DeliveryConditions;
@@ -82,7 +82,8 @@ namespace Webapi.Controllers
 
             if (!shopManagers().Contains(cu.Id)) return Unauthorized();
 
-            var dbobj = new Shop { 
+            var dbobj = new Shop
+            {
                 Caption = shop.Caption,
                 Description = shop.Description,
                 DeliveryConditions = shop.DeliveryConditions
@@ -105,7 +106,10 @@ namespace Webapi.Controllers
             if (shop.CreatedByID != cu.Id) return Unauthorized();
 
             var clStatuses = new[] { OrderStatuses.Canceled, OrderStatuses.Done };
-            var foo = db.Orders.Where(_ => _.Shop == shop && !_.IsDeleted && !clStatuses.Contains(_.Status)).FirstOrDefault();
+
+            var orders = db.OrderLines.Where(_ => _.Shop == shop && _.Order != null).Select(_ => _.Order.ID);
+
+            var foo = db.Orders.Where(_ => orders.Contains(_.ID) && !_.IsDeleted && !clStatuses.Contains(_.Status)).FirstOrDefault();
             if (foo != null) return BadRequest("Перед удалением витрины нужно закрыть все заказы по ней");
 
             var goods = db.Goods.Where(_ => _.OwnerShop == shop && !_.IsDeleted);

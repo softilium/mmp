@@ -42,7 +42,6 @@
     <table class="table table-hover">
       <thead class="table-primary">
         <tr>
-          <th class="col-3">Витрина</th>
           <th class="col-3">Отправитель</th>
           <th class="col-2">Статус</th>
           <th class="col-2">Создано</th>
@@ -51,11 +50,7 @@
       </thead>
       <tr v-for="order in orders" v-bind:key="order.id">
         <td>
-          <RouterLink v-if="order.shop.isDeleted" :to="`/order/${order.id}`">{{ order.shop.caption }} (удалено)</RouterLink>
-          <RouterLink v-if="!order.shop.isDeleted" :to="`/order/${order.id}`">{{ order.shop.caption }}</RouterLink>
-        </td>
-        <td>
-          <RouterLink :to="`/order/${order.id}`">{{ order.shop.createdByInfo.userName }} </RouterLink>
+          <RouterLink :to="`/order/${order.id}`">{{ order.senderInfo.userName }} </RouterLink>
         </td>
         <td>
           <RouterLink :to="`/order/${order.id}`">{{ statuses[order.status] }}</RouterLink>

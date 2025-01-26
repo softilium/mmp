@@ -16,8 +16,27 @@ namespace Webapi.Controllers
         }
 
         [HttpGet]
+        public async Task<ActionResult<IEnumerable<OrderLine>>> GetWholeBasket()
+        {
+            var cu = db.CurrentUser();
+            if (cu == null) return Unauthorized();
+
+
+            var res = await db.OrderLines
+                .AsNoTracking()
+                .Include(_ => _.Good)
+                .Where(_ => _.CreatedByID == cu.Id && _.Order == null)
+                .ToListAsync();
+
+            foreach (var line in res)
+                UserCache.LoadCreatedBy(line.Good, db);
+
+            return res;
+        }
+
+        [HttpGet]
         [Route("{shopId:long}")]
-        public async Task<ActionResult<IEnumerable<OrderLine>>> GetOrderLines(long shopId)
+        public async Task<ActionResult<IEnumerable<OrderLine>>> GetBasketForShop(long shopId)
         {
             var cu = db.CurrentUser();
             if (cu == null) return Unauthorized();
@@ -76,13 +95,13 @@ namespace Webapi.Controllers
             qty = qty ?? 1;
 
             var ol = db.OrderLines
+                .Include(_=>_.Good)
                 .Where(_ => _.CreatedByID == cu.Id && _.Order == null && _.Good.ID == goodId)
                 .FirstOrDefault();
             if (ol != null)
             {
-                var price = ol.Sum / ol.Qty;
                 ol.Qty -= qty.Value;
-                ol.Sum -= ol.Qty * price;
+                ol.Sum = ol.Qty * ol.Good.Price;
                 if (ol.Qty <= 0) db.OrderLines.Remove(ol);
                 await db.SaveChangesAsync();
                 return NoContent();
@@ -90,21 +109,5 @@ namespace Webapi.Controllers
             return NoContent();
         }
 
-        [HttpDelete]
-        [Route("{goodId:long}")]
-        public async Task<ActionResult<OrderLine>> Delete(long goodId)
-        {
-            var cu = db.CurrentUser();
-            if (cu == null) return Unauthorized();
-
-            var ol = db.OrderLines
-                .Where(_ => _.CreatedByID == cu.Id && _.Order == null && _.Good.ID == goodId)
-                .FirstOrDefault();
-            if (ol == null) return NotFound();
-
-            db.OrderLines.Remove(ol);
-            await db.SaveChangesAsync();
-            return NoContent();
-        }
     }
 }

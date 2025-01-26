@@ -115,9 +115,6 @@ namespace mmp.Data
         protected override void OnModelCreating(ModelBuilder mb)
         {
             base.OnModelCreating(mb);
-
-            mb.Entity<Order>().Navigation(_ => _.Shop).AutoInclude(true);
-
         }
     }
 

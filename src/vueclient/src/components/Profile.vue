@@ -90,8 +90,9 @@
 <template>
 
   <h1>
-    Профиль пользователя {{ user.userName }}&nbsp;<br/><button v-if="me && !authStore.isTg()" class="btn btn-outline-secondary btn-sm"
-      @click="authStore.Logout(); $router.push('/');">Выйти</button>
+    Профиль пользователя {{ user.userName }}&nbsp;<br />
+    <button v-if="me && !authStore.isTg()" class="btn btn-outline-secondary btn-sm" @click="authStore.Logout(); $router.push('/');">Выйти</button>&nbsp;
+    <RouterLink v-if="me" class="btn btn-outline-secondary btn-sm" to="/orders">История заказов</RouterLink>
   </h1>
   <br />
 

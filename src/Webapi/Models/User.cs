@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 namespace mmp.Data
 {
@@ -24,6 +25,17 @@ namespace mmp.Data
             Id = src.Id;
             TelegramVerified = src.TelegramVerified;
             BotChatId = src.BotChatId;
+        }
+
+        [JsonConstructor] 
+        public UserInfo(string userName, bool shopManage, bool admin, bool telegramVerified, long botChatId, long id) 
+        {
+            UserName = userName;
+            ShopManage = shopManage;
+            Admin = admin;
+            TelegramVerified = telegramVerified;
+            BotChatId = botChatId;
+            Id = id;
         }
     }
 

@@ -6,6 +6,18 @@ function newUserInfo() {
 
 export const authStore = reactive({
 
+  basket: { sum: 0 },
+  async loadBasket() {
+    this.basket.sum = 0;
+    let res = await fetch(`${authStore.rbUrl()}/api/baskets`, { headers: authStore.authHeaders() });
+    if (res.ok) {
+      res = await res.json();
+      res.forEach((_) => {
+        this.basket.sum += _.sum;
+      });
+    }
+  },
+
   userInfo: newUserInfo(),
   accessToken: "",
   refreshToken: "",

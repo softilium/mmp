@@ -44,7 +44,6 @@
     <table class="table table-sm">
       <thead class="table-primary">
         <tr>
-          <th class="col-2">Витрина</th>
           <th class="col-2">Заказчик</th>
           <th class="col-2">Статус</th>
           <th class="col-2">Создано</th>
@@ -53,10 +52,7 @@
       </thead>
       <tr v-for="order in orders" :key="order.id">
         <td>
-          <RouterLink :to="`/order/${order.id}`">{{ order.shop.caption }}</RouterLink>
-        </td>
-        <td>
-          <RouterLink :to="`/order/${order.id}`">{{ order.shop.createdByInfo.userName }}</RouterLink>
+          <RouterLink :to="`/order/${order.id}`">{{ order.senderInfo.userName }}</RouterLink>
         </td>
         <td>
           <RouterLink :to="`/order/${order.id}`">{{ statuses[order.status] }}</RouterLink>

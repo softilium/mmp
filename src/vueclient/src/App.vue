@@ -15,11 +15,13 @@
     myurl.value = url.href;
   }
 
-  onMounted(() => {
+  onMounted(async () => {
+    authStore.basket.sum = 0;
     authStore.SetAccessToken(localStorage.getItem("accessToken"));
     authStore.SetRefreshToken(localStorage.getItem("refreshToken"));
     authStore.CheckLogged();
     updateMyUrl();
+    await authStore.loadBasket();
   });
 
   // update myurl when user navigate within SPA
@@ -38,13 +40,13 @@
     <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow.mb-3">
       <div class="container-fluid">
         <RouterLink class="btn btn-outline-secondary btn-sm" to="/">Витрины</RouterLink>&nbsp;&nbsp;
-        <span v-if="authStore.userInfo.id">
-          <RouterLink class="btn btn-outline-secondary btn-sm" to="/orders">Заказы</RouterLink>&nbsp;
-        </span>
         <span v-if="!authStore.userInfo.id">
           <RouterLink class="btn btn-outline-secondary btn-sm" to="/login">Войти</RouterLink>&nbsp;
         </span>
         <ul class="navbar-nav flex-grow-1">&nbsp;</ul>
+        <span v-if="authStore.userInfo.id && authStore.basket.sum">
+          <RouterLink class="btn btn-outline-success btn-sm" to="/checkout"><i class="bi bi-basket2-fill"></i>&nbsp;{{authStore.basket.sum}}</RouterLink>&nbsp;&nbsp;
+        </span>
         <span v-if="authStore.userInfo.id">
           <RouterLink class="btn btn-outline-secondary btn-sm" to="/myprofile">{{ authStore.userInfo.userName }}</RouterLink>&nbsp;
         </span>

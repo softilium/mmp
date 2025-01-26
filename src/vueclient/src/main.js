@@ -23,7 +23,7 @@ const routes = [
   { path: '/shop/:id', component: Shop },
   { path: '/edit-good/:shopid', component: EditGood },
   { path: '/edit-good/:shopid/:id', component: EditGood },
-  { path: '/checkout/:shopid', component: CheckOut },
+  { path: '/checkout', component: CheckOut },
   { path: '/orders', component: Orders },
   { path: '/order/:id', component: Order },
   { path: '/myprofile', component: Profile },

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Webapi.Controllers;
 
 namespace mmp.Data
@@ -29,8 +30,10 @@ namespace mmp.Data
     public class Order : BaseObject
     {
         [Required]
-        [DeleteBehavior(DeleteBehavior.Restrict)]
-        public Shop Shop { get; set; }
+        public long SenderID { get; set; }
+
+        [NotMapped]
+        public UserInfo? SenderInfo { get; set; }
 
         [Required]
         public OrderStatuses Status { get; set; }
@@ -64,7 +67,7 @@ namespace mmp.Data
             {
                 var cu = db.CurrentUser();
 
-                var senderUser = UserCache.FindUserInfo(Shop.CreatedByID, db);
+                var senderUser = UserCache.FindUserInfo(SenderID, db);
 
                 db.NotifyAfterSave(senderUser.BotChatId, $"Новый заказ. Заказчик {cu.UserName}, {DateTime.Now:g}.");
             }
@@ -82,7 +85,7 @@ namespace mmp.Data
 
             if (Status != oldStatus || oldExpectedDeliveryDate != ExpectedDeliveryDate || oldCustomerComment != CustomerComment || oldSenderComment != SenderComment)
             {
-                var senderUser = UserCache.FindUserInfo(Shop.CreatedByID, db);
+                var senderUser = UserCache.FindUserInfo(SenderID, db);
                 var clientUser = UserCache.FindUserInfo(CreatedByID, db);
                 var cu = db.CurrentUser();
                 if (cu == null) return;
@@ -92,7 +95,7 @@ namespace mmp.Data
                     if (oldCustomerComment != CustomerComment)
                         db.NotifyAfterSave(senderUser.BotChatId, $"Заказчик {clientUser.UserName} по заказу {ID} от {CreatedOn:g} указал примечание к заказу.{DeltaTxt(oldCustomerComment ?? "", CustomerComment ?? "")}");
                 }
-                if (cu.Id == Shop.CreatedByID)
+                if (cu.Id == SenderID)
                 {
                     if (!clientUser.TelegramVerified)
                     {

@@ -40,18 +40,21 @@ namespace Webapi.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Order>> GetOrder(long id)
+        public async Task<ActionResult<Order>> GetOrder(long id) //common for inbox/outbox
         {
             var cu = db.CurrentUser();
             if (cu == null) return Unauthorized();
 
             var order = await db.Orders
-                .Include(_ => _.Lines)
-                    .ThenInclude(_ => _.Good)
+                .Include(_ => _.Lines).ThenInclude(_ => _.Good).ThenInclude(_ => _.OwnerShop)
+                .Include(_ => _.Lines).ThenInclude(_ => _.Shop)
                 .FirstOrDefaultAsync(_ => _.ID == id && !_.IsDeleted);
             if (order == null) return NotFound();
 
-            if (order.CreatedByID != cu.Id && order.Shop.CreatedByID != cu.Id) return Unauthorized();
+            if (order.CreatedByID != cu.Id && order.SenderID != cu.Id) return Unauthorized();
+
+            order.SenderInfo = UserCache.FindUserInfo(order.SenderID, db);
+            UserCache.LoadCreatedBy(order, db);
 
             return order;
         }
@@ -68,7 +71,8 @@ namespace Webapi.Controllers
                 .Where(_ => showAll == 1 || (_.Status != OrderStatuses.Done && _.Status != OrderStatuses.Canceled))
                 .OrderByDescending(_ => _.CreatedOn)
                 .ToListAsync();
-            foreach (var item in r) UserCache.LoadCreatedBy(item.Shop, db);
+            foreach (var item in r)
+                item.SenderInfo = UserCache.FindUserInfo(item.SenderID, db);
             return r;
         }
 
@@ -89,8 +93,8 @@ namespace Webapi.Controllers
             return NoContent();
         }
 
-        [HttpPost("outbox/{shopid:long}")]
-        public async Task<ActionResult<Order>> PostCustomerOrder([FromRoute] long shopId)
+        [HttpPost(template: "outbox/{id:long}")]
+        public async Task<ActionResult<Order>> CreateOrder(long id)
         {
             using StreamReader reader = new(Request.Body, leaveOpen: true);
             string customerComment = await reader.ReadToEndAsync();
@@ -98,15 +102,12 @@ namespace Webapi.Controllers
             var cu = db.CurrentUser();
             if (cu == null) return Unauthorized();
 
-            var shop = db.Shops.FirstOrDefault(_ => !_.IsDeleted && _.ID == shopId);
-            if (shop == null) return NotFound();
-
-            var lines = db.OrderLines.Where(_ => _.Order == null && _.Shop.ID == shopId).ToList();
+            var lines = db.OrderLines.Where(_ => _.Order == null && _.Shop.CreatedByID == id).ToList();
             if (lines.Count == 0) return NotFound();
 
             var dborder = new Order
             {
-                Shop = shop,
+                SenderID = id,
                 Status = OrderStatuses.New,
                 Qty = lines.Sum(_ => _.Qty),
                 Sum = lines.Sum(_ => _.Sum),
@@ -116,7 +117,7 @@ namespace Webapi.Controllers
             foreach (var line in lines) line.Order = dborder;
 
             await db.SaveChangesAsync();
-            return CreatedAtAction("GetOrder", new { id = dborder.ID }, dborder);
+            return CreatedAtAction("CreateOrder", new { id = dborder.ID }, dborder);
         }
 
         [HttpGet("inbox")]
@@ -125,17 +126,17 @@ namespace Webapi.Controllers
             var cu = db.CurrentUser();
             if (cu == null) return Unauthorized();
 
-            var myshops = db.Shops.Where(_ => !_.IsDeleted && _.CreatedByID == cu.Id).Select(_ => _.ID).ToList();
+            //var myshops = db.Shops.Where(_ => !_.IsDeleted && _.CreatedByID == cu.Id).Select(_ => _.ID).ToList();
 
             var r = await db.Orders
-                .Where(_ => !_.IsDeleted && myshops.Contains(_.Shop.ID))
+                .Where(_ => !_.IsDeleted && _.SenderID == cu.Id)
                 .Where(_ => showAll == 1 || (_.Status != OrderStatuses.Done && _.Status != OrderStatuses.Canceled))
                 .OrderByDescending(_ => _.CreatedOn)
                 .ToListAsync();
             foreach (var item in r)
             {
                 UserCache.LoadCreatedBy(item, db);
-                UserCache.LoadCreatedBy(item.Shop, db);
+                item.SenderInfo = UserCache.FindUserInfo(item.SenderID, db);
             }
             return r;
         }
@@ -149,7 +150,7 @@ namespace Webapi.Controllers
             var dborder = db.Orders.FirstOrDefault(_ => _.ID == id);
             if (dborder == null) return NotFound();
 
-            if (cu.Id != order.Shop.CreatedByID) return Unauthorized();
+            if (cu.Id != order.SenderID) return Unauthorized();
 
             dborder.Status = order.Status;
             dborder.SenderComment = order.SenderComment;

@@ -10,7 +10,7 @@
   let title = "Новая витрина";
   if (route.params.id) title = "Редактировать витрину";
 
-  let shop = ref({caption:"", description: "", deliveryConditions: ""})
+  let shop = ref({id: 0, caption:"", description: "", deliveryConditions: "", createdByInfo: {}})
 
   let shopId = null;
 
@@ -60,7 +60,7 @@
           router.push(`/shop/${shop.value.id}`);
 
       } catch (err) { console.log(err); }
-    
+
 
   }
 

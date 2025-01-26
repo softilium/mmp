@@ -83,7 +83,10 @@
       method: "POST",
       headers: authStore.authHeadersAppJson()
     });
-    if (res.ok) LoadBasket();
+    if (res.ok) {
+      LoadBasket();
+      authStore.loadBasket();
+    }
   }
 
   const Dec = async (good) => {
@@ -91,7 +94,10 @@
       method: "POST",
       headers: authStore.authHeadersAppJson()
     });
-    if (res.ok) LoadBasket();
+    if (res.ok) {
+      LoadBasket();
+      authStore.loadBasket();
+    }
   }
 
   const DeleteGood = async () => {
@@ -129,9 +135,6 @@
       <button class="btn btn-primary btn-sm" @click="Inc(good)">+</button>&nbsp;
       <span v-if="good.basked">
         <button class="btn btn-primary btn-sm" @click="Dec(good)">-</button>&nbsp; {{ basketSum }}
-        <button class="btn btn-outline-success btn-sm" @click="$router.push(`/checkout/${good.ownerShop.id}`);">
-          <i class="bi bi-basket2-fill"></i>
-        </button>
       </span>
     </div>
   </div>

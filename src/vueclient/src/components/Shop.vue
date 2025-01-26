@@ -53,15 +53,10 @@
 
   });
 
-  const basketSum = ref(0);
-
   const LoadBasket = async () => {
     if (authStore.userInfo.id) {
 
       try {
-
-        basketSum.value = 0;
-
         let res = await fetch(authStore.rbUrl() + "/api/baskets/" + shop.value.id, {
           method: "GET",
           headers: authStore.authHeadersAppJson()
@@ -80,7 +75,6 @@
               let gObj = goodmap.get(goodId);
               if (gObj != null) {
                 gObj.basked = _.qty;
-                basketSum.value += gObj.price * _.qty;
               }
             });
           }
@@ -97,6 +91,7 @@
     if (res.ok) {
       if (!good.basked) good.basked = 0;
       good.basked++;
+      await authStore.loadBasket();
       LoadBasket();
     }
   }
@@ -110,6 +105,7 @@
       if (good.basked && good.basked > 0) good.basked--;
       if (good.basked == 0) good.basked = null;
       LoadBasket();
+      await authStore.loadBasket();
     }
   }
 
@@ -155,16 +151,12 @@
       <thead class="table-primary" style="position: sticky; top: 0; z-index: 1; background-color: white;">
         <tr>
           <th>Товар или услуга</th>
-          <th>
-            <button class="btn btn-outline-success btn-sm" v-if="basketSum" @click="$router.push(`/checkout/${shop.id}`);">
-              <i class="bi bi-basket2-fill"></i> {{ basketSum }}
-            </button>
-          </th>
+          <th>Цена</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="good in goods" v-bind:key="good.id">
-          <td class="col-8">
+          <td class="col-9">
             <div class="row">
               <div class="col-4">
                 <RouterLink v-if="good.thumb" v-bind:to="`/good/${good.id}`"><img :src="good.thumb" class="img-fluid img-thumbnail" height="60" width="60"></RouterLink>
@@ -174,7 +166,7 @@
               </div>
             </div>
           </td>
-          <td class="col-4">
+          <td class="col-3">
             {{ good.price }}
             <p v-if="authStore.userInfo.id">
               <button class="btn btn-primary btn-sm" @click="Inc(good)">+</button>&nbsp;
