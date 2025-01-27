@@ -10,7 +10,7 @@ namespace mmp.Data
 
         #region NotifyAfterSave
 
-        private List<long>? adminChatIds = null;
+        //private List<long>? adminChatIds = null;
 
         private readonly Dictionary<long, List<string>> afterSaveNotifies = [];
         public void NotifyAfterSave(long chatId, string message)
@@ -25,22 +25,16 @@ namespace mmp.Data
 
         public void NotifyAdminsAfterSave(string message)
         {
-            if (adminChatIds == null)
-            {
-                var allAdmins = Users.Where(_ => _.Admin && _.TelegramVerified).Select(_ => _.TelegramUserName);
-                adminChatIds = BotChats.Where(_ => allAdmins.Contains(_.UserName)).Select(_ => _.ChatId).ToList();
-            }
+            var allAdmins = Users.Where(_ => _.Admin && _.TelegramVerified).Select(_ => _.TelegramUserName);
+            var adminChatIds = BotChats.Where(_ => allAdmins.Contains(_.UserName)).Select(_ => _.ChatId).ToList();
             foreach (var chatId in adminChatIds)
                 NotifyAfterSave(chatId, $"АДМ.СООБЩЕНИЕ:\n\r{message}");
         }
         public void NotifyFirstAdminAfterSave(string message)
         {
-            if (adminChatIds == null)
-            {
-                var allAdmins = Users.Where(_ => _.Admin && _.TelegramVerified).OrderBy(_=>_.Id).Take(1).Select(_ => _.TelegramUserName);
-                adminChatIds = BotChats.Where(_ => allAdmins.Contains(_.UserName)).Select(_ => _.ChatId).ToList();
-            }
-            foreach (var chatId in adminChatIds)
+            var tgAdmUserNames = Users.Where(_ => _.Admin && _.TelegramVerified).OrderBy(_ => _.Id).Take(1).Select(_ => _.TelegramUserName);
+            var tgAdmChats = BotChats.Where(_ => tgAdmUserNames.Contains(_.UserName)).Select(_ => _.ChatId).ToList();
+            foreach (var chatId in tgAdmChats)
                 NotifyAfterSave(chatId, $"АДМ.СООБЩЕНИЕ:\n\r{message}");
         }
 
