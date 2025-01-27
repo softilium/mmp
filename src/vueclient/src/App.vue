@@ -62,25 +62,30 @@
   </div>
 
   <br />
-  <footer class="border-top footer text-muted">
-    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow.mb-3">
-      <div class="container-fluid">
-        <span v-if="authStore.userInfo.id">
-          <RouterLink class="btn btn-info btn-sm" to="/inc-orders">Заказы для обработки</RouterLink>&nbsp;
-        </span>
-        <span v-if="authStore.userInfo.admin">
-          <RouterLink class="btn btn-info btn-sm" to="/set-roles">admin</RouterLink>&nbsp;
-        </span>
-      </div>
-    </nav>
+
+  <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow.mb-3" v-if="authStore.userInfo.admin || authStore.userInfo.shopManage">
     <div class="container-fluid">
-      <div class="row">
-        <div class="col">
-          <span>&copy;2024-2025, </span>
-          <div v-if="authStore.isTg() && authStore.userInfo.shopManage">Адрес страницы для браузера: <input class="form-control sm" v-model="myurl" /></div>
-        </div>
+      <span v-if="authStore.userInfo.shopManage">
+        <RouterLink class="btn btn-info btn-sm" to="/inc-orders">Заказы для обработки</RouterLink>&nbsp;
+      </span>
+      <span v-if="authStore.userInfo.admin">
+        <RouterLink class="btn btn-info btn-sm" to="/set-roles">admin</RouterLink>&nbsp;
+      </span>
+    </div>
+  </nav>
+  <div class="container-fluid">
+    <div class="row mb-3">
+      <div class="col">
+        <i class="bi bi-telegram"></i>
+        Вопросы, проблемы, предложения? Напишите их боту RiversStores, это будет передано администратору сервиса.
       </div>
     </div>
-  </footer>
+    <div class="row">
+      <div class="col">
+        <span>&copy;2024-2025,</span>
+        <div v-if="authStore.isTg() && authStore.userInfo.shopManage">Адрес страницы для браузера: <input class="form-control sm" v-model="myurl" /></div>
+      </div>
+    </div>
+  </div>
 
 </template>

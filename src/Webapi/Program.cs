@@ -119,21 +119,13 @@ if (!string.IsNullOrEmpty(TelegramBotAPIKEY))
                 Console.WriteLine($"Updated chat {msg.Chat.Id}. Now it's associated with {msg.From.Username}");
             }
         }
-
-        Console.WriteLine($"tg.msg from {msg.Chat.Username}: {msg.Text}");
-
         var admUserNames = db.Users.AsNoTracking().Where(_ => _.Admin && _.TelegramVerified).Select(_ => _.TelegramUserName).ToList();
-        Console.WriteLine($"admUserNames={string.Join(", ", admUserNames)}");
         var admChats = db.BotChats.AsNoTracking().Where(_ => admUserNames.Contains(_.UserName)).Select(_ => _.ChatId).ToList();
-
         if (!admChats.Contains(msg.Chat.Id))
         {
-            db.NotifyFirstAdminAfterSave($"Message from {msg.Chat.Id} (username={msg.Chat.Username}):\n\r{msg.Text}");
-            await db.SaveChangesAsync(); //to force notify
-            Console.WriteLine($"tg.msg. forwarded");
+            db.NotifyFirstAdminAfterSave($"Message from {msg.Chat.Username}:\n\r{msg.Text}");
+            await db.SaveChangesAsync();
         }
-        else
-            Console.WriteLine($"tg.msg. Ignoring admin chatid={msg.Chat.Id}");
     }
 }
 else Console.WriteLine("Bot isn't initialized, TelegramBotAPIKEY is empty");
