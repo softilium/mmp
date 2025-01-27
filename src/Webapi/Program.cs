@@ -123,8 +123,12 @@ if (!string.IsNullOrEmpty(TelegramBotAPIKEY))
         Console.WriteLine($"tg.msg from {msg.Chat.Username}: {msg.Text}");
 
         var adminChats = db.Users.Where(_ => _.Admin).Select(_ => _.BotChatId).ToList();
+        var adminChatsAsStr = adminChats.Select(chat => chat.ToString()).ToArray();
+        Console.WriteLine($"adminchatIds={string.Join(", ", adminChatsAsStr)}");
         if (!adminChats.Contains(msg.Chat.Id))
             db.NotifyFirstAdminAfterSave($"Message from {msg.Chat.Id} (username={msg.Chat.Username}):\n\r{msg.Text}");
+        else
+            Console.WriteLine($"tg.msg. Ignoring admin chatid={msg.Chat.Id}");
     }
 }
 else Console.WriteLine("Bot isn't initialized, TelegramBotAPIKEY is empty");
