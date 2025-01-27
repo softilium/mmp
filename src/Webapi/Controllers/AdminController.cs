@@ -21,7 +21,7 @@ namespace Webapi.Controllers
             var cu = db.CurrentUser();
             if (cu == null || !cu.Admin) return Unauthorized();
 
-            return await db.Users.ToListAsync();
+            return await db.Users.OrderByDescending(_ => _.Id).ToListAsync();
         }
 
         [HttpPut("allusers/{id}")]
