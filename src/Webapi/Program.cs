@@ -119,7 +119,10 @@ if (!string.IsNullOrEmpty(TelegramBotAPIKEY))
                 Console.WriteLine($"Updated chat {msg.Chat.Id}. Now it's associated with {msg.From.Username}");
             }
         }
-        //todo notify user about this chat is associated with user on river-stores.com (or not)
+
+        var adminChats = db.Users.Where(_ => _.Admin).Select(_ => _.BotChatId).ToList();
+        if (!adminChats.Contains(msg.Chat.Id))
+            db.NotifyFirstAdminAfterSave($"Message from {msg.Chat.Id} (username={msg.Chat.Username}):\n\r{msg.Text}");
     }
 }
 else Console.WriteLine("Bot isn't initialized, TelegramBotAPIKEY is empty");

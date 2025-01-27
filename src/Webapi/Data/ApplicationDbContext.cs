@@ -33,6 +33,16 @@ namespace mmp.Data
             foreach (var chatId in adminChatIds)
                 NotifyAfterSave(chatId, $"АДМ.СООБЩЕНИЕ:\n\r{message}");
         }
+        public void NotifyFirstAdminAfterSave(string message)
+        {
+            if (adminChatIds == null)
+            {
+                var allAdmins = Users.Where(_ => _.Admin && _.TelegramVerified).OrderBy(_=>_.Id).Take(1).Select(_ => _.TelegramUserName);
+                adminChatIds = BotChats.Where(_ => allAdmins.Contains(_.UserName)).Select(_ => _.ChatId).ToList();
+            }
+            foreach (var chatId in adminChatIds)
+                NotifyAfterSave(chatId, $"АДМ.СООБЩЕНИЕ:\n\r{message}");
+        }
 
         public void ClearAfterSaveNotifies()
         {
