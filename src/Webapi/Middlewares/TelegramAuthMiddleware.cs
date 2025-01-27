@@ -99,7 +99,7 @@ public class TelegramAuthMiddleWare
                             {
                                 // lets create default user record for telegram user 
 
-                                var chat = await db.BotChats.FirstOrDefaultAsync(_ => _.UserName == username) 
+                                var chat = await db.BotChats.FirstOrDefaultAsync(_ => _.UserName == username)
                                     ?? throw new Exception("Unable to find stored chat for tg user. Does bot active? Does bot handler?");
 
                                 var newUser = new User
@@ -122,8 +122,14 @@ public class TelegramAuthMiddleWare
 
                                 await db.SaveChangesAsync();
 
-                                await bot.SendMessage(chat.ChatId, 
-                                    $"Ваш пароль для входа на сайт river-stores.com: {newPassword}.\n\rВ карточке вашего профиля Вам нужно указать ваш реальный email вместо синтетического, который указан только для заполнения профиля."
+                                await bot.SendMessage(chat.ChatId,
+
+@$"Вас приветствует бот сервиса RiverStores. Вы можете использовать сервис, нажав на название бота сверху и открыв мини-приложение по ссылке. Либо, в списке чатов или в окне чата нажать кнопку (ОТКРЫТЬ/OPEN).
+
+Вы можете открыть ссылку в браузере: https://rives-stores.com
+Ваш логин  : {newUser.Email}
+Ваш пароль : {newPassword}"
+
                                 );
                                 user = newUser;
                             }
