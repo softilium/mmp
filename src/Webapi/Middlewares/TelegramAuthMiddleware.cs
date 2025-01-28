@@ -22,6 +22,10 @@ public class TelegramAuthMiddleWare
 
     public static bool CheckInitData(string initData, string botToken, out string username)
     {
+
+        Console.WriteLine("BotToken:"); //debug
+        Console.WriteLine(botToken); //debug
+
         username = "";
 
         try
