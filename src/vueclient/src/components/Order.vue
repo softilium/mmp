@@ -16,7 +16,7 @@
     expectedDeliveryDate: "",
     createdOn: "",
     senderID: 0,
-    senderInfo: { id:0, userName: "" },
+    senderInfo: { id:0, userName: "", description: "" },
     createdByInfo: { id:0, userName: "", description: "" },
     status: 0,
     id: 0,

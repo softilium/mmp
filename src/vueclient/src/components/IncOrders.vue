@@ -52,7 +52,7 @@
       </thead>
       <tr v-for="order in orders" :key="order.id">
         <td>
-          <RouterLink :to="`/order/${order.id}`">{{ order.senderInfo.userName }}</RouterLink>
+          <RouterLink :to="`/order/${order.id}`">{{ order.createdByInfo.userName }}</RouterLink>
         </td>
         <td>
           <RouterLink :to="`/order/${order.id}`">{{ statuses[order.status] }}</RouterLink>

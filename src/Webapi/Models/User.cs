@@ -16,7 +16,7 @@ namespace mmp.Data
         public long BotChatId { get; set; }
         public long Id { get; set; }
 
-        public string Description { get; set; } // by def we don't put value here except public profiles page
+        public string Description { get; set; } = ""; // by def we don't put value here except public profiles page
 
         public UserInfo(User src)
         {
