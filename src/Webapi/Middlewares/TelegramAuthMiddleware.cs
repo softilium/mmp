@@ -23,10 +23,6 @@ public class TelegramAuthMiddleWare
 
     public static bool CheckInitData(string initData, string botToken)
     {
-
-        Console.WriteLine("BotToken:"); //debug
-        Console.WriteLine(botToken); //debug
-
         try
         {
 
@@ -37,17 +33,6 @@ public class TelegramAuthMiddleWare
             var dataDict = new SortedDictionary<string, string>(
                 data.AllKeys.ToDictionary(x => x!, x => data[x]!),
                 StringComparer.Ordinal);
-
-            //foreach (var kv in dataDict)
-            //{
-            //    if (kv.Key == "user")
-            //    {   // extract value from "username" field in JSON
-            //        var usernamePos = kv.Value.IndexOf("username") + 9;
-            //        var firstQ = kv.Value.IndexOf("\"", usernamePos) + 1;
-            //        var secondQ = kv.Value.IndexOf("\"", firstQ);
-            //        username = kv.Value[firstQ..secondQ];
-            //    }
-            //}
 
             // Constant key to genrate secret key.
             var constantKey = "WebAppData";
@@ -92,7 +77,6 @@ public class TelegramAuthMiddleWare
             var tgauth = context.Request.Headers["Authorization"][0] ?? "     ";
             if (tgauth.StartsWith("tg "))
             {
-                Console.WriteLine($"tgauth=>{tgauth}");
                 tgauth = tgauth.Substring(3);
 
                 var tgauthtokens = tgauth.Split("~~", StringSplitOptions.None);
