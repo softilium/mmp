@@ -77,7 +77,7 @@ namespace mmp.Data
                 db.NotifyAfterSave(senderUser.BotChatId, $"Новый заказ для вас. Заказчик {cu.UserName}, {DateTime.Now:g}.");
 
                 if (cu.TelegramVerified)
-                    db.NotifyAfterSave(cu.BotChatId, $"Ваш заказ #{ID} от {CreatedOn: g} отправлен владельцу витрины {senderUser.UserName}. Бот уведомит вас обо всех изменениях его статуса.");
+                    db.NotifyAfterSave(cu.BotChatId, $"Ваш заказ от {DateTime.Now: g} отправлен владельцу витрины {senderUser.UserName}. Бот уведомит вас обо всех изменениях его статуса.");
 
             }
 
