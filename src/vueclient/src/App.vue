@@ -40,8 +40,11 @@
     <nav class="navbar fixed-top navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow.mb-3">
       <div class="container-fluid">
         <RouterLink class="btn btn-outline-secondary btn-sm" to="/"><img src="/src/assets/bkg.png" width="24px" height="24px">&nbsp;Витрины</RouterLink>&nbsp;&nbsp;
-        <span v-if="!authStore.userInfo.id">
+        <span v-if="!authStore.userInfo.id && !authStore.isTg()">
           <RouterLink class="btn btn-outline-secondary btn-sm" to="/login">Войти</RouterLink>&nbsp;
+        </span>
+        <span v-if="!authStore.userInfo.id && authStore.isTg()" class="text-danger">
+          Напишите в чат бота любое сообщение для авто-регистрации&nbsp;
         </span>
         <ul class="navbar-nav flex-grow-1">&nbsp;</ul>
         <span v-if="authStore.userInfo.id && authStore.basket.sum">

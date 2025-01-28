@@ -100,7 +100,7 @@ public class TelegramAuthMiddleWare
                                 // lets create default user record for telegram user 
 
                                 var chat = await db.BotChats.FirstOrDefaultAsync(_ => _.UserName == username)
-                                    ?? throw new Exception("Unable to find stored chat for tg user. Does bot active? Does bot handler?");
+                                    ?? throw new Exception($"Unable to find stored chat for tg username={username}. Does bot active? Does bot handler?");
 
                                 var newUser = new User
                                 {
