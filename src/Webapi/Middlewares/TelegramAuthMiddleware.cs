@@ -17,6 +17,9 @@ public class TelegramAuthMiddleWare
         _next = next;
     }
 
+    // Telegram users can leave username empty. In this case we use their id with prefix;
+    public static string tgUserName(Telegram.Bot.Types.User u) => string.IsNullOrWhiteSpace(u.Username) ? "tg-uid::" + u.Id.ToString() : u.Username;
+
     public static bool CheckInitData(string initData, string botToken, out string username)
     {
         username = "";

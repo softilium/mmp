@@ -96,7 +96,7 @@ if (!string.IsNullOrEmpty(TelegramBotAPIKEY))
     // associate users with chatIds
     async Task OnMessage(Telegram.Bot.Types.Message msg, UpdateType type)
     {
-        if (msg == null || msg.From == null || msg.From.Username == null) return;
+        if (msg == null || msg.From == null) return;
 
         using var botscope = app.Services.CreateScope();
 
@@ -106,17 +106,17 @@ if (!string.IsNullOrEmpty(TelegramBotAPIKEY))
         {
             chat = new BotChat { ChatId = msg.Chat.Id };
             db.BotChats.Add(chat);
-            chat.UserName = msg.From.Username;
+            chat.UserName = TelegramAuthMiddleWare.tgUserName(msg.From);
             await db.SaveChangesAsync();
-            Console.WriteLine($"New chat {msg.Chat.Id} is associated with {msg.From.Username}");
+            Console.WriteLine($"New chat {msg.Chat.Id} is associated with {TelegramAuthMiddleWare.tgUserName(msg.From)}");
         }
         else
         {
-            if (chat.UserName != msg.From.Username)
+            if (chat.UserName != TelegramAuthMiddleWare.tgUserName(msg.From))
             {
-                chat.UserName = msg.From.Username;
+                chat.UserName = TelegramAuthMiddleWare.tgUserName(msg.From);
                 await db.SaveChangesAsync();
-                Console.WriteLine($"Updated chat {msg.Chat.Id}. Now it's associated with {msg.From.Username}");
+                Console.WriteLine($"Updated chat {msg.Chat.Id}. Now it's associated with {TelegramAuthMiddleWare.tgUserName(msg.From)}");
             }
         }
         var admUserNames = db.Users.AsNoTracking().Where(_ => _.Admin && _.TelegramVerified).Select(_ => _.TelegramUserName).ToList();

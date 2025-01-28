@@ -29,6 +29,11 @@ export const authStore = reactive({
     return r;
   },
 
+  tgInitDataStruct() {
+    if (window.Telegram == undefined || window.Telegram.WebApp == undefined) return null;
+    return window.Telegram.WebApp.initDataUnsafe;
+  },
+
   isTg() {
     var r = this.tgInitData();
     return r != null;
