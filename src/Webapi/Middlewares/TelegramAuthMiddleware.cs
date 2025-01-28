@@ -18,15 +18,14 @@ public class TelegramAuthMiddleWare
     }
 
     // Telegram users can leave username empty. In this case we use their id with prefix;
-    public static string tgUserName(Telegram.Bot.Types.User u) => string.IsNullOrWhiteSpace(u.Username) ? "tg-uid::" + u.Id.ToString() : u.Username;
+    private static string tgUserNameInternal(string UserName, string UserId) => string.IsNullOrWhiteSpace(UserName) ? ("tg." + UserId) : UserName;
+    public static string tgUserName(Telegram.Bot.Types.User u) => tgUserNameInternal(u.Username, u.Id.ToString());
 
-    public static bool CheckInitData(string initData, string botToken, out string username)
+    public static bool CheckInitData(string initData, string botToken)
     {
 
         Console.WriteLine("BotToken:"); //debug
         Console.WriteLine(botToken); //debug
-
-        username = "";
 
         try
         {
@@ -39,16 +38,16 @@ public class TelegramAuthMiddleWare
                 data.AllKeys.ToDictionary(x => x!, x => data[x]!),
                 StringComparer.Ordinal);
 
-            foreach (var kv in dataDict)
-            {
-                if (kv.Key == "user")
-                {   // extract value from "username" field in JSON
-                    var usernamePos = kv.Value.IndexOf("username") + 9;
-                    var firstQ = kv.Value.IndexOf("\"", usernamePos) + 1;
-                    var secondQ = kv.Value.IndexOf("\"", firstQ);
-                    username = kv.Value[firstQ..secondQ];
-                }
-            }
+            //foreach (var kv in dataDict)
+            //{
+            //    if (kv.Key == "user")
+            //    {   // extract value from "username" field in JSON
+            //        var usernamePos = kv.Value.IndexOf("username") + 9;
+            //        var firstQ = kv.Value.IndexOf("\"", usernamePos) + 1;
+            //        var secondQ = kv.Value.IndexOf("\"", firstQ);
+            //        username = kv.Value[firstQ..secondQ];
+            //    }
+            //}
 
             // Constant key to genrate secret key.
             var constantKey = "WebAppData";
@@ -94,11 +93,24 @@ public class TelegramAuthMiddleWare
             if (tgauth.StartsWith("tg "))
             {
                 tgauth = tgauth.Substring(3);
+
+                var tgauthtokens = tgauth.Split("~~", StringSplitOptions.None);
+                if (tgauthtokens.Length != 3)
+                {
+                    Console.WriteLine("Unable to parse tg auth token: " + tgauth);
+                    return;
+                }
+                tgauth = tgauthtokens[0];
+                var tgAuthId = tgauthtokens[1];
+                var tgAuthUserName = tgauthtokens[2];
+
                 if (!string.IsNullOrWhiteSpace(tgauth))
                 {
                     var botToken = Environment.GetEnvironmentVariable("TelegramBotAPIKEY") ?? "nobothere";
-                    if (CheckInitData(tgauth, botToken, out string? username))
+                    if (CheckInitData(tgauth, botToken))
                     {
+                        var username = tgUserNameInternal(tgAuthUserName, tgAuthId);
+
                         if (username != "")
                         {
                             var user = await db.Users.AsNoTracking().FirstOrDefaultAsync(_ => _.TelegramUserName == username && _.TelegramVerified);

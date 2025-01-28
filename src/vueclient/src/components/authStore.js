@@ -43,9 +43,13 @@ export const authStore = reactive({
     return import.meta.env.VITE_API_URL;
   },
 
+  tgAuthToken() {
+    return `tg ${this.tgInitData()}~~${this.tgInitDataStruct().user.id}~~${this.tgInitDataStruct().user.username}`;
+  }
+
   authHeaders() {
     if (this.isTg())
-      return { "Authorization": "tg " + this.tgInitData() };
+      return { "Authorization": this.tgAuthToken() }
     else
       return { "Authorization": "Bearer " + this.accessToken };
   },
@@ -53,7 +57,7 @@ export const authStore = reactive({
   authHeadersAppJson() {
     if (this.isTg())
       return {
-        "Authorization": "tg " + this.tgInitData(),
+        "Authorization": this.tgAuthToken(),
         "Content-Type": "application/json",
       };
     else
