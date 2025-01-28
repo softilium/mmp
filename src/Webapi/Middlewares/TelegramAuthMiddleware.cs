@@ -92,6 +92,7 @@ public class TelegramAuthMiddleWare
             var tgauth = context.Request.Headers["Authorization"][0] ?? "     ";
             if (tgauth.StartsWith("tg "))
             {
+                Console.WriteLine($"tgauth=>{tgauth}");
                 tgauth = tgauth.Substring(3);
 
                 var tgauthtokens = tgauth.Split("~~", StringSplitOptions.None);
