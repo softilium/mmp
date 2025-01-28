@@ -45,7 +45,7 @@ export const authStore = reactive({
 
   tgAuthToken() {
     return `tg ${this.tgInitData()}~~${this.tgInitDataStruct().user.id}~~${this.tgInitDataStruct().user.username}`;
-  }
+  },
 
   authHeaders() {
     if (this.isTg())
