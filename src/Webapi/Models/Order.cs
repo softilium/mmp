@@ -65,8 +65,13 @@ namespace mmp.Data
         {
             if (entity.State == EntityState.Added)
             {
-                var cu = db.CurrentUser();
-
+                var cuRaw = db.CurrentUser();
+                if (cuRaw == null)
+                {
+                    Console.WriteLine("ERR. CurrentUser is null during order saving");
+                    return;
+                }
+                var cu = UserCache.FindUserInfo(cuRaw.Id, db);
                 var senderUser = UserCache.FindUserInfo(SenderID, db);
 
                 db.NotifyAfterSave(senderUser.BotChatId, $"Новый заказ для вас. Заказчик {cu.UserName}, {DateTime.Now:g}.");

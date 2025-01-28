@@ -82,10 +82,11 @@ namespace mmp.Data
                 if (loaded == null || loaded.Count == 0 || !loaded.ContainsKey(id))
                 {
                     var chats = db.BotChats.AsNoTracking().ToDictionary(k => k.UserName, v => v.ChatId);
+                    var users2tg = db.Users.AsNoTracking().ToDictionary(k => k.UserName, v => v.TelegramUserName); //map user names to tg names
                     loaded = db.Users.AsNoTracking().ToDictionary(k => k.Id, v => new UserInfo(v));
                     foreach (var kv in loaded)
                     {
-                        if (chats.TryGetValue(kv.Value.UserName, out long chatId))
+                        if (chats.TryGetValue(users2tg[kv.Value.UserName], out long chatId))
                         kv.Value.BotChatId = chatId;
                     }
                 }
