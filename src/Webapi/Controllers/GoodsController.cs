@@ -18,7 +18,7 @@ namespace Webapi.Controllers
         private readonly IHostEnvironment host;
         private readonly IFusionCache cache;
 
-        private readonly BlobContainerClient blobContainer;
+        private readonly BlobContainerClient? blobContainer;
 
         private bool UseAzureBlobs => !host.IsDevelopment();
 
@@ -162,6 +162,8 @@ namespace Webapi.Controllers
                     }
                     else
                     {
+                        if (blobContainer == null)
+                            throw new Exception("BlobContainer=null. Check blob storage credentials");
                         var handler = blobContainer.GetBlobClient(BlobName(goodId, num));
                         if (!handler.Exists()) return null;
                         using var memoryStream = new MemoryStream();
@@ -227,6 +229,8 @@ namespace Webapi.Controllers
             }
             else
             {
+                if (blobContainer == null)
+                    throw new Exception("BlobContainer=null. Check blob storage credentials");
                 await blobContainer.DeleteBlobIfExistsAsync(BlobName(goodId, num));
                 var handler = blobContainer.GetBlobClient(BlobName(goodId, num));
                 using var memoryStream = new MemoryStream();
@@ -258,6 +262,8 @@ namespace Webapi.Controllers
             }
             else
             {
+                if (blobContainer == null)
+                    throw new Exception("BlobContainer=null. Check blob storage credentials");
                 await blobContainer.DeleteBlobIfExistsAsync(BlobName(goodId, num));
             }
 

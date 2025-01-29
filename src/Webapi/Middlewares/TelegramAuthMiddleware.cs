@@ -19,7 +19,7 @@ public class TelegramAuthMiddleWare
 
     // Telegram users can leave username empty. In this case we use their id with prefix;
     private static string tgUserNameInternal(string UserName, string UserId) => string.IsNullOrWhiteSpace(UserName) ? ("tg." + UserId) : UserName;
-    public static string tgUserName(Telegram.Bot.Types.User u) => tgUserNameInternal(u.Username, u.Id.ToString());
+    public static string tgUserName(Telegram.Bot.Types.User u) => tgUserNameInternal(u.Username ?? "", u.Id.ToString());
 
     public static bool CheckInitData(string initData, string botToken)
     {
@@ -139,7 +139,7 @@ public class TelegramAuthMiddleWare
                                 );
                                 user = newUser;
                             }
-                            var identity = new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, user.UserName) }, "custom");
+                            var identity = new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, user.UserName ?? "") }, "custom");
                             context.User = new ClaimsPrincipal(identity);
                         }
                     }

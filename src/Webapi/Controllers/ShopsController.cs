@@ -107,7 +107,11 @@ namespace Webapi.Controllers
 
             var clStatuses = new[] { OrderStatuses.Canceled, OrderStatuses.Done };
 
-            var orders = db.OrderLines.Where(_ => _.Shop == shop && _.Order != null).Select(_ => _.Order.ID);
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+            var orders = db.OrderLines
+                .Where(_ => _.Shop == shop && _.Order != null)
+                .Select(_ => _.Order.ID);
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
 
             var foo = db.Orders.Where(_ => orders.Contains(_.ID) && !_.IsDeleted && !clStatuses.Contains(_.Status)).FirstOrDefault();
             if (foo != null) return BadRequest("Перед удалением витрины нужно закрыть все заказы по ней");
