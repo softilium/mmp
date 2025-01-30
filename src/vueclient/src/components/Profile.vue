@@ -9,11 +9,12 @@
   const route = useRoute();
 
   const me = ref(false);
-  const user = ref({ userName: "", email: "", telegramUserName: "", telegramVerified: false, telegramCheckCode: "", botChatId: 0 });
+  const user = ref({ id: 0, userName: "", email: "", telegramUserName: "", telegramVerified: false, telegramCheckCode: "", botChatId: 0 });
   const newTelegramUserName = ref("");
   const telegramVerifyCode = ref("");
   const result = ref("");
   const userDescription = ref("");
+  const msgtext = ref("");
 
   const NewTelegramCode = async () => {
 
@@ -88,6 +89,22 @@
       result.value = await res.text();
   }
 
+  const SendMsg = async () => {
+
+    if (!msgtext.value) return;
+
+    let res = await fetch(`${authStore.rbUrl()}/api/profiles/sendmsg/${user.value.id}`,
+      {
+        method: "POST",
+        headers: authStore.authHeadersAppJson(),
+        body: msgtext.value
+      });
+    if (res.ok) {
+      msgtext.value = "";
+      result.value = "Сообщение отослано";
+    }
+  }
+
 </script>
 
 <template>
@@ -159,10 +176,33 @@
     <div v-if="!route.params.id">
       <button class="btn btn-secondary btn-sm" @click="Save">Сохранить</button>
     </div>
-    <div v-if="result" class="alert alert-primary">
-      {{ result }}
-    </div>
 
+  </div>
+
+  <div v-if="!me">
+    <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#sendMsgModal">
+      <i class="bi bi-telegram"></i>&nbsp;Написать сообщение
+    </button>
+
+    <div class="modal fade" id="sendMsgModal" tabindex="-1" aria-labelledby="sendMsgModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="sendMsgModalLabel">Отправка сообщения в бот пользователю</h5>
+          </div>
+          <div class="modal-body">
+            <textarea class="form-control" rows="5" v-model="msgtext"></textarea>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="SendMsg()"><i class="bi bi-telegram"></i>&nbsp;Послать</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div v-if="result" class="alert alert-primary">
+    {{ result }}
   </div>
 
 </template>

@@ -10,8 +10,6 @@ namespace mmp.Data
 
         #region NotifyAfterSave
 
-        //private List<long>? adminChatIds = null;
-
         private readonly Dictionary<long, List<string>> afterSaveNotifies = [];
         public void NotifyAfterSave(long chatId, string message)
         {

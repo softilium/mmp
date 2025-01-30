@@ -126,5 +126,27 @@ namespace Webapi.Controllers
             return Ok();
         }
 
+        [HttpPost("sendmsg/{userid:long}")]
+        public async Task<IActionResult> SendMsg(long userid)
+        {
+            string body;
+            using (var reader = new StreamReader(HttpContext.Request.Body))
+                body = await reader.ReadToEndAsync();
+
+            if (string.IsNullOrWhiteSpace(body))
+                return BadRequest();
+
+            var cu = db.CurrentUser();
+            if (cu == null) return Unauthorized();
+
+            var receiver = db.Users.FirstOrDefault(_ => _.Id == userid && _.TelegramVerified);
+            if (receiver == null) return NotFound();
+            var chat = db.BotChats.FirstOrDefault(_ => _.UserName == cu.TelegramUserName);
+            if (chat == null) return NotFound();
+
+            await bot.SendMessage(chat.ChatId, $"Сообщение сервиса RiverStores от пользователя {cu.UserName}:\n\r{body}");
+
+            return Ok();
+        }
     }
 }
