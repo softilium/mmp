@@ -141,7 +141,7 @@ namespace Webapi.Controllers
 
             var receiver = db.Users.FirstOrDefault(_ => _.Id == userid && _.TelegramVerified);
             if (receiver == null) return NotFound();
-            var chat = db.BotChats.FirstOrDefault(_ => _.UserName == cu.TelegramUserName);
+            var chat = db.BotChats.FirstOrDefault(_ => _.UserName == receiver.TelegramUserName);
             if (chat == null) return NotFound();
 
             await bot.SendMessage(chat.ChatId, $"Сообщение сервиса RiverStores от пользователя {cu.UserName}:\n\r{body}");
