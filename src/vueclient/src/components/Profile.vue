@@ -4,8 +4,7 @@
   import { onMounted, ref } from 'vue';
   import { useRoute } from 'vue-router'
   import { authStore } from './authStore.js';
-  import { glob } from './globals.js';
-
+  
   const route = useRoute();
 
   const me = ref(false);
@@ -52,7 +51,7 @@
         });
       if (res.ok) {
         user.value = await res.json();
-        userDescription.value = glob.linkify(user.value.description);
+        userDescription.value = authStore.linkify(user.value.description);
         me.value = !route.params.id;
       }
     }

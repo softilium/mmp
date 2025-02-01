@@ -3,8 +3,7 @@
 
   import { onMounted, ref } from 'vue';
   import { authStore } from './authStore.js';
-  import { glob } from './globals.js';
-
+  
   const orders = ref([]);
   const statuses = ref([]);
   const showAll = ref(false);
@@ -56,7 +55,7 @@
           <RouterLink :to="`/order/${order.id}`">{{ statuses[order.status] }}</RouterLink>
         </td>
         <td>
-          <RouterLink :to="`/order/${order.id}`">{{ glob.fmtDate(order.createdOn) }}</RouterLink>
+          <RouterLink :to="`/order/${order.id}`">{{ authStore.fmtDate(order.createdOn) }}</RouterLink>
         </td>
         <td class="text-end">
           <RouterLink :to="`/order/${order.id}`">{{ order.sum }}</RouterLink>

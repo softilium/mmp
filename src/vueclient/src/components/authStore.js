@@ -1,4 +1,7 @@
 import { reactive } from 'vue'
+import moment from 'moment';
+import 'moment/dist/locale/ru';
+import linkifyHtml from 'linkify-html';
 
 function newUserInfo() {
   return { userName: null, shopManage: false, admin: false, id: 0 }
@@ -7,6 +10,10 @@ function newUserInfo() {
 export const authStore = reactive({
 
   basket: { sum: 0 },
+  userInfo: newUserInfo(),
+  accessToken: "",
+  refreshToken: "",
+
   async loadBasket() {
     this.basket.sum = 0;
     let res = await fetch(`${authStore.rbUrl()}/api/baskets`, { headers: authStore.authHeaders() });
@@ -18,9 +25,20 @@ export const authStore = reactive({
     }
   },
 
-  userInfo: newUserInfo(),
-  accessToken: "",
-  refreshToken: "",
+  fmtDate(date) {
+    moment.locale('ru');
+    return moment(date).fromNow();
+  },
+
+  linkify(src) {
+    const opt = {
+      target: {
+        url: "_blank",
+        email: null,
+      },
+    };
+    return linkifyHtml(src, opt);
+  },
 
   tgInitData() {
     if (window.Telegram == undefined || window.Telegram.WebApp == undefined) return null;

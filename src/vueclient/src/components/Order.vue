@@ -4,7 +4,6 @@
   import { onMounted, ref } from 'vue';
   import { useRoute, useRouter } from 'vue-router'
   import { authStore } from './authStore.js';
-  import { glob } from './globals.js';
   import ProfileLink from './ProfileLink.vue';
 
   const route = useRoute()
@@ -84,7 +83,7 @@
   <div v-if="order">
     <button :disabled="!isCustomer && !isSender" class="btn btn-primary" @click="Save()">Сохранить</button>
     <h1>Заказ {{ order.id }}</h1>
-    <h6>{{ glob.fmtDate(order.createdOn) }}</h6>
+    <h6>{{ authStore.fmtDate(order.createdOn) }}</h6>
     <h6>Отправитель <ProfileLink :userInfo="order.senderInfo"></ProfileLink></h6>
     <h6>Заказчик <ProfileLink :userInfo="order.createdByInfo"></ProfileLink></h6>
     <div>&nbsp;</div>
