@@ -3,7 +3,7 @@
 
   import { onMounted, ref } from 'vue';
   import { useRoute, useRouter } from 'vue-router'
-  import { authStore } from './authStore.js';
+  import { ctx } from './ctx.js';
 
   const route = useRoute()
   const router = useRouter()
@@ -25,10 +25,10 @@
   onMounted(async () => {
     if (route.params.id) {
       try {
-        let res = await fetch(authStore.rbUrl() + "/api/goods/" + route.params.id);
+        let res = await fetch(ctx.rbUrl() + "/api/goods/" + route.params.id);
         if (res.ok) {
           good.value = await res.json();
-          isOwner.value = (good.value.createdByID == authStore.userInfo.id);
+          isOwner.value = (good.value.createdByID == ctx.userInfo.id);
           good.value.basked = null;
           basketSum.value = null;
           LoadBasket();
@@ -48,7 +48,7 @@
 
   const LoadImages = async () => {
     for (let i = 0; i < maxImagesCnt.value; i++) {
-      let res = await fetch(`${authStore.rbUrl()}/api/goods/images/${route.params.id}/${i}`, { method: "GET" });
+      let res = await fetch(`${ctx.rbUrl()}/api/goods/images/${route.params.id}/${i}`, { method: "GET" });
       if (res.status == 200) { // status 204 means no image
         let b = await res.blob();
         const src = URL.createObjectURL(b);
@@ -61,10 +61,10 @@
   const LoadBasket = async () => {
     basketSum.value = null;
     good.value.basked = null;
-    if (authStore.userInfo.id) {
-      let res = await fetch(authStore.rbUrl() + "/api/baskets/" + good.value.ownerShop.id, {
+    if (ctx.userInfo.id) {
+      let res = await fetch(ctx.rbUrl() + "/api/baskets/" + good.value.ownerShop.id, {
         method: "GET",
-        headers: authStore.authHeadersAppJson()
+        headers: ctx.authHeadersAppJson()
       });
       if (res.ok) {
         res = await res.json();
@@ -79,24 +79,24 @@
   }
 
   const Inc = async (good) => {
-    let res = await fetch(authStore.rbUrl() + "/api/baskets/increase/" + good.id, {
+    let res = await fetch(ctx.rbUrl() + "/api/baskets/increase/" + good.id, {
       method: "POST",
-      headers: authStore.authHeadersAppJson()
+      headers: ctx.authHeadersAppJson()
     });
     if (res.ok) {
       LoadBasket();
-      authStore.loadBasket();
+      ctx.loadBasket();
     }
   }
 
   const Dec = async (good) => {
-    let res = await fetch(authStore.rbUrl() + "/api/baskets/decrease/" + good.id, {
+    let res = await fetch(ctx.rbUrl() + "/api/baskets/decrease/" + good.id, {
       method: "POST",
-      headers: authStore.authHeadersAppJson()
+      headers: ctx.authHeadersAppJson()
     });
     if (res.ok) {
       LoadBasket();
-      authStore.loadBasket();
+      ctx.loadBasket();
     }
   }
 
@@ -104,9 +104,9 @@
 
     if (!confirm('Удалить товар, вы уверены?')) return;
 
-    let res = await fetch(`${authStore.rbUrl()}/api/goods/${good.value.id}`, {
+    let res = await fetch(`${ctx.rbUrl()}/api/goods/${good.value.id}`, {
       method: "DELETE",
-      headers: authStore.authHeadersAppJson()
+      headers: ctx.authHeadersAppJson()
     });
     if (res.ok) {
       router.push("/shop/" + route.params.shopid);

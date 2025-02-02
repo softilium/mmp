@@ -3,7 +3,7 @@
 
   import { onMounted, ref } from 'vue';
   import { useRoute, useRouter } from 'vue-router'
-  import { authStore } from './authStore.js';
+  import { ctx } from './ctx.js';
   import ProfileLink from './ProfileLink.vue';
 
   const route = useRoute()
@@ -31,19 +31,19 @@
 
   onMounted(async () => {
 
-    let res = await fetch(authStore.rbUrl() + "/api/orders/statuses");
+    let res = await fetch(ctx.rbUrl() + "/api/orders/statuses");
     if (res.ok) {
       statuses.value = await res.json();
     }
 
-    res = await fetch(authStore.rbUrl() + "/api/orders/" + route.params.id, {
-      headers: authStore.authHeadersAppJson()
+    res = await fetch(ctx.rbUrl() + "/api/orders/" + route.params.id, {
+      headers: ctx.authHeadersAppJson()
     });
 
     if (res.ok) {
       order.value = await res.json();
-      isCustomer.value = order.value.createdByID == authStore.userInfo.id;
-      isSender.value = order.value.senderID == authStore.userInfo.id;
+      isCustomer.value = order.value.createdByID == ctx.userInfo.id;
+      isSender.value = order.value.senderID == ctx.value.userInfo.id;
     }
   });
 
@@ -53,22 +53,22 @@
     //order.value.createdByInfo = null;
 
     if (isCustomer.value) {
-      let req = await fetch(`${authStore.rbUrl()}/api/orders/outbox/${route.params.id}`,
+      let req = await fetch(`${ctx.rbUrl()}/api/orders/outbox/${route.params.id}`,
         {
           method: "PUT",
           body: JSON.stringify(order.value),
-          headers: authStore.authHeadersAppJson()
+          headers: ctx.authHeadersAppJson()
         });
       if (req.ok) {
         router.push("/orders");
       }
     }
     if (isSender.value) {
-      let req = await fetch(`${authStore.rbUrl()}/api/orders/inbox/${route.params.id}`,
+      let req = await fetch(`${ctx.rbUrl()}/api/orders/inbox/${route.params.id}`,
         {
           method: "PUT",
           body: JSON.stringify(order.value),
-          headers: authStore.authHeadersAppJson()
+          headers: ctx.authHeadersAppJson()
         });
       if (req.ok) {
         router.push("/inc-orders");
@@ -83,7 +83,7 @@
   <div v-if="order">
     <button :disabled="!isCustomer && !isSender" class="btn btn-primary" @click="Save()">Сохранить</button>
     <h1>Заказ {{ order.id }}</h1>
-    <h6>{{ authStore.fmtDate(order.createdOn) }}</h6>
+    <h6>{{ ctx.fmtDate(order.createdOn) }}</h6>
     <h6>Отправитель <ProfileLink :userInfo="order.senderInfo"></ProfileLink></h6>
     <h6>Заказчик <ProfileLink :userInfo="order.createdByInfo"></ProfileLink></h6>
     <div>&nbsp;</div>

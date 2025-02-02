@@ -2,7 +2,7 @@
 <script setup lang="ts">
 
   import { ref } from 'vue';
-  import { authStore } from './authStore.js';
+  import { ctx } from './ctx.js';
   import { useRouter } from 'vue-router';
 
   const router = useRouter();
@@ -16,12 +16,12 @@
   let registerError = ref("");
 
   const doLogin = async () => {
-    loginError.value = await authStore.Login(emailString.value, passwordString.value);
+    loginError.value = await ctx.Login(emailString.value, passwordString.value);
     if (loginError.value == "") router.push('/');
   }
 
   const doRegister = async () => {
-    let q = await authStore.Register(emailStringreg.value, passwordStringreg.value);
+    let q = await ctx.Register(emailStringreg.value, passwordStringreg.value);
     registerError.value = q;
     if (registerError.value == "") router.push('/');
   }

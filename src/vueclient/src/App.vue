@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
   import { onMounted, ref, watch } from 'vue';
-  import { authStore } from './components/authStore.js';
+  import { ctx } from './components/ctx.js';
   import { useRoute } from 'vue-router';
 
   const route = useRoute();
@@ -16,20 +16,18 @@
   }
 
   onMounted(async () => {
-    authStore.basket.sum = 0;
-    authStore.SetAccessToken(localStorage.getItem("accessToken"));
-    authStore.SetRefreshToken(localStorage.getItem("refreshToken"));
-    authStore.CheckLogged();
+    ctx.basket.sum = 0;
+    ctx.SetAccessToken(localStorage.getItem("accessToken"));
+    ctx.SetRefreshToken(localStorage.getItem("refreshToken"));
+    ctx.CheckLogged();
     updateMyUrl();
-    await authStore.loadBasket();
+    await ctx.loadBasket();
   });
 
   // update myurl when user navigate within SPA
   watch(
     () => route.fullPath,
-    async newId => {
-      updateMyUrl();
-    }
+    async newId => { updateMyUrl(); }
   )
 
 </script>
@@ -40,18 +38,18 @@
     <nav class="navbar fixed-top navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow.mb-3">
       <div class="container-fluid">
         <RouterLink class="btn btn-outline-secondary btn-sm" to="/"><img src="/src/assets/bkg.png" width="24px" height="24px">&nbsp;Витрины</RouterLink>&nbsp;&nbsp;
-        <span v-if="!authStore.userInfo.id && !authStore.isTg()">
+        <span v-if="!ctx.userInfo.id && !ctx.isTg()">
           <RouterLink class="btn btn-outline-secondary btn-sm" to="/login">Войти</RouterLink>&nbsp;
         </span>
-        <span v-if="!authStore.userInfo.id && authStore.isTg()" class="text-danger">
+        <span v-if="!ctx.userInfo.id && ctx.isTg()" class="text-danger">
           Напишите в чат бота любое сообщение для авто-регистрации&nbsp;
         </span>
         <ul class="navbar-nav flex-grow-1">&nbsp;</ul>
-        <span v-if="authStore.userInfo.id && authStore.basket.sum">
-          <RouterLink class="btn btn-outline-success btn-sm" to="/checkout"><i class="bi bi-basket2-fill"></i>&nbsp;{{authStore.basket.sum}}</RouterLink>&nbsp;&nbsp;
+        <span v-if="ctx.userInfo.id && ctx.basket.sum">
+          <RouterLink class="btn btn-outline-success btn-sm" to="/checkout"><i class="bi bi-basket2-fill"></i>&nbsp;{{ctx.basket.sum}}</RouterLink>&nbsp;&nbsp;
         </span>
-        <span v-if="authStore.userInfo.id">
-          <RouterLink class="btn btn-outline-secondary btn-sm" to="/myprofile">{{ authStore.userInfo.userName }}</RouterLink>&nbsp;
+        <span v-if="ctx.userInfo.id">
+          <RouterLink class="btn btn-outline-secondary btn-sm" to="/myprofile">{{ ctx.userInfo.userName }}</RouterLink>&nbsp;
         </span>
       </div>
     </nav>
@@ -66,12 +64,12 @@
 
   <br />
 
-  <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow.mb-3" v-if="authStore.userInfo.admin || authStore.userInfo.shopManage">
+  <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow.mb-3" v-if="ctx.userInfo.admin || ctx.userInfo.shopManage">
     <div class="container-fluid">
-      <span v-if="authStore.userInfo.shopManage">
+      <span v-if="ctx.userInfo.shopManage">
         <RouterLink class="btn btn-info btn-sm" to="/inc-orders">Заказы для обработки</RouterLink>&nbsp;
       </span>
-      <span v-if="authStore.userInfo.admin">
+      <span v-if="ctx.userInfo.admin">
         <RouterLink class="btn btn-info btn-sm" to="/set-roles">admin</RouterLink>&nbsp;
       </span>
     </div>
@@ -86,7 +84,7 @@
     <div class="row">
       <div class="col">
         <span>&copy;2024-2025,</span>
-        <div v-if="authStore.isTg() && authStore.userInfo.shopManage">Адрес страницы для браузера: <input class="form-control sm" v-model="myurl" /></div>
+        <div v-if="ctx.isTg() && ctx.userInfo.shopManage">Адрес страницы для браузера: <input class="form-control sm" v-model="myurl" /></div>
       </div>
     </div>
   </div>

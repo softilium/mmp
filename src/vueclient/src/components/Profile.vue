@@ -3,8 +3,8 @@
 
   import { onMounted, ref } from 'vue';
   import { useRoute } from 'vue-router'
-  import { authStore } from './authStore.js';
-  
+  import { ctx } from './ctx.js';
+
   const route = useRoute();
 
   const me = ref(false);
@@ -19,9 +19,9 @@
 
     if (me.value != true) return;
 
-    let res = await fetch(authStore.rbUrl() + "/api/profiles/newtelegramcode", {
+    let res = await fetch(ctx.rbUrl() + "/api/profiles/newtelegramcode", {
       method: "POST",
-      headers: authStore.authHeadersAppJson()
+      headers: ctx.authHeadersAppJson()
     });
     if (res.ok) Load();
 
@@ -30,9 +30,9 @@
 
     if (me.value != true) return;
 
-    let res = await fetch(authStore.rbUrl() + "/api/profiles/checktelegramcode/" + telegramVerifyCode.value, {
+    let res = await fetch(ctx.rbUrl() + "/api/profiles/checktelegramcode/" + telegramVerifyCode.value, {
       method: "POST",
-      headers: authStore.authHeadersAppJson()
+      headers: ctx.authHeadersAppJson()
     });
     if (res.ok) Load();
 
@@ -45,20 +45,20 @@
 
   const Load = async () => {
     if (!me.value) {
-      let res = await fetch(authStore.rbUrl() + "/api/profiles/" + route.params.id,
+      let res = await fetch(ctx.rbUrl() + "/api/profiles/" + route.params.id,
         {
-          headers: authStore.authHeadersAppJson()
+          headers: ctx.authHeadersAppJson()
         });
       if (res.ok) {
         user.value = await res.json();
-        userDescription.value = authStore.linkify(user.value.description);
+        userDescription.value = ctx.linkify(user.value.description);
         me.value = !route.params.id;
       }
     }
     else {
-      let res = await fetch(authStore.rbUrl() + "/api/profiles/my",
+      let res = await fetch(ctx.rbUrl() + "/api/profiles/my",
         {
-          headers: authStore.authHeadersAppJson()
+          headers: ctx.authHeadersAppJson()
         });
       if (res.ok) {
         user.value = await res.json();
@@ -74,11 +74,11 @@
       user.value.telegramCheckCode = "";
     }
     user.value.telegramUserName = newTelegramUserName.value;
-    let res = await fetch(authStore.rbUrl() + "/api/profiles",
+    let res = await fetch(ctx.rbUrl() + "/api/profiles",
       {
         method: "PUT",
         body: JSON.stringify(user.value),
-        headers: authStore.authHeadersAppJson()
+        headers: ctx.authHeadersAppJson()
       });
     if (res.ok) {
       result.value = "Изменения записаны";
@@ -92,10 +92,10 @@
 
     if (!msgtext.value) return;
 
-    let res = await fetch(`${authStore.rbUrl()}/api/profiles/sendmsg/${user.value.id}`,
+    let res = await fetch(`${ctx.rbUrl()}/api/profiles/sendmsg/${user.value.id}`,
       {
         method: "POST",
-        headers: authStore.authHeadersAppJson(),
+        headers: ctx.authHeadersAppJson(),
         body: msgtext.value
       });
     if (res.ok) {
@@ -110,7 +110,7 @@
 
   <h1>
     Профиль пользователя {{ user.userName }}&nbsp;<br />
-    <button v-if="me && !authStore.isTg()" class="btn btn-outline-secondary btn-sm" @click="authStore.Logout(); $router.push('/');">Выйти</button>&nbsp;
+    <button v-if="me && !ctx.isTg()" class="btn btn-outline-secondary btn-sm" @click="ctx.Logout(); $router.push('/');">Выйти</button>&nbsp;
     <RouterLink v-if="me" class="btn btn-outline-secondary btn-sm" to="/orders">История заказов</RouterLink>
   </h1>
   <br />
@@ -146,7 +146,7 @@
     <div class="row mb-3">
       <label class="col-4 form-label">Пользователь телеграм</label>
       <div class="col-7">
-        <input class="form-control" v-model="newTelegramUserName" :readonly="authStore.isTg()" />
+        <input class="form-control" v-model="newTelegramUserName" :readonly="ctx.isTg()" />
       </div>
       <div class="col-1">
         <span class="text-success"><i class="bi bi-star-fill"></i></span>

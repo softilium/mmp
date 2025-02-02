@@ -3,8 +3,8 @@
 
   import { onMounted, ref, nextTick } from 'vue';
   import { useRoute, useRouter } from 'vue-router'
-  import { authStore } from './authStore.js';
-  
+  import { ctx } from './ctx.js';
+
   const route = useRoute();
   const router = useRouter();
 
@@ -18,11 +18,11 @@
   onMounted(async () => {
 
     try {
-      let res = await fetch(authStore.rbUrl() + "/api/shops/" + route.params.id);
+      let res = await fetch(ctx.rbUrl() + "/api/shops/" + route.params.id);
       if (res.ok) {
         shop.value = await res.json();
-        isOwner.value = shop.value.createdByInfo.id == authStore.userInfo.id && authStore.userInfo.shopManage;
-        shopDescription.value = authStore.linkify(shop.value.description);
+        isOwner.value = shop.value.createdByInfo.id == ctx.userInfo.id && ctx.userInfo.shopManage;
+        shopDescription.value = ctx.linkify(shop.value.description);
       } else router.push("/");
     } catch (err) {
       console.log(err);
@@ -30,12 +30,12 @@
     }
 
     try {
-      let res = await fetch(authStore.rbUrl() + "/api/goods?shopid=" + route.params.id, { signal: AbortSignal.timeout(5000), });
+      let res = await fetch(ctx.rbUrl() + "/api/goods?shopid=" + route.params.id, { signal: AbortSignal.timeout(5000), });
       if (res.ok) {
         goods.value = await res.json();
 
         goods.value.forEach(async g => {
-          let res = await fetch(`${authStore.rbUrl()}/api/goods/thumbs/${g.id}/0`, { method: "GET" });
+          let res = await fetch(`${ctx.rbUrl()}/api/goods/thumbs/${g.id}/0`, { method: "GET" });
           if (res.status == 200) { // status 204 means no image
             let b = await res.blob();
             const src = URL.createObjectURL(b);
@@ -53,12 +53,12 @@
   });
 
   const LoadBasket = async () => {
-    if (authStore.userInfo.id) {
+    if (ctx.userInfo.id) {
 
       try {
-        let res = await fetch(authStore.rbUrl() + "/api/baskets/" + shop.value.id, {
+        let res = await fetch(ctx.rbUrl() + "/api/baskets/" + shop.value.id, {
           method: "GET",
-          headers: authStore.authHeadersAppJson()
+          headers: ctx.authHeadersAppJson()
         });
         if (res.ok) {
 
@@ -83,28 +83,28 @@
   }
 
   const Inc = async (good) => {
-    let res = await fetch(authStore.rbUrl() + "/api/baskets/increase/" + good.id, {
+    let res = await fetch(ctx.rbUrl() + "/api/baskets/increase/" + good.id, {
       method: "POST",
-      headers: authStore.authHeadersAppJson()
+      headers: ctx.authHeadersAppJson()
     });
     if (res.ok) {
       if (!good.basked) good.basked = 0;
       good.basked++;
-      await authStore.loadBasket();
+      await ctx.loadBasket();
       LoadBasket();
     }
   }
 
   const Dec = async (good) => {
-    let res = await fetch(authStore.rbUrl() + "/api/baskets/decrease/" + good.id, {
+    let res = await fetch(ctx.rbUrl() + "/api/baskets/decrease/" + good.id, {
       method: "POST",
-      headers: authStore.authHeadersAppJson()
+      headers: ctx.authHeadersAppJson()
     });
     if (res.ok) {
       if (good.basked && good.basked > 0) good.basked--;
       if (good.basked == 0) good.basked = null;
       LoadBasket();
-      await authStore.loadBasket();
+      await ctx.loadBasket();
     }
   }
 
@@ -112,10 +112,10 @@
 
     if (!confirm("Удалить витрину, вы уверены?")) return;
 
-    let res = await fetch(`${authStore.rbUrl()}/api/shops/${route.params.id}`,
+    let res = await fetch(`${ctx.rbUrl()}/api/shops/${route.params.id}`,
       {
         method: "DELETE",
-        headers: authStore.authHeaders()
+        headers: ctx.authHeaders()
       }
     );
     if (res.ok) {
@@ -161,7 +161,7 @@
           </td>
           <td class="col-3">
             {{ good.price }}
-            <p v-if="authStore.userInfo.id">
+            <p v-if="ctx.userInfo.id">
               <button class="btn btn-primary btn-sm" @click="Inc(good)">+</button>&nbsp;
               <span v-if="good.basked"><button class="btn btn-primary btn-sm" @click="Dec(good)">-</button>&nbsp;{{ good.basked }}</span>
             </p>

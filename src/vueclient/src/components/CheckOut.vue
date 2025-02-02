@@ -2,7 +2,7 @@
 
   import { onMounted, ref } from 'vue';
   import { useRouter } from 'vue-router'
-  import { authStore } from './authStore.js';
+  import { ctx } from './ctx.js';
   import ProfileLink from './ProfileLink.vue';
 
   const router = useRouter();
@@ -14,9 +14,9 @@
   });
 
   const Load = async () => {
-    let res = await fetch(authStore.rbUrl() + "/api/baskets/", {
+    let res = await fetch(ctx.rbUrl() + "/api/baskets/", {
       mathod: "GET",
-      headers: authStore.authHeadersAppJson()
+      headers: ctx.authHeadersAppJson()
     });
     if (res.ok) {
       res = await res.json();
@@ -43,37 +43,37 @@
   }
 
   const Checkout = async (senderRec) => {
-    let res = await fetch(authStore.rbUrl() + "/api/orders/outbox/" + senderRec.senderID, {
+    let res = await fetch(ctx.rbUrl() + "/api/orders/outbox/" + senderRec.senderID, {
       method: "POST",
-      headers: authStore.authHeadersAppJson(),
+      headers: ctx.authHeadersAppJson(),
       body: senderRec.customerComment
     });
     if (res.ok) {
-      await authStore.loadBasket();
+      await ctx.loadBasket();
       res = await res.json();
       router.push(`/order/${res.id}`);      
     }
   };
 
   const Inc = async (good) => {
-    let res = await fetch(authStore.rbUrl() + "/api/baskets/increase/" + good.id, {
+    let res = await fetch(ctx.rbUrl() + "/api/baskets/increase/" + good.id, {
       method: "POST",
-      headers: authStore.authHeadersAppJson()
+      headers: ctx.authHeadersAppJson()
     });
     if (res.ok) {
       await Load();
-      authStore.loadBasket();
+      ctx.loadBasket();
     }
   }
 
   const Dec = async (good) => {
-    let res = await fetch(authStore.rbUrl() + "/api/baskets/decrease/" + good.id, {
+    let res = await fetch(ctx.rbUrl() + "/api/baskets/decrease/" + good.id, {
       method: "POST",
-      headers: authStore.authHeadersAppJson()
+      headers: ctx.authHeadersAppJson()
     });
     if (res.ok) {
       await Load();
-      authStore.loadBasket();
+      ctx.loadBasket();
     }
   }
 

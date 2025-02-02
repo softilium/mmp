@@ -7,16 +7,17 @@ function newUserInfo() {
   return { userName: null, shopManage: false, admin: false, id: 0 }
 }
 
-export const authStore = reactive({
+export const ctx = reactive({
 
   basket: { sum: 0 },
   userInfo: newUserInfo(),
   accessToken: "",
   refreshToken: "",
 
+
   async loadBasket() {
     this.basket.sum = 0;
-    let res = await fetch(`${authStore.rbUrl()}/api/baskets`, { headers: authStore.authHeaders() });
+    let res = await fetch(`${ctx.rbUrl()}/api/baskets`, { headers: ctx.authHeaders() });
     if (res.ok) {
       res = await res.json();
       res.forEach((_) => {

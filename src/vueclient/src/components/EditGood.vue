@@ -2,7 +2,7 @@
 
   import { onMounted, ref } from 'vue';
   import { useRoute, useRouter } from 'vue-router'
-  import { authStore } from './authStore.js';
+  import { ctx } from './ctx.js';
 
   const route = useRoute()
   const router = useRouter()
@@ -13,7 +13,7 @@
   onMounted(async () => {
     if (route.params.id) {
       try {
-        let res = await fetch(authStore.rbUrl() + "/api/goods/" + route.params.id);
+        let res = await fetch(ctx.rbUrl() + "/api/goods/" + route.params.id);
         if (res.ok) {
           good.value = await res.json();
           await LoadImages();
@@ -27,7 +27,7 @@
 
   const LoadImages = async () => {
     for (let i = 0; i < maxImagesCnt.value; i++) {
-      let res = await fetch(`${authStore.rbUrl()}/api/goods/images/${route.params.id}/${i}`, { method: "GET" });
+      let res = await fetch(`${ctx.rbUrl()}/api/goods/images/${route.params.id}/${i}`, { method: "GET" });
       if (res.status == 200) { // status 204 also ok but it means no image
         let b = await res.blob();
         const src = URL.createObjectURL(b);
@@ -40,18 +40,18 @@
   const SaveImages = async (gid) => {
     for (let i = 0; i <= maxImagesCnt.value - 1; i++) {
       if (!imageSrc.value[i]) {
-        let res = await fetch(`${authStore.rbUrl()}/api/goods/images/${gid}/${i}`, {
+        let res = await fetch(`${ctx.rbUrl()}/api/goods/images/${gid}/${i}`, {
           method: "DELETE",
-          headers: authStore.authHeaders()
+          headers: ctx.authHeaders()
         });
         if (!res.ok) console.log(res);
       } else {
         let blob = await fetch(imageSrc.value[i]).then(r => r.blob()); // load image from blob url
         let data = new FormData();
         data.append("image", blob);
-        let res = await fetch(`${authStore.rbUrl()}/api/goods/images/${gid}/${i}`, {
+        let res = await fetch(`${ctx.rbUrl()}/api/goods/images/${gid}/${i}`, {
           method: "POST",
-          headers: authStore.authHeaders(),
+          headers: ctx.authHeaders(),
           body: data
         });
         if (!res.ok) console.log(res);
@@ -61,9 +61,9 @@
 
   const Save = async () => {
     if (route.params.id) {
-      let res = await fetch(authStore.rbUrl() + "/api/goods/" + route.params.id, {
+      let res = await fetch(ctx.rbUrl() + "/api/goods/" + route.params.id, {
         method: "PUT",
-        headers: authStore.authHeadersAppJson(),
+        headers: ctx.authHeadersAppJson(),
         body: JSON.stringify(good.value)
       });
       if (res.ok) {
@@ -72,9 +72,9 @@
       }
     } else {
       good.value.ownerShop.id = route.params.shopid;
-      let res = await fetch(authStore.rbUrl() + "/api/goods", {
+      let res = await fetch(ctx.rbUrl() + "/api/goods", {
         method: "POST",
-        headers: authStore.authHeadersAppJson(),
+        headers: ctx.authHeadersAppJson(),
         body: JSON.stringify(good.value)
       });
       if (res.ok) {

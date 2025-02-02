@@ -1,19 +1,19 @@
 <script setup lang="ts">
 
   import { onMounted, ref } from 'vue';
-  import { authStore } from './authStore.js';
-  
+  import { ctx } from './ctx.js';
+
   const orders = ref([]);
   const showAll = ref(false);
   const statuses = ref([]);
 
   const Load = async () => {
 
-    let url = `${authStore.rbUrl()}/api/orders/inbox`;
+    let url = `${ctx.rbUrl()}/api/orders/inbox`;
     if (showAll.value) url += "?showAll=1"
     let res = await fetch(url,
       {
-        headers: authStore.authHeadersAppJson()
+        headers: ctx.authHeadersAppJson()
       });
 
     if (res.ok) {
@@ -23,7 +23,7 @@
   }
 
   onMounted(async () => {
-    let res = await fetch(authStore.rbUrl() + "/api/orders/statuses");
+    let res = await fetch(ctx.rbUrl() + "/api/orders/statuses");
     if (res.ok) {
       statuses.value = await res.json();
     }
@@ -57,7 +57,7 @@
           <RouterLink :to="`/order/${order.id}`">{{ statuses[order.status] }}</RouterLink>
         </td>
         <td>
-          <RouterLink :to="`/order/${order.id}`">{{ authStore.fmtDate(order.createdOn) }}</RouterLink>
+          <RouterLink :to="`/order/${order.id}`">{{ ctx.fmtDate(order.createdOn) }}</RouterLink>
         </td>
         <td class="text-end">
           <RouterLink :to="`/order/${order.id}`">{{ order.sum }}</RouterLink>

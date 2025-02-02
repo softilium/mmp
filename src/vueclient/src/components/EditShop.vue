@@ -2,7 +2,7 @@
 
   import { onMounted, ref } from 'vue';
   import { useRoute, useRouter } from 'vue-router'
-  import { authStore } from './authStore.js';
+  import { ctx } from './ctx.js';
 
   const route = useRoute();
   const router = useRouter();
@@ -18,7 +18,7 @@
     shopId = route.params.id;
     if (shopId != null) {
       try {
-        let res = await fetch(authStore.rbUrl() + "/api/shops/" + shopId, {
+        let res = await fetch(ctx.rbUrl() + "/api/shops/" + shopId, {
           method: "GET"
         });
         if (res.ok) {
@@ -32,13 +32,13 @@
 
   const Save = async () => {
 
-    if (!authStore.userInfo.id) return;
+    if (!ctx.userInfo.id) return;
 
     if (shopId == null)
       try {
-        let res = await fetch(authStore.rbUrl() + "/api/shops", {
+        let res = await fetch(ctx.rbUrl() + "/api/shops", {
           method: "POST",
-          headers: authStore.authHeadersAppJson(),
+          headers: ctx.authHeadersAppJson(),
           body: JSON.stringify(shop.value)
         });
 
@@ -50,9 +50,9 @@
       } catch (err) { console.log(err); }
     else
       try {
-        let res = await fetch(authStore.rbUrl() + "/api/shops/" + shopId, {
+        let res = await fetch(ctx.rbUrl() + "/api/shops/" + shopId, {
           method: "PUT",
-          headers: authStore.authHeadersAppJson(),
+          headers: ctx.authHeadersAppJson(),
           body: JSON.stringify(shop.value)
         });
 

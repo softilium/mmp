@@ -2,14 +2,14 @@
 <script setup lang="ts">
 
   import { onMounted, ref } from 'vue';
-  import { authStore } from './authStore.js';
+  import { ctx } from './ctx.js';
   import ProfileLink from './ProfileLink.vue';
 
   let shops = ref([]);
 
   onMounted(async () => {
     try {
-      let res = await fetch(authStore.rbUrl() + "/api/shops", { signal: AbortSignal.timeout(5000), });
+      let res = await fetch(ctx.rbUrl() + "/api/shops", { signal: AbortSignal.timeout(5000), });
       if (res.ok) {
         shops.value = await res.json();
       }
@@ -20,7 +20,7 @@
 
 <template>
   <nav>
-    <button class="btn btn-info btn-sm" v-if="authStore.userInfo.id && authStore.userInfo.shopManage" @click="$router.push('/edit-shop');">Добавить витрину</button>
+    <button class="btn btn-info btn-sm" v-if="ctx.userInfo.id && ctx.userInfo.shopManage" @click="$router.push('/edit-shop');">Добавить витрину</button>
   </nav>
 
   <h1>Витрины</h1>

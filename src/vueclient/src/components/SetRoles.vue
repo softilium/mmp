@@ -1,14 +1,14 @@
 <script setup lang="ts">
 
   import { onMounted, ref } from 'vue';
-  import { authStore } from './authStore.js';
+  import { ctx } from './ctx.js';
 
   const users = ref([]);
 
   onMounted(async () => {
-    let res = await fetch(authStore.rbUrl() + "/api/admin/allusers",
+    let res = await fetch(ctx.rbUrl() + "/api/admin/allusers",
       {
-        headers: authStore.authHeadersAppJson()
+        headers: ctx.authHeadersAppJson()
       });
     if (res.ok) {
       users.value = await res.json();
@@ -18,11 +18,11 @@
   const Save = async (id) => {
     users.value.forEach(async (u) => {
       if (u.id == id) {
-        await fetch(authStore.rbUrl() + "/api/admin/allusers/" + u.id,
+        await fetch(ctx.rbUrl() + "/api/admin/allusers/" + u.id,
           {
             method: "PUT",
             body: JSON.stringify(u),
-            headers: authStore.authHeadersAppJson()
+            headers: ctx.authHeadersAppJson()
           });
       }
     });
