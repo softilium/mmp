@@ -7,6 +7,7 @@
   const route = useRoute();
 
   const myurl = ref("");
+  const msgtext = ref("");
 
   const updateMyUrl = () => {
     // telegram hash param delete from URL
@@ -30,11 +31,18 @@
     async newId => { updateMyUrl(); }
   )
 
+  const SendMsg = async () => {
+    if (await ctx.SendMsg(-1, msgtext.value)) {
+      msgtext.value = "";
+      alert("Сообщение отослано");
+    }
+  }
+
 </script>
 
 <template>
 
-    <header>
+  <header>
     <nav class="navbar fixed-top navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow.mb-3">
       <div class="container-fluid">
         <RouterLink class="btn btn-outline-secondary btn-sm" to="/"><img src="/src/assets/bkg.png" width="24px" height="24px">&nbsp;Витрины</RouterLink>&nbsp;&nbsp;
@@ -75,16 +83,26 @@
     </div>
   </nav>
   <div class="container-fluid">
-    <div class="row mb-3">
-      <div class="col">
-        <i class="bi bi-telegram"></i>
-        Вопросы, проблемы, предложения? Напишите их боту RiversStores, это будет передано администратору сервиса.
-      </div>
-    </div>
     <div class="row">
       <div class="col">
-        <span>&copy;2024-2025,</span>
+        <span>&copy;2024-2025,</span>&nbsp;&nbsp;<button v-if="!me" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#sendAdminMsgModal"><i class="bi bi-chat-quote"></i>&nbsp;Вопросы, проблемы, предложения?</button>
         <div v-if="ctx.isTg() && ctx.userInfo.shopManage">Адрес страницы для браузера: <input class="form-control sm" v-model="myurl" /></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="sendAdminMsgModal" tabindex="-1" aria-labelledby="sendAdminMsgModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="sendAdminMsgModalLabel">Написать администратору сервиса</h5>
+        </div>
+        <div class="modal-body">
+          <textarea class="form-control" rows="5" v-model="msgtext"></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-warning btn-sm" data-bs-dismiss="modal" @click="SendMsg()">Послать</button>
+        </div>
       </div>
     </div>
   </div>

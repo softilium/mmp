@@ -139,8 +139,15 @@ namespace Webapi.Controllers
             var cu = db.CurrentUser();
             if (cu == null) return Unauthorized();
 
-            var receiver = db.Users.FirstOrDefault(_ => _.Id == userid && _.TelegramVerified);
+            User? receiver;
+
+            if (userid == -1)
+                receiver = db.Users.OrderBy(_ => _.Id).FirstOrDefault(_ => _.TelegramVerified && _.Admin);
+            else
+                receiver = db.Users.FirstOrDefault(_ => _.Id == userid && _.TelegramVerified);
+
             if (receiver == null) return NotFound();
+
             var chat = db.BotChats.FirstOrDefault(_ => _.UserName == receiver.TelegramUserName);
             if (chat == null) return NotFound();
 

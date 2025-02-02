@@ -238,6 +238,19 @@ export const ctx = reactive({
     } catch (err) {
       return err;
     }
+  },
+
+  async SendMsg(userid, msgtext) {
+
+    if (!msgtext) return false;
+
+    let res = await fetch(`${ctx.rbUrl()}/api/profiles/sendmsg/${userid}`, {
+      method: "POST",
+      headers: ctx.authHeadersAppJson(),
+      body: msgtext
+    });
+
+    return res.ok;
   }
 
 })

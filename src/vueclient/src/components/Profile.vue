@@ -89,18 +89,9 @@
   }
 
   const SendMsg = async () => {
-
-    if (!msgtext.value) return;
-
-    let res = await fetch(`${ctx.rbUrl()}/api/profiles/sendmsg/${user.value.id}`,
-      {
-        method: "POST",
-        headers: ctx.authHeadersAppJson(),
-        body: msgtext.value
-      });
-    if (res.ok) {
+    if (await ctx.SendMsg(user.value.id, msgtext.value)) {
       msgtext.value = "";
-      result.value = "Сообщение отослано";
+      alert("Сообщение отослано");
     }
   }
 
@@ -110,6 +101,8 @@
 
   <h1>
     Профиль пользователя {{ user.userName }}&nbsp;<br />
+    <button v-if="!me" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#sendMsgModal"><i class="bi bi-chat-quote"></i>&nbsp;Написать</button>
+    <br />
     <button v-if="me && !ctx.isTg()" class="btn btn-outline-secondary btn-sm" @click="ctx.Logout(); $router.push('/');">Выйти</button>&nbsp;
     <RouterLink v-if="me" class="btn btn-outline-secondary btn-sm" to="/orders">История заказов</RouterLink>
   </h1>
@@ -179,10 +172,6 @@
   </div>
 
   <div v-if="!me">
-    <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#sendMsgModal">
-      <i class="bi bi-telegram"></i>&nbsp;Написать сообщение
-    </button>
-
     <div class="modal fade" id="sendMsgModal" tabindex="-1" aria-labelledby="sendMsgModalLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -193,7 +182,7 @@
             <textarea class="form-control" rows="5" v-model="msgtext"></textarea>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="SendMsg()"><i class="bi bi-telegram"></i>&nbsp;Послать</button>
+            <button type="button" class="btn btn-warning btn-sm" data-bs-dismiss="modal" @click="SendMsg()">Послать</button>
           </div>
         </div>
       </div>
