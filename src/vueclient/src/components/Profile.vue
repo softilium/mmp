@@ -8,7 +8,7 @@
   const route = useRoute();
 
   const me = ref(false);
-  const user = ref({ id: 0, userName: "", email: "", telegramUserName: "", telegramVerified: false, telegramCheckCode: "", botChatId: 0 });
+  const user = ref({ id: 0, userName: "", email: "", telegramUserName: "", telegramVerified: false, telegramCheckCode: "", botChatId: 0, description: "" });
   const newTelegramUserName = ref("");
   const telegramVerifyCode = ref("");
   const result = ref("");

@@ -43,7 +43,7 @@
     if (res.ok) {
       order.value = await res.json();
       isCustomer.value = order.value.createdByID == ctx.userInfo.id;
-      isSender.value = order.value.senderID == ctx.value.userInfo.id;
+      isSender.value = order.value.senderID == ctx.userInfo.id;
     }
   });
 
