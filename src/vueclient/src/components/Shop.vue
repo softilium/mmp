@@ -4,6 +4,7 @@
   import { onMounted, ref, nextTick } from 'vue';
   import { useRoute, useRouter } from 'vue-router'
   import { ctx } from './ctx.js';
+  import { localBasket } from '../services/localBasket';
 
   const route = useRoute();
   const router = useRouter();
@@ -79,10 +80,35 @@
           }
         }
       } catch (err) { console.log(err); }
+    } else {
+      // Anonymous users: use localBasket
+      const items = localBasket.getItems();
+      goods.value.forEach(good => {
+        const found = items.find(i => i.goodId === good.id);
+        if (found) {
+          good.basked = found.quantity;
+        } else {
+          good.basked = null;
+        }
+      });
     }
   }
 
   const Inc = async (good) => {
+    if (!ctx.userInfo.id) {
+      localBasket.addItem({
+        goodId: good.id,
+        quantity: 1,
+        price: good.price,
+        title: good.caption,
+        shopTitle: shop.value.caption,
+        senderId: shop.value.createdByInfo.id,
+        shopId: shop.value.id
+      });
+      await ctx.loadBasket();
+      LoadBasket();
+      return;
+    }
     let res = await fetch(ctx.rbUrl() + "/api/baskets/increase/" + good.id, {
       method: "POST",
       headers: ctx.authHeadersAppJson()
@@ -96,6 +122,12 @@
   }
 
   const Dec = async (good) => {
+    if (!ctx.userInfo.id) {
+      localBasket.decItem(good.id);
+      LoadBasket();
+      await ctx.loadBasket();
+      return;
+    }
     let res = await fetch(ctx.rbUrl() + "/api/baskets/decrease/" + good.id, {
       method: "POST",
       headers: ctx.authHeadersAppJson()
@@ -161,10 +193,10 @@
           </td>
           <td class="col-3">
             {{ good.price }}
-            <p v-if="ctx.userInfo.id">
+
               <button class="btn btn-primary btn-sm" @click="Inc(good)">+</button>&nbsp;
               <span v-if="good.basked"><button class="btn btn-primary btn-sm" @click="Dec(good)">-</button>&nbsp;{{ good.basked }}</span>
-            </p>
+
           </td>
         </tr>
       </tbody>

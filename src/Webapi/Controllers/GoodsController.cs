@@ -55,6 +55,7 @@ namespace Webapi.Controllers
                 .AsNoTracking()
                 .FirstOrDefaultAsync(_ => _.ID == id && (!_.IsDeleted || showDeleted));
             if (good == null) return NotFound();
+            good.CreatedByInfo = UserCache.FindUserInfo(good.CreatedByID, db);
             return good;
         }
 

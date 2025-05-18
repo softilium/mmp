@@ -53,8 +53,8 @@
           Напишите в чат бота любое сообщение для авто-регистрации&nbsp;
         </span>
         <ul class="navbar-nav flex-grow-1">&nbsp;</ul>
-        <span v-if="ctx.userInfo.id && ctx.basket.sum">
-          <RouterLink class="btn btn-outline-success btn-sm" to="/checkout"><i class="bi bi-basket2-fill"></i>&nbsp;{{ctx.basket.sum}}</RouterLink>&nbsp;&nbsp;
+        <span v-if="ctx.basket.sum">
+          <RouterLink class="btn btn-success btn-sm" to="/checkout"><i class="bi bi-basket2-fill"></i>&nbsp;{{ctx.basket.sum}}</RouterLink>&nbsp;&nbsp;
         </span>
         <span v-if="ctx.userInfo.id">
           <RouterLink class="btn btn-outline-secondary btn-sm" to="/myprofile">{{ ctx.userInfo.userName }}</RouterLink>&nbsp;

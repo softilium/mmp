@@ -4,6 +4,7 @@
   import { onMounted, ref } from 'vue';
   import { useRoute, useRouter } from 'vue-router'
   import { ctx } from './ctx.js';
+  import { localBasket } from '../services/localBasket';
 
   const route = useRoute()
   const router = useRouter()
@@ -19,7 +20,7 @@
     url: "",
     createdByID: 0
   });
-  const basketSum = ref(0);
+  const basketQty = ref(0);
   const isOwner = ref(false);
 
   onMounted(async () => {
@@ -30,7 +31,7 @@
           good.value = await res.json();
           isOwner.value = (good.value.createdByID == ctx.userInfo.id);
           good.value.basked = null;
-          basketSum.value = null;
+          basketQty.value = null;
           LoadBasket();
           LoadImages();
         } else router.push("/shop/" + route.params.shopid);
@@ -59,7 +60,7 @@
   }
 
   const LoadBasket = async () => {
-    basketSum.value = null;
+    basketQty.value = null;
     good.value.basked = null;
     if (ctx.userInfo.id) {
       let res = await fetch(ctx.rbUrl() + "/api/baskets/" + good.value.ownerShop.id, {
@@ -71,32 +72,59 @@
         res.forEach(l => {
           if (l.good.id == good.value.id) {
             good.value.basked = l.qty;
-            basketSum.value = good.value.price * l.qty;
+            basketQty.value = l.qty;
           }
         });
+      }
+    } else {
+      // Check localBasket for anonymous users
+      const items = localBasket.getItems();
+      const found = items.find(i => i.goodId === good.value.id);
+      if (found) {
+        good.value.basked = found.quantity;
+        basketQty.value = found.quantity;
       }
     }
   }
 
-  const Inc = async (good) => {
-    let res = await fetch(ctx.rbUrl() + "/api/baskets/increase/" + good.id, {
+  const Inc = async () => {
+    if (!ctx.userInfo.id) {
+      localBasket.addItem({
+        goodId: good.value.id,
+        quantity: 1,
+        price: good.value.price,
+        title: good.value.caption,
+        shopTitle: good.value.ownerShop ? good.value.ownerShop.caption : '',
+        senderId: good.value.createdByID,
+        shopId: good.value.ownerShop ? good.value.ownerShop.id : null
+      });
+      await LoadBasket();
+      await ctx.loadBasket();
+    }
+    let res = await fetch(ctx.rbUrl() + "/api/baskets/increase/" + good.value.id, {
       method: "POST",
       headers: ctx.authHeadersAppJson()
     });
     if (res.ok) {
       LoadBasket();
-      ctx.loadBasket();
+      await ctx.loadBasket();
     }
   }
 
-  const Dec = async (good) => {
-    let res = await fetch(ctx.rbUrl() + "/api/baskets/decrease/" + good.id, {
+  const Dec = async () => {
+    if (!ctx.userInfo.id) {
+      localBasket.decItem(good.value.id);
+      await LoadBasket();
+      await ctx.loadBasket();
+      return;
+    }
+    let res = await fetch(ctx.rbUrl() + "/api/baskets/decrease/" + good.value.id, {
       method: "POST",
       headers: ctx.authHeadersAppJson()
     });
     if (res.ok) {
       LoadBasket();
-      ctx.loadBasket();
+      await ctx.loadBasket();
     }
   }
 
@@ -132,9 +160,9 @@
       Положить в корзину
     </div>
     <div class="col-6 col-md-9">
-      <button class="btn btn-primary btn-sm" @click="Inc(good)">+</button>&nbsp;
+      <button class="btn btn-primary btn-sm" @click="Inc()">+</button>&nbsp;
       <span v-if="good.basked">
-        <button class="btn btn-primary btn-sm" @click="Dec(good)">-</button>&nbsp; {{ basketSum }}
+        <button class="btn btn-primary btn-sm" @click="Dec()">-</button>&nbsp; {{ basketQty }}
       </span>
     </div>
   </div>

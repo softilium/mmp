@@ -109,5 +109,47 @@ namespace Webapi.Controllers
             return NoContent();
         }
 
+        public class MergeBasketItem
+        {
+            public long goodId { get; set; }
+            public int quantity { get; set; }
+        }
+
+        [HttpPost("merge")]
+        public async Task<IActionResult> Merge([FromBody] List<MergeBasketItem> items)
+        {
+            var cu = db.CurrentUser();
+            if (cu == null) return Unauthorized();
+
+            foreach (var item in items)
+            {
+                var good = await db.Goods.Include(g => g.OwnerShop).FirstOrDefaultAsync(g => g.ID == item.goodId);
+                if (good == null) continue;
+
+                var existing = await db.OrderLines
+                    .FirstOrDefaultAsync(l => l.CreatedByID == cu.Id && l.Good.ID == item.goodId && l.Order == null);
+
+                if (existing != null)
+                {
+                    existing.Qty += item.quantity;
+                    existing.Sum = existing.Qty * good.Price;
+                }
+                else
+                {
+                    db.OrderLines.Add(new OrderLine
+                    {
+                        Good = good,
+                        Shop = good.OwnerShop,
+                        Qty = item.quantity,
+                        Sum = item.quantity * good.Price,
+                        CreatedByID = cu.Id
+                    });
+                }
+            }
+
+            await db.SaveChangesAsync();
+            return Ok();
+        }
+
     }
 }

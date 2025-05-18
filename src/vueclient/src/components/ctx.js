@@ -2,6 +2,7 @@ import { reactive } from 'vue'
 import moment from 'moment';
 import 'moment/dist/locale/ru';
 import linkifyHtml from 'linkify-html';
+import { localBasket } from '../services/localBasket';
 
 function newUserInfo() {
   return { userName: null, shopManage: false, admin: false, id: 0 }
@@ -17,12 +18,20 @@ export const ctx = reactive({
 
   async loadBasket() {
     this.basket.sum = 0;
-    let res = await fetch(`${ctx.rbUrl()}/api/baskets`, { headers: ctx.authHeaders() });
-    if (res.ok) {
-      res = await res.json();
-      res.forEach((_) => {
-        this.basket.sum += _.sum;
+    if (!this.userInfo.id) {
+      // Anonymous user: calculate sum from localBasket
+      const items = localBasket.getItems();
+      items.forEach(item => {
+        this.basket.sum += item.price * item.quantity;
       });
+    } else {
+      let res = await fetch(`${ctx.rbUrl()}/api/baskets`, { headers: ctx.authHeaders() });
+      if (res.ok) {
+        res = await res.json();
+        res.forEach((_) => {
+          this.basket.sum += _.sum;
+        });
+      }
     }
   },
 
@@ -180,6 +189,7 @@ export const ctx = reactive({
         res = await res.json();
         this.SetAccessToken(res.accessToken);
         this.SetRefreshToken(res.refreshToken);
+        await this.mergeAnonymousBasket();
         this.CheckLogged();
       } else {
         let r = await res.json();
@@ -230,9 +240,10 @@ export const ctx = reactive({
         },
       });
       let r = "";
-      if (response.ok)
+      if (response.ok) {
         r = await this.Login(emailString, passwordString);
-      else
+        await this.mergeAnonymousBasket();
+      } else
         r = this.errFormat(await response.json());
       return r;
     } catch (err) {
@@ -251,6 +262,22 @@ export const ctx = reactive({
     });
 
     return res.ok;
+  },
+
+  async mergeAnonymousBasket() {
+    const items = localBasket.getItems();
+    if (!items.length) return;
+    // Prepare payload for API
+    const payload = items.map(item => ({
+      goodId: item.goodId,
+      quantity: item.quantity
+    }));
+    await fetch(`${this.rbUrl()}/api/baskets/merge`, {
+      method: "POST",
+      headers: this.authHeadersAppJson(),
+      body: JSON.stringify(payload)
+    });
+    localBasket.clear();
   }
 
 })
