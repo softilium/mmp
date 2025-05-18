@@ -1,5 +1,5 @@
 set PGPASSWORD=0000
-set PGPATH=D:\Program Files\PostgreSQL\16.4-5.1C\bin
+set PGPATH=C:\PostgreSQL\16.4-5.1C\bin
 
 rar x rsdata.rar
 
