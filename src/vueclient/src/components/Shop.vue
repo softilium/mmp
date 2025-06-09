@@ -192,11 +192,9 @@
             </div>
           </td>
           <td class="col-3">
-            {{ good.price }}
-
+            {{ good.price }}<br />
               <button class="btn btn-primary btn-sm" @click="Inc(good)">+</button>&nbsp;
               <span v-if="good.basked"><button class="btn btn-primary btn-sm" @click="Dec(good)">-</button>&nbsp;{{ good.basked }}</span>
-
           </td>
         </tr>
       </tbody>
