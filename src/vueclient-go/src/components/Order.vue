@@ -1,0 +1,154 @@
+<!-- eslint-disable vue/multi-word-component-names -->
+<script setup lang="ts">
+
+  import { onMounted, ref } from 'vue';
+  import { useRoute, useRouter } from 'vue-router'
+  import { ctx } from './ctx.js';
+  import ProfileLink from './ProfileLink.vue';
+
+  const route = useRoute()
+  const router = useRouter()
+
+  const order = ref({
+    customerComment: "",
+    senderComment: "",
+    expectedDeliveryDate: "",
+    createdOn: "",
+    senderID: 0,
+    senderInfo: { id:0, userName: "", description: "" },
+    createdByInfo: { id:0, userName: "", description: "" },
+    status: 0,
+    id: 0,
+    lines: [],
+    qty: 0,
+    sum: 0,
+    createdByID: 0
+  });
+  const statuses = ref([]);
+
+  const isSender = ref(false);
+  const isCustomer = ref(false);
+
+  onMounted(async () => {
+
+    let res = await fetch(ctx.rbUrl() + "/api/orders/statuses");
+    if (res.ok) {
+      statuses.value = await res.json();
+    }
+
+    res = await fetch(ctx.rbUrl() + "/api/orders/" + route.params.id, {
+      headers: ctx.authHeadersAppJson()
+    });
+
+    if (res.ok) {
+      order.value = await res.json();
+      isCustomer.value = order.value.createdByID == ctx.userInfo.id;
+      isSender.value = order.value.senderID == ctx.userInfo.id;
+    }
+  });
+
+  const Save = async () => {
+
+    //order.value.senderInfo = null;
+    //order.value.createdByInfo = null;
+
+    if (isCustomer.value) {
+      let req = await fetch(`${ctx.rbUrl()}/api/orders/outbox/${route.params.id}`,
+        {
+          method: "PUT",
+          body: JSON.stringify(order.value),
+          headers: ctx.authHeadersAppJson()
+        });
+      if (req.ok) {
+        router.push("/orders");
+      }
+    }
+    if (isSender.value) {
+      let req = await fetch(`${ctx.rbUrl()}/api/orders/inbox/${route.params.id}`,
+        {
+          method: "PUT",
+          body: JSON.stringify(order.value),
+          headers: ctx.authHeadersAppJson()
+        });
+      if (req.ok) {
+        router.push("/inc-orders");
+      }
+    }
+  }
+
+</script>
+
+<template>
+
+  <div v-if="order">
+    <button :disabled="!isCustomer && !isSender" class="btn btn-primary" @click="Save()">Сохранить</button>
+    <h1>Заказ {{ order.id }}</h1>
+    <h6>{{ ctx.fmtDate(order.createdOn) }}</h6>
+    <h6>Отправитель <ProfileLink :userInfo="order.senderInfo"></ProfileLink></h6>
+    <h6>Заказчик <ProfileLink :userInfo="order.createdByInfo"></ProfileLink></h6>
+    <div>&nbsp;</div>
+
+    <table class="table table-sm">
+      <thead class="table-primary">
+        <tr>
+          <th>Товар или услуга</th>
+          <th>Количество</th>
+          <th>Цена</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="line in order.lines" v-bind:key="line.id">
+          <td v-if="line.good.isDeleted==true">{{line.good.caption}} (удалено)</td>
+          <td v-if="line.good.isDeleted==false"><RouterLink :to="`/good/${line.good.id}`">{{line.good.caption}}</RouterLink></td>
+          <td>{{line.qty}}</td>
+          <td>{{line.sum}}</td>
+        </tr>
+      </tbody>
+      <tfoot class="table-primary">
+        <tr>
+          <td>ИТОГО</td>
+          <td>{{ order.qty}}</td>
+          <td>{{ order.sum}}</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <div class="row mb-3">
+    <div class="form-group form-group-sm row">
+      <label class="col-3 form-label">Статус</label>
+      <div class="col-9">
+        <select :disabled="!isSender" class="form-select form-control-sm" v-model="order.status">
+          <template v-for="(value,key) in statuses">
+            <option v-bind:value="Number(key)">{{ value }}</option>
+          </template>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="row mb-3">
+    <div class="form-group form-group-sm row">
+      <label class="col-3 form-label">Примечание покупателя</label>
+      <div class="col-9">
+        <textarea :disabled="!isCustomer" class="form-control" v-model="order.customerComment" rows="5" />
+      </div>
+    </div>
+  </div>
+  <div class="row mb-3">
+    <div class="form-group form-group-sm row">
+      <label class="col-3 form-label">Примечание продавца</label>
+      <div class="col-9">
+        <textarea :disabled="!isSender" class="form-control" v-model="order.senderComment" rows="5" />
+      </div>
+    </div>
+  </div>
+  <div class="row mb-3">
+    <div class="form-group form-group-sm row">
+      <label class="col-3 form-label">Ожидаемая дата доставки</label>
+      <div class="col-9">
+        <input :disabled="!isSender" type="datetime-local" class="form-control" v-model="order.expectedDeliveryDate" />
+      </div>
+    </div>
+  </div>
+
+</template>

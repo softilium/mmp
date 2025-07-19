@@ -1,0 +1,589 @@
+// THIS IS GENERATED CODE. DO NOT MODIFY IT
+package models
+
+import (
+	"github.com/softilium/elorm"
+	"time"
+)
+
+// Shop class
+//////
+
+type ShopDefStruct struct {
+	*elorm.EntityDef
+	Ref         *elorm.FieldDef
+	IsDeleted   *elorm.FieldDef
+	DataVersion *elorm.FieldDef
+
+	Caption *elorm.FieldDef
+
+	Description *elorm.FieldDef
+
+	DeliveryConditions *elorm.FieldDef
+
+	CreatedBy *elorm.FieldDef
+
+	CreatedAt *elorm.FieldDef
+
+	ModifiedBy *elorm.FieldDef
+
+	ModifiedAt *elorm.FieldDef
+
+	DeletedBy *elorm.FieldDef
+
+	DeletedAt *elorm.FieldDef
+}
+
+func (T *ShopDefStruct) SelectEntities(filters []*elorm.Filter, sorts []*elorm.SortItem, pageNo int, pageSize int) (result []*Shop, pages int, err error) {
+
+	res, total, err := T.EntityDef.SelectEntities(filters, sorts, pageNo, pageSize)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	res2 := make([]*Shop, 0, len(res))
+
+	for _, r := range res {
+		if r == nil {
+			continue
+		}
+		rt := T.Wrap(r)
+		res2 = append(res2, rt.(*Shop))
+	}
+
+	return res2, total, nil
+
+}
+
+type Shop struct {
+	*elorm.Entity
+
+	field_Caption            *elorm.FieldValueString
+	field_Description        *elorm.FieldValueString
+	field_DeliveryConditions *elorm.FieldValueString
+	field_CreatedBy          *elorm.FieldValueRef
+	field_CreatedAt          *elorm.FieldValueDateTime
+	field_ModifiedBy         *elorm.FieldValueRef
+	field_ModifiedAt         *elorm.FieldValueDateTime
+	field_DeletedBy          *elorm.FieldValueRef
+	field_DeletedAt          *elorm.FieldValueDateTime
+}
+
+func (T *Shop) Caption() string {
+	if T.field_Caption == nil {
+		T.field_Caption = T.Values["Caption"].(*elorm.FieldValueString)
+	}
+	return T.field_Caption.Get()
+}
+
+func (T *Shop) SetCaption(newValue string) {
+	if T.field_Caption == nil {
+		T.field_Caption = T.Values["Caption"].(*elorm.FieldValueString)
+	}
+	T.field_Caption.Set(newValue)
+}
+
+func (T *Shop) Description() string {
+	if T.field_Description == nil {
+		T.field_Description = T.Values["Description"].(*elorm.FieldValueString)
+	}
+	return T.field_Description.Get()
+}
+
+func (T *Shop) SetDescription(newValue string) {
+	if T.field_Description == nil {
+		T.field_Description = T.Values["Description"].(*elorm.FieldValueString)
+	}
+	T.field_Description.Set(newValue)
+}
+
+func (T *Shop) DeliveryConditions() string {
+	if T.field_DeliveryConditions == nil {
+		T.field_DeliveryConditions = T.Values["DeliveryConditions"].(*elorm.FieldValueString)
+	}
+	return T.field_DeliveryConditions.Get()
+}
+
+func (T *Shop) SetDeliveryConditions(newValue string) {
+	if T.field_DeliveryConditions == nil {
+		T.field_DeliveryConditions = T.Values["DeliveryConditions"].(*elorm.FieldValueString)
+	}
+	T.field_DeliveryConditions.Set(newValue)
+}
+
+func (T *Shop) CreatedBy() *User {
+	if T.field_CreatedBy == nil {
+		T.field_CreatedBy = T.Values["CreatedBy"].(*elorm.FieldValueRef)
+	}
+	r, err := T.field_CreatedBy.Get()
+	if err != nil {
+		panic(err)
+	}
+	return r.(*User)
+}
+
+func (T *Shop) SetCreatedBy(newValue *User) {
+	if T.field_CreatedBy == nil {
+		T.field_CreatedBy = T.Values["CreatedBy"].(*elorm.FieldValueRef)
+	}
+	err := T.field_CreatedBy.Set(newValue)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (T *Shop) CreatedAt() time.Time {
+	if T.field_CreatedAt == nil {
+		T.field_CreatedAt = T.Values["CreatedAt"].(*elorm.FieldValueDateTime)
+	}
+	return T.field_CreatedAt.Get()
+}
+
+func (T *Shop) SetCreatedAt(newValue time.Time) {
+	if T.field_CreatedAt == nil {
+		T.field_CreatedAt = T.Values["CreatedAt"].(*elorm.FieldValueDateTime)
+	}
+	T.field_CreatedAt.Set(newValue)
+}
+
+func (T *Shop) ModifiedBy() *User {
+	if T.field_ModifiedBy == nil {
+		T.field_ModifiedBy = T.Values["ModifiedBy"].(*elorm.FieldValueRef)
+	}
+	r, err := T.field_ModifiedBy.Get()
+	if err != nil {
+		panic(err)
+	}
+	return r.(*User)
+}
+
+func (T *Shop) SetModifiedBy(newValue *User) {
+	if T.field_ModifiedBy == nil {
+		T.field_ModifiedBy = T.Values["ModifiedBy"].(*elorm.FieldValueRef)
+	}
+	err := T.field_ModifiedBy.Set(newValue)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (T *Shop) ModifiedAt() time.Time {
+	if T.field_ModifiedAt == nil {
+		T.field_ModifiedAt = T.Values["ModifiedAt"].(*elorm.FieldValueDateTime)
+	}
+	return T.field_ModifiedAt.Get()
+}
+
+func (T *Shop) SetModifiedAt(newValue time.Time) {
+	if T.field_ModifiedAt == nil {
+		T.field_ModifiedAt = T.Values["ModifiedAt"].(*elorm.FieldValueDateTime)
+	}
+	T.field_ModifiedAt.Set(newValue)
+}
+
+func (T *Shop) DeletedBy() *User {
+	if T.field_DeletedBy == nil {
+		T.field_DeletedBy = T.Values["DeletedBy"].(*elorm.FieldValueRef)
+	}
+	r, err := T.field_DeletedBy.Get()
+	if err != nil {
+		panic(err)
+	}
+	return r.(*User)
+}
+
+func (T *Shop) SetDeletedBy(newValue *User) {
+	if T.field_DeletedBy == nil {
+		T.field_DeletedBy = T.Values["DeletedBy"].(*elorm.FieldValueRef)
+	}
+	err := T.field_DeletedBy.Set(newValue)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (T *Shop) DeletedAt() time.Time {
+	if T.field_DeletedAt == nil {
+		T.field_DeletedAt = T.Values["DeletedAt"].(*elorm.FieldValueDateTime)
+	}
+	return T.field_DeletedAt.Get()
+}
+
+func (T *Shop) SetDeletedAt(newValue time.Time) {
+	if T.field_DeletedAt == nil {
+		T.field_DeletedAt = T.Values["DeletedAt"].(*elorm.FieldValueDateTime)
+	}
+	T.field_DeletedAt.Set(newValue)
+}
+
+// User class
+//////
+
+type UserDefStruct struct {
+	*elorm.EntityDef
+	Ref         *elorm.FieldDef
+	IsDeleted   *elorm.FieldDef
+	DataVersion *elorm.FieldDef
+
+	Username *elorm.FieldDef
+
+	Email *elorm.FieldDef
+
+	Password *elorm.FieldDef
+
+	IsActive *elorm.FieldDef
+
+	ShopManager *elorm.FieldDef
+
+	Admin *elorm.FieldDef
+
+	TelegramUsername *elorm.FieldDef
+
+	TelegramCheckCode *elorm.FieldDef
+
+	TelegramVerified *elorm.FieldDef
+
+	TelegramChatId *elorm.FieldDef
+
+	BotChatId *elorm.FieldDef
+
+	Description *elorm.FieldDef
+}
+
+func (T *UserDefStruct) SelectEntities(filters []*elorm.Filter, sorts []*elorm.SortItem, pageNo int, pageSize int) (result []*User, pages int, err error) {
+
+	res, total, err := T.EntityDef.SelectEntities(filters, sorts, pageNo, pageSize)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	res2 := make([]*User, 0, len(res))
+
+	for _, r := range res {
+		if r == nil {
+			continue
+		}
+		rt := T.Wrap(r)
+		res2 = append(res2, rt.(*User))
+	}
+
+	return res2, total, nil
+
+}
+
+type User struct {
+	*elorm.Entity
+
+	field_Username          *elorm.FieldValueString
+	field_Email             *elorm.FieldValueString
+	field_Password          *elorm.FieldValueString
+	field_IsActive          *elorm.FieldValueBool
+	field_ShopManager       *elorm.FieldValueBool
+	field_Admin             *elorm.FieldValueBool
+	field_TelegramUsername  *elorm.FieldValueString
+	field_TelegramCheckCode *elorm.FieldValueString
+	field_TelegramVerified  *elorm.FieldValueBool
+	field_TelegramChatId    *elorm.FieldValueString
+	field_BotChatId         *elorm.FieldValueInt
+	field_Description       *elorm.FieldValueString
+}
+
+func (T *User) Username() string {
+	if T.field_Username == nil {
+		T.field_Username = T.Values["Username"].(*elorm.FieldValueString)
+	}
+	return T.field_Username.Get()
+}
+
+func (T *User) SetUsername(newValue string) {
+	if T.field_Username == nil {
+		T.field_Username = T.Values["Username"].(*elorm.FieldValueString)
+	}
+	T.field_Username.Set(newValue)
+}
+
+func (T *User) Email() string {
+	if T.field_Email == nil {
+		T.field_Email = T.Values["Email"].(*elorm.FieldValueString)
+	}
+	return T.field_Email.Get()
+}
+
+func (T *User) SetEmail(newValue string) {
+	if T.field_Email == nil {
+		T.field_Email = T.Values["Email"].(*elorm.FieldValueString)
+	}
+	T.field_Email.Set(newValue)
+}
+
+func (T *User) Password() string {
+	if T.field_Password == nil {
+		T.field_Password = T.Values["Password"].(*elorm.FieldValueString)
+	}
+	return T.field_Password.Get()
+}
+
+func (T *User) SetPassword(newValue string) {
+	if T.field_Password == nil {
+		T.field_Password = T.Values["Password"].(*elorm.FieldValueString)
+	}
+	T.field_Password.Set(newValue)
+}
+
+func (T *User) IsActive() bool {
+	if T.field_IsActive == nil {
+		T.field_IsActive = T.Values["IsActive"].(*elorm.FieldValueBool)
+	}
+	return T.field_IsActive.Get()
+}
+
+func (T *User) SetIsActive(newValue bool) {
+	if T.field_IsActive == nil {
+		T.field_IsActive = T.Values["IsActive"].(*elorm.FieldValueBool)
+	}
+	T.field_IsActive.Set(newValue)
+}
+
+func (T *User) ShopManager() bool {
+	if T.field_ShopManager == nil {
+		T.field_ShopManager = T.Values["ShopManager"].(*elorm.FieldValueBool)
+	}
+	return T.field_ShopManager.Get()
+}
+
+func (T *User) SetShopManager(newValue bool) {
+	if T.field_ShopManager == nil {
+		T.field_ShopManager = T.Values["ShopManager"].(*elorm.FieldValueBool)
+	}
+	T.field_ShopManager.Set(newValue)
+}
+
+func (T *User) Admin() bool {
+	if T.field_Admin == nil {
+		T.field_Admin = T.Values["Admin"].(*elorm.FieldValueBool)
+	}
+	return T.field_Admin.Get()
+}
+
+func (T *User) SetAdmin(newValue bool) {
+	if T.field_Admin == nil {
+		T.field_Admin = T.Values["Admin"].(*elorm.FieldValueBool)
+	}
+	T.field_Admin.Set(newValue)
+}
+
+func (T *User) TelegramUsername() string {
+	if T.field_TelegramUsername == nil {
+		T.field_TelegramUsername = T.Values["TelegramUsername"].(*elorm.FieldValueString)
+	}
+	return T.field_TelegramUsername.Get()
+}
+
+func (T *User) SetTelegramUsername(newValue string) {
+	if T.field_TelegramUsername == nil {
+		T.field_TelegramUsername = T.Values["TelegramUsername"].(*elorm.FieldValueString)
+	}
+	T.field_TelegramUsername.Set(newValue)
+}
+
+func (T *User) TelegramCheckCode() string {
+	if T.field_TelegramCheckCode == nil {
+		T.field_TelegramCheckCode = T.Values["TelegramCheckCode"].(*elorm.FieldValueString)
+	}
+	return T.field_TelegramCheckCode.Get()
+}
+
+func (T *User) SetTelegramCheckCode(newValue string) {
+	if T.field_TelegramCheckCode == nil {
+		T.field_TelegramCheckCode = T.Values["TelegramCheckCode"].(*elorm.FieldValueString)
+	}
+	T.field_TelegramCheckCode.Set(newValue)
+}
+
+func (T *User) TelegramVerified() bool {
+	if T.field_TelegramVerified == nil {
+		T.field_TelegramVerified = T.Values["TelegramVerified"].(*elorm.FieldValueBool)
+	}
+	return T.field_TelegramVerified.Get()
+}
+
+func (T *User) SetTelegramVerified(newValue bool) {
+	if T.field_TelegramVerified == nil {
+		T.field_TelegramVerified = T.Values["TelegramVerified"].(*elorm.FieldValueBool)
+	}
+	T.field_TelegramVerified.Set(newValue)
+}
+
+func (T *User) TelegramChatId() string {
+	if T.field_TelegramChatId == nil {
+		T.field_TelegramChatId = T.Values["TelegramChatId"].(*elorm.FieldValueString)
+	}
+	return T.field_TelegramChatId.Get()
+}
+
+func (T *User) SetTelegramChatId(newValue string) {
+	if T.field_TelegramChatId == nil {
+		T.field_TelegramChatId = T.Values["TelegramChatId"].(*elorm.FieldValueString)
+	}
+	T.field_TelegramChatId.Set(newValue)
+}
+
+func (T *User) BotChatId() int64 {
+	if T.field_BotChatId == nil {
+		T.field_BotChatId = T.Values["BotChatId"].(*elorm.FieldValueInt)
+	}
+	return T.field_BotChatId.Get()
+}
+
+func (T *User) SetBotChatId(newValue int64) {
+	if T.field_BotChatId == nil {
+		T.field_BotChatId = T.Values["BotChatId"].(*elorm.FieldValueInt)
+	}
+	T.field_BotChatId.Set(newValue)
+}
+
+func (T *User) Description() string {
+	if T.field_Description == nil {
+		T.field_Description = T.Values["Description"].(*elorm.FieldValueString)
+	}
+	return T.field_Description.Get()
+}
+
+func (T *User) SetDescription(newValue string) {
+	if T.field_Description == nil {
+		T.field_Description = T.Values["Description"].(*elorm.FieldValueString)
+	}
+	T.field_Description.Set(newValue)
+}
+
+// DbContext core
+//////
+
+type DbContext struct {
+	*elorm.Factory
+	ShopDef ShopDefStruct
+	UserDef UserDefStruct
+}
+
+func CreateDbContext(dbDialect string, connectionString string) (*DbContext, error) {
+
+	var err error
+	frg := []string{}
+	_ = frg // to avoid unused variable error if no fragments are defined
+
+	r := &DbContext{}
+	r.Factory, err = elorm.CreateFactory(dbDialect, connectionString)
+	if err != nil {
+		return nil, err
+	}
+
+	r.ShopDef.EntityDef, err = r.CreateEntityDef("Shop", "Shops")
+	if err != nil {
+		return nil, err
+	}
+
+	r.ShopDef.Fragments = make([]string, 0)
+	frg = []string{}
+
+	frg = append(frg, "BusinessObjects")
+
+	r.ShopDef.Fragments = frg
+
+	r.UserDef.EntityDef, err = r.CreateEntityDef("User", "Users")
+	if err != nil {
+		return nil, err
+	}
+
+	// Shop
+	//////
+
+	r.ShopDef.Ref = r.ShopDef.FieldDefByName("Ref")
+	r.ShopDef.IsDeleted = r.ShopDef.FieldDefByName("IsDeleted")
+	r.ShopDef.DataVersion = r.ShopDef.FieldDefByName("DataVersion")
+
+	r.ShopDef.Caption, _ = r.ShopDef.AddStringFieldDef("Caption", 100, "")
+	r.ShopDef.Description, _ = r.ShopDef.AddStringFieldDef("Description", 300, "")
+	r.ShopDef.DeliveryConditions, _ = r.ShopDef.AddStringFieldDef("DeliveryConditions", 300, "")
+	r.ShopDef.CreatedBy, _ = r.ShopDef.AddRefFieldDef("CreatedBy", r.UserDef.EntityDef)
+	r.ShopDef.CreatedAt, _ = r.ShopDef.AddDateTimeFieldDef("CreatedAt")
+	r.ShopDef.ModifiedBy, _ = r.ShopDef.AddRefFieldDef("ModifiedBy", r.UserDef.EntityDef)
+	r.ShopDef.ModifiedAt, _ = r.ShopDef.AddDateTimeFieldDef("ModifiedAt")
+	r.ShopDef.DeletedBy, _ = r.ShopDef.AddRefFieldDef("DeletedBy", r.UserDef.EntityDef)
+	r.ShopDef.DeletedAt, _ = r.ShopDef.AddDateTimeFieldDef("DeletedAt")
+
+	r.ShopDef.Wrap = func(source *elorm.Entity) any { return &Shop{Entity: source} }
+
+	// User
+	//////
+
+	r.UserDef.Ref = r.UserDef.FieldDefByName("Ref")
+	r.UserDef.IsDeleted = r.UserDef.FieldDefByName("IsDeleted")
+	r.UserDef.DataVersion = r.UserDef.FieldDefByName("DataVersion")
+
+	r.UserDef.Username, _ = r.UserDef.AddStringFieldDef("Username", 100, "")
+	r.UserDef.Email, _ = r.UserDef.AddStringFieldDef("Email", 100, "")
+	r.UserDef.Password, _ = r.UserDef.AddStringFieldDef("Password", 50, "")
+	r.UserDef.IsActive, _ = r.UserDef.AddBoolFieldDef("IsActive", false)
+	r.UserDef.ShopManager, _ = r.UserDef.AddBoolFieldDef("ShopManager", false)
+	r.UserDef.Admin, _ = r.UserDef.AddBoolFieldDef("Admin", false)
+	r.UserDef.TelegramUsername, _ = r.UserDef.AddStringFieldDef("TelegramUsername", 100, "")
+	r.UserDef.TelegramCheckCode, _ = r.UserDef.AddStringFieldDef("TelegramCheckCode", 100, "")
+	r.UserDef.TelegramVerified, _ = r.UserDef.AddBoolFieldDef("TelegramVerified", false)
+	r.UserDef.TelegramChatId, _ = r.UserDef.AddStringFieldDef("TelegramChatId", 100, "")
+	r.UserDef.BotChatId, _ = r.UserDef.AddIntFieldDef("BotChatId", 0)
+	r.UserDef.Description, _ = r.UserDef.AddStringFieldDef("Description", 300, "")
+
+	r.UserDef.Wrap = func(source *elorm.Entity) any { return &User{Entity: source} }
+
+	err = r.UserDef.AddIndex(true,
+		*r.UserDef.Username,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	err = r.UserDef.AddIndex(true,
+		*r.UserDef.Email,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return r, nil
+}
+
+func (T *DbContext) CreateShop() (*Shop, error) {
+	r, err := T.CreateEntityWrapped(T.ShopDef.EntityDef)
+	if err != nil {
+		return nil, err
+	}
+	rt := r.(*Shop)
+	return rt, nil
+}
+
+func (T *DbContext) LoadShop(Ref string) (*Shop, error) {
+	r, err := T.LoadEntityWrapped(Ref)
+	if err != nil {
+		return nil, err
+	}
+	rt := r.(*Shop)
+	return rt, nil
+}
+
+func (T *DbContext) CreateUser() (*User, error) {
+	r, err := T.CreateEntityWrapped(T.UserDef.EntityDef)
+	if err != nil {
+		return nil, err
+	}
+	rt := r.(*User)
+	return rt, nil
+}
+
+func (T *DbContext) LoadUser(Ref string) (*User, error) {
+	r, err := T.LoadEntityWrapped(Ref)
+	if err != nil {
+		return nil, err
+	}
+	rt := r.(*User)
+	return rt, nil
+}

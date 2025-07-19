@@ -1,0 +1,135 @@
+{
+    "PackageName": "models",
+    "Fragments": [
+        {
+            "FragmentName": "BusinessObjects",
+            "Columns": [
+                {
+                    "Name": "CreatedBy",
+                    "ColumnType": "ref.User"
+                },
+                {
+                    "Name": "CreatedAt",
+                    "ColumnType": "datetime"
+                },
+                {
+                    "Name": "ModifiedBy",
+                    "ColumnType": "ref.User"
+                },
+                {
+                    "Name": "ModifiedAt",
+                    "ColumnType": "datetime"
+                },
+                {
+                    "Name": "DeletedBy",
+                    "ColumnType": "ref.User"
+                },
+                {
+                    "Name": "DeletedAt",
+                    "ColumnType": "datetime"
+                }
+            ]
+        }
+    ],
+    "Entities": [
+        {
+            "ObjectName": "User",
+            "TableName": "Users",
+            "Indexes": [
+                {
+                    "Columns": [
+                        "Username"
+                    ],
+                    "Unique": true
+                },
+                {
+                    "Columns": [
+                        "Email"
+                    ],
+                    "Unique": true
+                }
+            ],
+            "Columns": [
+                {
+                    "Name": "Username",
+                    "ColumnType": "string",
+                    "Len": 100
+                },
+                {
+                    "Name": "Email",
+                    "ColumnType": "string",
+                    "Len": 100
+                },
+                {
+                    "Name": "Password",
+                    "ColumnType": "string",
+                    "Len": 50
+                },
+                {
+                    "Name": "IsActive",
+                    "ColumnType": "bool"
+                },
+                {
+                    "Name": "ShopManager",
+                    "ColumnType": "bool"
+                },
+                {
+                    "Name": "Admin",
+                    "ColumnType": "bool"
+                },
+                {
+                    "Name": "TelegramUsername",
+                    "ColumnType": "string",
+                    "Len": 100
+                },
+                {
+                    "Name": "TelegramCheckCode",
+                    "ColumnType": "string",
+                    "Len": 100
+                },
+                {
+                    "Name": "TelegramVerified",
+                    "ColumnType": "bool"
+                },
+                {
+                    "Name": "TelegramChatId",
+                    "ColumnType": "string",
+                    "Len": 100
+                },
+                {
+                    "Name": "BotChatId",
+                    "ColumnType": "int"
+                },
+                {
+                    "Name": "Description",
+                    "ColumnType": "string",
+                    "Len": 300
+                }
+            ]
+        },
+        {
+            "ObjectName": "Shop",
+            "TableName": "Shops",
+            "Fragments": [
+                "BusinessObjects"
+            ],
+            "Columns": [
+                {
+                    "Name": "Caption",
+                    "ColumnType": "string",
+                    "Len": 100
+                },
+                {
+                    "Name": "Description",
+                    "ColumnType": "string",
+                    "Len": 300
+                },
+                {
+                    "Name": "DeliveryConditions",
+                    "ColumnType": "string",
+                    "Len": 300
+                }
+            ]
+        }
+    ]
+}
