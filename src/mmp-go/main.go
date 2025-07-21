@@ -16,25 +16,12 @@ import (
 	_ "modernc.org/sqlite"
 )
 
-var dbc *models.DbContext
 var err error
 
 func logError(err error) {
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
-}
-
-func HandleErr(w http.ResponseWriter, status int, err error) {
-	if status == 0 {
-		status = http.StatusInternalServerError
-	}
-	errStr := ""
-	if err != nil {
-		log.Println(err.Error())
-		errStr = err.Error()
-	}
-	http.Error(w, errStr, status)
 }
 
 func gracefullShutdown(server *http.Server, quit <-chan os.Signal, done chan<- bool) {
@@ -74,25 +61,24 @@ func initServer() *http.Server {
 
 	// API routes
 	shopsRestApiConfig := elorm.CreateStdRestApiConfig(
-		*dbc.ShopDef.EntityDef,
-		dbc.LoadShop,
-		dbc.ShopDef.SelectEntities,
-		dbc.CreateShop)
+		*models.Dbc.ShopDef.EntityDef,
+		models.Dbc.LoadShop,
+		models.Dbc.ShopDef.SelectEntities,
+		models.Dbc.CreateShop)
 	shopsRestApiConfig.DefaultPageSize = 0
 	router.HandleFunc("/api/shops", elorm.HandleRestApi(shopsRestApiConfig))
 
 	allusersRestApiConfig := elorm.CreateStdRestApiConfig(
-		*dbc.UserDef.EntityDef,
-		dbc.LoadUser,
-		dbc.UserDef.SelectEntities,
-		dbc.CreateUser)
+		*models.Dbc.UserDef.EntityDef,
+		models.Dbc.LoadUser,
+		models.Dbc.UserDef.SelectEntities,
+		models.Dbc.CreateUser)
 	allusersRestApiConfig.DefaultPageSize = 0
 	allusersRestApiConfig.EnableDelete = true
 	allusersRestApiConfig.EnablePost = false
 	allusersRestApiConfig.EnablePut = true
-
 	allusersRestApiConfig.BeforeMiddleware = func(w http.ResponseWriter, r *http.Request) bool {
-		user, err := UserFromHttpRequest(r)
+		user, err := models.UserFromHttpRequest(r)
 		if err != nil {
 			HandleErr(w, 0, fmt.Errorf("unauthorized: %v", err))
 			return false
@@ -103,6 +89,7 @@ func initServer() *http.Server {
 		}
 		return true
 	}
+	allusersRestApiConfig.Context = models.HttpUserContext
 	router.HandleFunc("/api/admin/allusers", elorm.HandleRestApi(allusersRestApiConfig))
 
 	router.HandleFunc("/api/admin/migrate", Migrate)
@@ -154,25 +141,25 @@ func main() {
 
 	}
 
-	dbc, err = models.CreateDbContext(Cfg.dbDialect, Cfg.DbConnectionString)
+	models.Dbc, err = models.CreateDbContext(Cfg.dbDialect, Cfg.DbConnectionString)
 	logError(err)
 
-	dbc.AggressiveReadingCache = true
+	models.Dbc.AggressiveReadingCache = true
 
-	err = dbc.SetHandlers()
+	err = models.Dbc.SetHandlers()
 	logError(err)
 
-	err = dbc.EnsureDBStructure()
+	err = models.Dbc.EnsureDBStructure()
 	logError(err)
 	fmt.Println("Database structure ensured successfully.")
 
-	users, _, err := dbc.UserDef.SelectEntities(nil, nil, 0, 0)
+	users, _, err := models.Dbc.UserDef.SelectEntities(nil, nil, 0, 0)
 	if err != nil {
 		logError(err)
 	}
 	if len(users) == 0 {
 		fmt.Println("No users found, creating default admin user...")
-		adminUser, err := dbc.CreateUser()
+		adminUser, err := models.Dbc.CreateUser()
 		if err != nil {
 			logError(err)
 		}
@@ -181,7 +168,7 @@ func main() {
 		adminUser.SetPassword(Cfg.AdminPassword)
 		adminUser.SetAdmin(true)
 		adminUser.SetShopManager(true)
-		err = adminUser.Save()
+		err = adminUser.Save(context.Background())
 		if err != nil {
 			logError(err)
 		}
@@ -202,3 +189,10 @@ func main() {
 	<-done
 
 }
+
+//TODO expand nav. properties (Shop.Owner, ...)
+//TODO goods
+//TODO profile
+//TODO telegram middleware
+//TODO base filter func for std. rest api
+//TODO old as separated entity

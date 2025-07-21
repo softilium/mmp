@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
@@ -16,6 +17,18 @@ type userPayLoad struct {
 	Password string `json:"password"`
 }
 
+func HandleErr(w http.ResponseWriter, status int, err error) {
+	if status == 0 {
+		status = http.StatusInternalServerError
+	}
+	errStr := ""
+	if err != nil {
+		log.Println(err.Error())
+		errStr = err.Error()
+	}
+	http.Error(w, errStr, status)
+}
+
 func UserRegister(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		HandleErr(w, http.StatusMethodNotAllowed, nil)
@@ -27,8 +40,8 @@ func UserRegister(w http.ResponseWriter, r *http.Request) {
 		HandleErr(w, 0, err)
 		return
 	}
-	exist, _, err := dbc.UserDef.SelectEntities(
-		[]*elorm.Filter{elorm.AddFilterEQ(dbc.UserDef.Email, payload.Email)}, nil, 0, 0)
+	exist, _, err := models.Dbc.UserDef.SelectEntities(
+		[]*elorm.Filter{elorm.AddFilterEQ(models.Dbc.UserDef.Email, payload.Email)}, nil, 0, 0)
 	if err != nil {
 		HandleErr(w, 0, err)
 		return
@@ -37,7 +50,7 @@ func UserRegister(w http.ResponseWriter, r *http.Request) {
 		HandleErr(w, http.StatusBadRequest, fmt.Errorf("user with this email already exists: %s", payload.Email))
 		return
 	}
-	newUser, err := dbc.CreateUser()
+	newUser, err := models.Dbc.CreateUser()
 	if err != nil {
 		HandleErr(w, 0, err)
 		return
@@ -45,7 +58,7 @@ func UserRegister(w http.ResponseWriter, r *http.Request) {
 	newUser.SetUsername(payload.Email)
 	newUser.SetEmail(payload.Email)
 	newUser.SetPassword(payload.Password)
-	err = newUser.Save()
+	err = newUser.Save(r.Context())
 	if err != nil {
 		HandleErr(w, 0, err)
 		return
@@ -73,8 +86,8 @@ func UserLogin(w http.ResponseWriter, r *http.Request) {
 		HandleErr(w, 0, err)
 		return
 	}
-	users, _, err := dbc.UserDef.SelectEntities(
-		[]*elorm.Filter{elorm.AddFilterEQ(dbc.UserDef.Email, payload.Email)}, nil, 1, 1)
+	users, _, err := models.Dbc.UserDef.SelectEntities(
+		[]*elorm.Filter{elorm.AddFilterEQ(models.Dbc.UserDef.Email, payload.Email)}, nil, 1, 1)
 	if err != nil {
 		HandleErr(w, 0, err)
 		return
@@ -91,7 +104,7 @@ func UserLogin(w http.ResponseWriter, r *http.Request) {
 
 	newToken, at := generateToken(users[0])
 	w.WriteHeader(http.StatusOK)
-	res := tokensResponse{AccessToken: at, RefreshToken: newToken.refreshToken}
+	res := tokensResponse{AccessToken: at, RefreshToken: newToken.RefreshToken}
 	err = json.NewEncoder(w).Encode(res)
 	if err != nil {
 		HandleErr(w, 0, err)
@@ -104,71 +117,37 @@ func UserLogout(w http.ResponseWriter, r *http.Request) {
 		HandleErr(w, http.StatusMethodNotAllowed, nil)
 		return
 	}
-	user, err := UserFromHttpRequest(r)
-	if err != nil {
+
+	user, ok := r.Context().Value(models.UserContextKey).(*models.User)
+	if !ok {
 		HandleErr(w, http.StatusUnauthorized, nil)
 		return
 	}
-	for token, item := range tokensByAT {
-		if item.userRef == user.RefString() {
-			delete(tokensByAT, token)
+	for token, item := range models.TokensByAT {
+		if item.UserRef == user.RefString() {
+			delete(models.TokensByAT, token)
 		}
 	}
 	w.WriteHeader(http.StatusOK)
 }
 
-func generateToken(user *models.User) (TokenItem, string) {
-	newToken := TokenItem{
-		userRef:               user.RefString(),
-		refreshToken:          uuid.NewString(),
-		accessTokenExpiresAt:  time.Now().Add(5 * time.Minute),
-		refreshTokenExpiresAt: time.Now().Add(24 * time.Hour),
+func generateToken(user *models.User) (models.TokenItem, string) {
+	newToken := models.TokenItem{
+		UserRef:               user.RefString(),
+		RefreshToken:          uuid.NewString(),
+		AccessTokenExpiresAt:  time.Now().Add(5 * time.Minute),
+		RefreshTokenExpiresAt: time.Now().Add(24 * time.Hour),
 	}
 
 	res := uuid.NewString()
 
-	tokensByAT[res] = newToken
+	models.TokensByAT[res] = newToken
 	return newToken, res
-}
-
-func UserFromHttpRequest(r *http.Request) (*models.User, error) {
-
-	raw := r.Header.Get("Authorization")
-	if raw == "" {
-		return nil, fmt.Errorf("Unauthorized")
-	}
-	if len(raw) < 7 || raw[:7] != "Bearer " {
-		return nil, fmt.Errorf("Unauthorized")
-	}
-	token := raw[7:]
-
-	if item, ok := tokensByAT[token]; ok {
-		if item.accessTokenExpiresAt.After(time.Now()) {
-			user, err := dbc.LoadUser(item.userRef)
-			if err != nil {
-				return nil, fmt.Errorf("Unauthorized")
-			}
-			if !user.IsActive() {
-				return nil, fmt.Errorf("user isn't active")
-			}
-			return user, nil
-		}
-	}
-	return nil, fmt.Errorf("Unauthorized")
-
-}
-
-type UserProfileResponse struct {
-	Username   string `json:"userName"`
-	Email      string `json:"email"`
-	ShopManage bool   `json:"shopManage"`
-	Admin      bool   `json:"admin"`
-	Id         string `json:"id"`
 }
 
 func UserPublicProfile(w http.ResponseWriter, r *http.Request) {
 
-	user, err := UserFromHttpRequest(r)
+	user, err := models.UserFromHttpRequest(r)
 	if err != nil {
 		HandleErr(w, http.StatusUnauthorized, nil)
 		return
@@ -190,11 +169,10 @@ func UserPublicProfile(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-type TokenItem struct {
-	userRef               string
-	refreshToken          string
-	accessTokenExpiresAt  time.Time
-	refreshTokenExpiresAt time.Time
+type UserProfileResponse struct {
+	Username   string `json:"userName"`
+	Email      string `json:"email"`
+	ShopManage bool   `json:"shopManage"`
+	Admin      bool   `json:"admin"`
+	Id         string `json:"id"`
 }
-
-var tokensByAT = make(map[string]TokenItem)

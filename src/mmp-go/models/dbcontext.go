@@ -456,6 +456,30 @@ func (T *User) SetDescription(newValue string) {
 	T.field_Description.Set(newValue)
 }
 
+// BusinessObjects fragment
+
+const BusinessObjectsFragment = "BusinessObjects"
+
+type BusinessObjectsFragmentMethods interface {
+	CreatedBy() *User
+	SetCreatedBy(newValue *User)
+
+	CreatedAt() time.Time
+	SetCreatedAt(newValue time.Time)
+
+	ModifiedBy() *User
+	SetModifiedBy(newValue *User)
+
+	ModifiedAt() time.Time
+	SetModifiedAt(newValue time.Time)
+
+	DeletedBy() *User
+	SetDeletedBy(newValue *User)
+
+	DeletedAt() time.Time
+	SetDeletedAt(newValue time.Time)
+}
+
 // DbContext core
 //////
 

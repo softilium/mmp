@@ -371,3 +371,5 @@ FodyWeavers.xsd
 /src/vueclient/.env.development
 /src/vueclient/.env.production
 /devops/backup.sql
+src/mmp-go/todo.db
+/src/mmp-go/todo.db

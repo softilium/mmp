@@ -8,7 +8,9 @@
   let shops = ref({Data: [], PagesCount: 0});
 
   onMounted(async () => {
-    try {let res = await fetch(ctx.rbUrl() + "/api/shops", { signal: AbortSignal.timeout(5000), });
+    try {let res = await fetch(ctx.rbUrl() + "/api/shops", {
+      signal: AbortSignal.timeout(5000),
+    });
       if (res.ok) {
         shops.value = await res.json();
       }
@@ -33,11 +35,11 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="item in shops.Data" v-bind:key="item.id">
+        <tr v-for="item in shops.Data" v-bind:key="item.Ref">
           <td class="col-9">
-            <RouterLink v-bind:to="`/shop/${item.id}`">{{ item.caption }}</RouterLink>
+            <RouterLink v-bind:to="`/shop/${item.Ref}`">{{ item.Caption }}</RouterLink>
           </td>
-          <td class="col-2"><ProfileLink :userInfo="item.createdByInfo"></ProfileLink></td>
+          <td class="col-2"><ProfileLink :userInfo="item.CreatedBy"></ProfileLink></td>
         </tr>
       </tbody>
     </table>
