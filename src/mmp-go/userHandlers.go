@@ -12,9 +12,32 @@ import (
 	"github.com/softilium/mmp-go/models"
 )
 
+func initRouterAUTH(router *http.ServeMux) {
+	router.HandleFunc("/identity/register", UserRegister)
+	router.HandleFunc("/identity/login", UserLogin)
+	router.HandleFunc("/identity/logout", UserLogout)
+	router.HandleFunc("/identity/myprofile", UserPublicProfile)
+}
+
 type userPayLoad struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
+}
+
+type UserProfileResponse struct {
+	Username         string `json:"userName"`
+	Email            string `json:"email"`
+	ShopManage       bool   `json:"shopManage"`
+	Admin            bool   `json:"admin"`
+	Id               string `json:"id"`
+	Description      string `json:"description"`
+	TelegramUsername string `json:"telegramUsername"`
+	BotChatId        int64  `json:"botChatId"`
+}
+
+type tokensResponse struct {
+	AccessToken  string `json:"accessToken"`
+	RefreshToken string `json:"refreshToken"`
 }
 
 func HandleErr(w http.ResponseWriter, status int, err error) {
@@ -68,11 +91,6 @@ func UserRegister(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusCreated)
 
-}
-
-type tokensResponse struct {
-	AccessToken  string `json:"accessToken"`
-	RefreshToken string `json:"refreshToken"`
 }
 
 func UserLogin(w http.ResponseWriter, r *http.Request) {
@@ -193,15 +211,4 @@ func UserPublicProfile(w http.ResponseWriter, r *http.Request) {
 		}
 		w.WriteHeader(http.StatusOK)
 	}
-}
-
-type UserProfileResponse struct {
-	Username         string `json:"userName"`
-	Email            string `json:"email"`
-	ShopManage       bool   `json:"shopManage"`
-	Admin            bool   `json:"admin"`
-	Id               string `json:"id"`
-	Description      string `json:"description"`
-	TelegramUsername string `json:"telegramUsername"`
-	BotChatId        int64  `json:"botChatId"`
 }

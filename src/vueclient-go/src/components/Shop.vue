@@ -22,7 +22,7 @@
       let res = await fetch(ctx.rbUrl() + "/api/shops?ref=" + route.params.id);
       if (res.ok) {
         shop.value = await res.json();
-        isOwner.value = shop.value.CreatedBy.Ref == ctx.userInfo.Ref && ctx.userInfo.ShopManager;
+        isOwner.value = shop.value.CreatedBy.Ref == ctx.userInfo.id && ctx.userInfo.shopManage;
         shopDescription.value = ctx.linkify(shop.value.Description);
       } else router.push("/");
     } catch (err) {
@@ -36,12 +36,12 @@
         goods.value = await res.json();
 
         goods.value.Data.forEach(async g => {
-          // let res = await fetch(`${ctx.rbUrl()}/api/goods/thumbs/${g.id}/0`, { method: "GET" });
-          // if (res.status == 200) { // status 204 means no image
-          //   let b = await res.blob();
-          //   const src = URL.createObjectURL(b);
-          //   g.thumb = src;
-          // }
+           let res = await fetch(`${ctx.rbUrl()}/api/goods/thumbs?ref=${g.Ref}&n=0`, { method: "GET" });
+           if (res.status == 200) { // status 204 means no image
+             let b = await res.blob();
+             const src = URL.createObjectURL(b);
+             g.thumb = src;
+           }
         });
 
       }
@@ -54,7 +54,7 @@
   });
 
   const LoadBasket = async () => {
-    if (ctx.userInfo.Ref) {
+    if (ctx.userInfo.id) {
 
       try {
         let res = await fetch(ctx.rbUrl() + "/api/baskets/" + shop.value.Ref, {
@@ -95,7 +95,7 @@
   }
 
   const Inc = async (good) => {
-    if (!ctx.userInfo.Ref) {
+    if (!ctx.userInfo.id) {
       localBasket.addItem({
         goodId: good.id,
         quantity: 1,
@@ -122,7 +122,7 @@
   }
 
   const Dec = async (good) => {
-    if (!ctx.userInfo.Ref) {
+    if (!ctx.userInfo.id) {
       localBasket.decItem(good.id);
       LoadBasket();
       await ctx.loadBasket();

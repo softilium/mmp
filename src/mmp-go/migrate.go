@@ -5,6 +5,9 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
+	"os"
+	"strconv"
+	"strings"
 
 	"github.com/softilium/mmp-go/models"
 )
@@ -32,6 +35,7 @@ func Migrate(w http.ResponseWriter, r *http.Request) {
 
 	usersMap := make(map[int64]*models.User)
 	shopsMap := make(map[int64]*models.Shop)
+	goodMap := make(map[int64]*models.Good)
 
 	// Users
 	////////
@@ -259,6 +263,53 @@ from "Goods" order by "ID"
 		err = ng.Save(ctxMig)
 		if err != nil {
 			HandleErr(w, 0, fmt.Errorf("failed to scan good row: %v", err))
+			return
+		}
+
+		goodMap[id] = ng
+
+	}
+
+	// images
+	/////////
+
+	items, _ := os.ReadDir(Cfg.ImagesFolderForMigration)
+	for _, item := range items {
+
+		fn := item.Name()
+		tokens := strings.Split(fn, "-")
+		if len(tokens) != 3 {
+			HandleErr(w, 0, fmt.Errorf("invalid image file name %s", fn))
+			return
+		}
+		if tokens[0] != "goodImage" {
+			HandleErr(w, 0, fmt.Errorf("invalid image file name %s, expected 'goodImage-<goodId>-<imageNum>'", fn))
+			return
+		}
+
+		t1, err := strconv.Atoi(tokens[1])
+		if err != nil {
+			HandleErr(w, 0, fmt.Errorf("invalid good id in image file name %s: %v", fn, err))
+			return
+		}
+
+		g, ok := goodMap[int64(t1)]
+		if !ok {
+			fmt.Printf("good with id %s not found\n", tokens[1])
+			continue
+		}
+		tokens[1] = g.RefString()
+		newFn := strings.Join(tokens, "-")
+
+		data, err := os.ReadFile(Cfg.ImagesFolderForMigration + "/" + fn)
+		if err != nil {
+			HandleErr(w, 0, fmt.Errorf("failed to read image file %s: %v", fn, err))
+			return
+		}
+
+		err = os.WriteFile(Cfg.ImagesFolder+"/"+newFn, data, 0644)
+		if err != nil {
+			HandleErr(w, 0, fmt.Errorf("failed to read image file %s: %v", fn, err))
 			return
 		}
 

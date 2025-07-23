@@ -134,12 +134,8 @@ func initServer() *http.Server {
 
 	router.HandleFunc("/api/admin/migrate", Migrate)
 
-	// AUTH routes
-
-	router.HandleFunc("/identity/register", UserRegister)
-	router.HandleFunc("/identity/login", UserLogin)
-	router.HandleFunc("/identity/logout", UserLogout)
-	router.HandleFunc("/identity/myprofile", UserPublicProfile)
+	initRouterImages(router)
+	initRouterAUTH(router)
 
 	// CORE
 
@@ -232,6 +228,5 @@ func main() {
 
 //TODO profile
 //TODO orders+lines
-//TODO goods images
 //TODO telegram middleware
 //TODO unmarshal json, autoexpand support

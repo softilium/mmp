@@ -25,9 +25,8 @@ require (
 	github.com/gorilla/handlers v1.5.2
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
 	github.com/lib/pq v1.10.9
+	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	modernc.org/sqlite v1.38.0
 )
 
-replace (
-	github.com/softilium/elorm => ../../../elorm
-)
+replace github.com/softilium/elorm => ../../../elorm

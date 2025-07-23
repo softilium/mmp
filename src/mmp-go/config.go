@@ -16,6 +16,8 @@ type ConfigData struct {
 	AdminEmail                     string
 	AdminPassword                  string
 	DbConnectionStringForMigration string
+	ImagesFolder                   string
+	ImagesFolderForMigration       string
 }
 
 var Cfg ConfigData
@@ -36,5 +38,8 @@ func init() {
 	Cfg.DbConnectionStringForMigration = os.Getenv("DB_CONNECTION_STRING_FOR_MIGRATION")
 
 	Cfg.FrontEndFolder, _ = strings.CutSuffix(Cfg.FrontEndFolder, "/")
+
+	Cfg.ImagesFolder = os.Getenv("IMAGES_FOLDER")
+	Cfg.ImagesFolderForMigration = os.Getenv("IMAGES_FOLDER_FOR_MIGRATION")
 
 }

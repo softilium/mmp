@@ -29,7 +29,7 @@
         let res = await fetch(ctx.rbUrl() + "/api/goods?ref=" + route.params.id);
         if (res.ok) {
           good.value = await res.json();
-          isOwner.value = (good.value.CreatedBy.Ref == ctx.userInfo.Ref);
+          isOwner.value = (good.value.CreatedBy.Ref == ctx.userInfo.id);
           good.value.Basked = null;
           basketQty.value = null;
           LoadBasket();
@@ -43,26 +43,26 @@
   });
 
   const isImageLoading = ref(true);
-  //const maxImagesCnt = ref(3);
+  const maxImagesCnt = ref(3);
   const imageSrc = ref([]);
   let curImgIndex = ref(0);
 
   const LoadImages = async () => {
-    // for (let i = 0; i < maxImagesCnt.value; i++) {
-    //   let res = await fetch(`${ctx.rbUrl()}/api/goods/images/${route.params.id}/${i}`, { method: "GET" });
-    //   if (res.status == 200) { // status 204 means no image
-    //     let b = await res.blob();
-    //     const src = URL.createObjectURL(b);
-    //     imageSrc.value.push(src);
-    //   }
-    // }
+     for (let i = 0; i < maxImagesCnt.value; i++) {
+       let res = await fetch(`${ctx.rbUrl()}/api/goods/images?ref=${route.params.id}&n=${i}`, { method: "GET" });
+       if (res.status == 200) { // status 204 means no image
+         let b = await res.blob();
+         const src = URL.createObjectURL(b);
+         imageSrc.value.push(src);
+       }
+     }
     isImageLoading.value = false;
   }
 
   const LoadBasket = async () => {
     basketQty.value = null;
     good.value.Basked = null;
-    if (ctx.userInfo.Ref) {
+    if (ctx.userInfo.id) {
       let res = await fetch(ctx.rbUrl() + "/api/baskets/" + good.value.OwnerShop.Ref, {
         method: "GET",
         headers: ctx.authHeadersAppJson()
@@ -88,7 +88,7 @@
   }
 
   const Inc = async () => {
-    if (!ctx.userInfo.Ref) {
+    if (!ctx.userInfo.id) {
       localBasket.addItem({
         goodId: good.value.Ref,
         quantity: 1,
@@ -112,7 +112,7 @@
   }
 
   const Dec = async () => {
-    if (!ctx.userInfo.Ref) {
+    if (!ctx.userInfo.id) {
       localBasket.decItem(good.value.Ref);
       await LoadBasket();
       await ctx.loadBasket();

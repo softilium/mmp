@@ -28,7 +28,7 @@
   // update myurl when user navigate within SPA
   watch(
     () => route.fullPath,
-    async newId => { updateMyUrl(); }
+    () => { updateMyUrl(); }
   )
 
   const SendMsg = async () => {
@@ -85,7 +85,7 @@
   <div class="container-fluid">
     <div class="row">
       <div class="col">
-        <span>&copy;2024-2025,</span>&nbsp;&nbsp;<button v-if="!me" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#sendAdminMsgModal"><i class="bi bi-chat-quote"></i>&nbsp;Вопросы, проблемы, предложения?</button>
+        <span>&copy;2024-2025,</span>&nbsp;&nbsp;<button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#sendAdminMsgModal"><i class="bi bi-chat-quote"></i>&nbsp;Вопросы, проблемы, предложения?</button>
         <div v-if="ctx.isTg() && ctx.userInfo.shopManage">Адрес страницы для браузера: <input class="form-control sm" v-model="myurl" /></div>
       </div>
     </div>
