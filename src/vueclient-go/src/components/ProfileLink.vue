@@ -7,6 +7,6 @@
 
 <template>
 
-  <RouterLink :to="`/profile/${userInfo.id}`">{{userInfo.userName}}</RouterLink>
+  <RouterLink :to="`/profile/${userInfo.Ref}`">{{userInfo.Username}}</RouterLink>
 
 </template>

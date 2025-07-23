@@ -5,7 +5,7 @@ import linkifyHtml from 'linkify-html';
 import { localBasket } from '../services/localBasket';
 
 function newUserInfo() {
-  return { userName: null, shopManage: false, admin: false, id: 0 }
+  return { Username: null, ShopManager: false, Admin: false, Ref: "" }
 }
 
 export const ctx = reactive({

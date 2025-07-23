@@ -6,6 +6,291 @@ import (
 	"time"
 )
 
+// Good class
+//////
+
+type GoodDefStruct struct {
+	*elorm.EntityDef
+	Ref         *elorm.FieldDef
+	IsDeleted   *elorm.FieldDef
+	DataVersion *elorm.FieldDef
+
+	OwnerShop *elorm.FieldDef
+
+	Caption *elorm.FieldDef
+
+	Article *elorm.FieldDef
+
+	Url *elorm.FieldDef
+
+	Description *elorm.FieldDef
+
+	Price *elorm.FieldDef
+
+	OrderInShop *elorm.FieldDef
+
+	CreatedBy *elorm.FieldDef
+
+	CreatedAt *elorm.FieldDef
+
+	ModifiedBy *elorm.FieldDef
+
+	ModifiedAt *elorm.FieldDef
+
+	DeletedBy *elorm.FieldDef
+
+	DeletedAt *elorm.FieldDef
+}
+
+func (T *GoodDefStruct) SelectEntities(filters []*elorm.Filter, sorts []*elorm.SortItem, pageNo int, pageSize int) (result []*Good, pages int, err error) {
+
+	res, total, err := T.EntityDef.SelectEntities(filters, sorts, pageNo, pageSize)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	res2 := make([]*Good, 0, len(res))
+
+	for _, r := range res {
+		if r == nil {
+			continue
+		}
+		rt := T.Wrap(r)
+		res2 = append(res2, rt.(*Good))
+	}
+
+	return res2, total, nil
+
+}
+
+type Good struct {
+	*elorm.Entity
+
+	field_OwnerShop   *elorm.FieldValueRef
+	field_Caption     *elorm.FieldValueString
+	field_Article     *elorm.FieldValueString
+	field_Url         *elorm.FieldValueString
+	field_Description *elorm.FieldValueString
+	field_Price       *elorm.FieldValueNumeric
+	field_OrderInShop *elorm.FieldValueInt
+	field_CreatedBy   *elorm.FieldValueRef
+	field_CreatedAt   *elorm.FieldValueDateTime
+	field_ModifiedBy  *elorm.FieldValueRef
+	field_ModifiedAt  *elorm.FieldValueDateTime
+	field_DeletedBy   *elorm.FieldValueRef
+	field_DeletedAt   *elorm.FieldValueDateTime
+}
+
+func (T *Good) OwnerShop() *Shop {
+	if T.field_OwnerShop == nil {
+		T.field_OwnerShop = T.Values["OwnerShop"].(*elorm.FieldValueRef)
+	}
+	r, err := T.field_OwnerShop.Get()
+	if err != nil {
+		panic(err)
+	}
+	return r.(*Shop)
+}
+
+func (T *Good) SetOwnerShop(newValue *Shop) {
+	if T.field_OwnerShop == nil {
+		T.field_OwnerShop = T.Values["OwnerShop"].(*elorm.FieldValueRef)
+	}
+	err := T.field_OwnerShop.Set(newValue)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (T *Good) Caption() string {
+	if T.field_Caption == nil {
+		T.field_Caption = T.Values["Caption"].(*elorm.FieldValueString)
+	}
+	return T.field_Caption.Get()
+}
+
+func (T *Good) SetCaption(newValue string) {
+	if T.field_Caption == nil {
+		T.field_Caption = T.Values["Caption"].(*elorm.FieldValueString)
+	}
+	T.field_Caption.Set(newValue)
+}
+
+func (T *Good) Article() string {
+	if T.field_Article == nil {
+		T.field_Article = T.Values["Article"].(*elorm.FieldValueString)
+	}
+	return T.field_Article.Get()
+}
+
+func (T *Good) SetArticle(newValue string) {
+	if T.field_Article == nil {
+		T.field_Article = T.Values["Article"].(*elorm.FieldValueString)
+	}
+	T.field_Article.Set(newValue)
+}
+
+func (T *Good) Url() string {
+	if T.field_Url == nil {
+		T.field_Url = T.Values["Url"].(*elorm.FieldValueString)
+	}
+	return T.field_Url.Get()
+}
+
+func (T *Good) SetUrl(newValue string) {
+	if T.field_Url == nil {
+		T.field_Url = T.Values["Url"].(*elorm.FieldValueString)
+	}
+	T.field_Url.Set(newValue)
+}
+
+func (T *Good) Description() string {
+	if T.field_Description == nil {
+		T.field_Description = T.Values["Description"].(*elorm.FieldValueString)
+	}
+	return T.field_Description.Get()
+}
+
+func (T *Good) SetDescription(newValue string) {
+	if T.field_Description == nil {
+		T.field_Description = T.Values["Description"].(*elorm.FieldValueString)
+	}
+	T.field_Description.Set(newValue)
+}
+
+func (T *Good) Price() float64 {
+	if T.field_Price == nil {
+		T.field_Price = T.Values["Price"].(*elorm.FieldValueNumeric)
+	}
+	return T.field_Price.Get()
+}
+
+func (T *Good) SetPrice(newValue float64) {
+	if T.field_Price == nil {
+		T.field_Price = T.Values["Price"].(*elorm.FieldValueNumeric)
+	}
+	T.field_Price.Set(newValue)
+}
+
+func (T *Good) OrderInShop() int64 {
+	if T.field_OrderInShop == nil {
+		T.field_OrderInShop = T.Values["OrderInShop"].(*elorm.FieldValueInt)
+	}
+	return T.field_OrderInShop.Get()
+}
+
+func (T *Good) SetOrderInShop(newValue int64) {
+	if T.field_OrderInShop == nil {
+		T.field_OrderInShop = T.Values["OrderInShop"].(*elorm.FieldValueInt)
+	}
+	T.field_OrderInShop.Set(newValue)
+}
+
+func (T *Good) CreatedBy() *User {
+	if T.field_CreatedBy == nil {
+		T.field_CreatedBy = T.Values["CreatedBy"].(*elorm.FieldValueRef)
+	}
+	r, err := T.field_CreatedBy.Get()
+	if err != nil {
+		panic(err)
+	}
+	return r.(*User)
+}
+
+func (T *Good) SetCreatedBy(newValue *User) {
+	if T.field_CreatedBy == nil {
+		T.field_CreatedBy = T.Values["CreatedBy"].(*elorm.FieldValueRef)
+	}
+	err := T.field_CreatedBy.Set(newValue)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (T *Good) CreatedAt() time.Time {
+	if T.field_CreatedAt == nil {
+		T.field_CreatedAt = T.Values["CreatedAt"].(*elorm.FieldValueDateTime)
+	}
+	return T.field_CreatedAt.Get()
+}
+
+func (T *Good) SetCreatedAt(newValue time.Time) {
+	if T.field_CreatedAt == nil {
+		T.field_CreatedAt = T.Values["CreatedAt"].(*elorm.FieldValueDateTime)
+	}
+	T.field_CreatedAt.Set(newValue)
+}
+
+func (T *Good) ModifiedBy() *User {
+	if T.field_ModifiedBy == nil {
+		T.field_ModifiedBy = T.Values["ModifiedBy"].(*elorm.FieldValueRef)
+	}
+	r, err := T.field_ModifiedBy.Get()
+	if err != nil {
+		panic(err)
+	}
+	return r.(*User)
+}
+
+func (T *Good) SetModifiedBy(newValue *User) {
+	if T.field_ModifiedBy == nil {
+		T.field_ModifiedBy = T.Values["ModifiedBy"].(*elorm.FieldValueRef)
+	}
+	err := T.field_ModifiedBy.Set(newValue)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (T *Good) ModifiedAt() time.Time {
+	if T.field_ModifiedAt == nil {
+		T.field_ModifiedAt = T.Values["ModifiedAt"].(*elorm.FieldValueDateTime)
+	}
+	return T.field_ModifiedAt.Get()
+}
+
+func (T *Good) SetModifiedAt(newValue time.Time) {
+	if T.field_ModifiedAt == nil {
+		T.field_ModifiedAt = T.Values["ModifiedAt"].(*elorm.FieldValueDateTime)
+	}
+	T.field_ModifiedAt.Set(newValue)
+}
+
+func (T *Good) DeletedBy() *User {
+	if T.field_DeletedBy == nil {
+		T.field_DeletedBy = T.Values["DeletedBy"].(*elorm.FieldValueRef)
+	}
+	r, err := T.field_DeletedBy.Get()
+	if err != nil {
+		panic(err)
+	}
+	return r.(*User)
+}
+
+func (T *Good) SetDeletedBy(newValue *User) {
+	if T.field_DeletedBy == nil {
+		T.field_DeletedBy = T.Values["DeletedBy"].(*elorm.FieldValueRef)
+	}
+	err := T.field_DeletedBy.Set(newValue)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (T *Good) DeletedAt() time.Time {
+	if T.field_DeletedAt == nil {
+		T.field_DeletedAt = T.Values["DeletedAt"].(*elorm.FieldValueDateTime)
+	}
+	return T.field_DeletedAt.Get()
+}
+
+func (T *Good) SetDeletedAt(newValue time.Time) {
+	if T.field_DeletedAt == nil {
+		T.field_DeletedAt = T.Values["DeletedAt"].(*elorm.FieldValueDateTime)
+	}
+	T.field_DeletedAt.Set(newValue)
+}
+
 // Shop class
 //////
 
@@ -245,8 +530,6 @@ type UserDefStruct struct {
 
 	TelegramChatId *elorm.FieldDef
 
-	BotChatId *elorm.FieldDef
-
 	Description *elorm.FieldDef
 }
 
@@ -284,7 +567,6 @@ type User struct {
 	field_TelegramCheckCode *elorm.FieldValueString
 	field_TelegramVerified  *elorm.FieldValueBool
 	field_TelegramChatId    *elorm.FieldValueString
-	field_BotChatId         *elorm.FieldValueInt
 	field_Description       *elorm.FieldValueString
 }
 
@@ -428,20 +710,6 @@ func (T *User) SetTelegramChatId(newValue string) {
 	T.field_TelegramChatId.Set(newValue)
 }
 
-func (T *User) BotChatId() int64 {
-	if T.field_BotChatId == nil {
-		T.field_BotChatId = T.Values["BotChatId"].(*elorm.FieldValueInt)
-	}
-	return T.field_BotChatId.Get()
-}
-
-func (T *User) SetBotChatId(newValue int64) {
-	if T.field_BotChatId == nil {
-		T.field_BotChatId = T.Values["BotChatId"].(*elorm.FieldValueInt)
-	}
-	T.field_BotChatId.Set(newValue)
-}
-
 func (T *User) Description() string {
 	if T.field_Description == nil {
 		T.field_Description = T.Values["Description"].(*elorm.FieldValueString)
@@ -461,6 +729,9 @@ func (T *User) SetDescription(newValue string) {
 const BusinessObjectsFragment = "BusinessObjects"
 
 type BusinessObjectsFragmentMethods interface {
+	IsDeleted() bool
+	SetIsDeleted(newValue bool)
+
 	CreatedBy() *User
 	SetCreatedBy(newValue *User)
 
@@ -485,6 +756,7 @@ type BusinessObjectsFragmentMethods interface {
 
 type DbContext struct {
 	*elorm.Factory
+	GoodDef GoodDefStruct
 	ShopDef ShopDefStruct
 	UserDef UserDefStruct
 }
@@ -501,6 +773,18 @@ func CreateDbContext(dbDialect string, connectionString string) (*DbContext, err
 		return nil, err
 	}
 
+	r.GoodDef.EntityDef, err = r.CreateEntityDef("Good", "Goods")
+	if err != nil {
+		return nil, err
+	}
+
+	r.GoodDef.Fragments = make([]string, 0)
+	frg = []string{}
+
+	frg = append(frg, "BusinessObjects")
+
+	r.GoodDef.Fragments = frg
+
 	r.ShopDef.EntityDef, err = r.CreateEntityDef("Shop", "Shops")
 	if err != nil {
 		return nil, err
@@ -514,6 +798,36 @@ func CreateDbContext(dbDialect string, connectionString string) (*DbContext, err
 	r.ShopDef.Fragments = frg
 
 	r.UserDef.EntityDef, err = r.CreateEntityDef("User", "Users")
+	if err != nil {
+		return nil, err
+	}
+
+	// Good
+	//////
+
+	r.GoodDef.Ref = r.GoodDef.FieldDefByName("Ref")
+	r.GoodDef.IsDeleted = r.GoodDef.FieldDefByName("IsDeleted")
+	r.GoodDef.DataVersion = r.GoodDef.FieldDefByName("DataVersion")
+
+	r.GoodDef.OwnerShop, _ = r.GoodDef.AddRefFieldDef("OwnerShop", r.ShopDef.EntityDef)
+	r.GoodDef.Caption, _ = r.GoodDef.AddStringFieldDef("Caption", 100, "")
+	r.GoodDef.Article, _ = r.GoodDef.AddStringFieldDef("Article", 50, "")
+	r.GoodDef.Url, _ = r.GoodDef.AddStringFieldDef("Url", 500, "")
+	r.GoodDef.Description, _ = r.GoodDef.AddStringFieldDef("Description", 4096, "")
+	r.GoodDef.Price, _ = r.GoodDef.AddNumericFieldDef("Price", 10, 2, 0)
+	r.GoodDef.OrderInShop, _ = r.GoodDef.AddIntFieldDef("OrderInShop", 0)
+	r.GoodDef.CreatedBy, _ = r.GoodDef.AddRefFieldDef("CreatedBy", r.UserDef.EntityDef)
+	r.GoodDef.CreatedAt, _ = r.GoodDef.AddDateTimeFieldDef("CreatedAt")
+	r.GoodDef.ModifiedBy, _ = r.GoodDef.AddRefFieldDef("ModifiedBy", r.UserDef.EntityDef)
+	r.GoodDef.ModifiedAt, _ = r.GoodDef.AddDateTimeFieldDef("ModifiedAt")
+	r.GoodDef.DeletedBy, _ = r.GoodDef.AddRefFieldDef("DeletedBy", r.UserDef.EntityDef)
+	r.GoodDef.DeletedAt, _ = r.GoodDef.AddDateTimeFieldDef("DeletedAt")
+
+	r.GoodDef.Wrap = func(source *elorm.Entity) any { return &Good{Entity: source} }
+
+	err = r.GoodDef.AddIndex(false,
+		*r.GoodDef.OwnerShop,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -554,7 +868,6 @@ func CreateDbContext(dbDialect string, connectionString string) (*DbContext, err
 	r.UserDef.TelegramCheckCode, _ = r.UserDef.AddStringFieldDef("TelegramCheckCode", 100, "")
 	r.UserDef.TelegramVerified, _ = r.UserDef.AddBoolFieldDef("TelegramVerified", false)
 	r.UserDef.TelegramChatId, _ = r.UserDef.AddStringFieldDef("TelegramChatId", 100, "")
-	r.UserDef.BotChatId, _ = r.UserDef.AddIntFieldDef("BotChatId", 0)
 	r.UserDef.Description, _ = r.UserDef.AddStringFieldDef("Description", 300, "")
 
 	r.UserDef.Wrap = func(source *elorm.Entity) any { return &User{Entity: source} }
@@ -574,6 +887,24 @@ func CreateDbContext(dbDialect string, connectionString string) (*DbContext, err
 	}
 
 	return r, nil
+}
+
+func (T *DbContext) CreateGood() (*Good, error) {
+	r, err := T.CreateEntityWrapped(T.GoodDef.EntityDef)
+	if err != nil {
+		return nil, err
+	}
+	rt := r.(*Good)
+	return rt, nil
+}
+
+func (T *DbContext) LoadGood(Ref string) (*Good, error) {
+	r, err := T.LoadEntityWrapped(Ref)
+	if err != nil {
+		return nil, err
+	}
+	rt := r.(*Good)
+	return rt, nil
 }
 
 func (T *DbContext) CreateShop() (*Shop, error) {

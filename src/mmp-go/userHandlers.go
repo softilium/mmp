@@ -118,8 +118,8 @@ func UserLogout(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, ok := r.Context().Value(models.UserContextKey).(*models.User)
-	if !ok {
+	user, err := models.UserFromHttpRequest(r)
+	if err != nil {
 		HandleErr(w, http.StatusUnauthorized, nil)
 		return
 	}
@@ -152,27 +152,56 @@ func UserPublicProfile(w http.ResponseWriter, r *http.Request) {
 		HandleErr(w, http.StatusUnauthorized, nil)
 		return
 	}
+	if r.Method == http.MethodGet {
+		res := UserProfileResponse{
+			Username:         user.Username(),
+			Email:            user.Email(),
+			ShopManage:       user.ShopManager(),
+			Admin:            user.Admin(),
+			Id:               user.RefString(),
+			Description:      user.Description(),
+			TelegramUsername: user.TelegramUsername(),
+			//BotChatId:        user.BotChatId(),
+		}
 
-	res := UserProfileResponse{
-		Username:   user.Username(),
-		Email:      user.Email(),
-		ShopManage: user.ShopManager(),
-		Admin:      user.Admin(),
-		Id:         user.RefString(),
+		w.WriteHeader(http.StatusOK)
+		err = json.NewEncoder(w).Encode(res)
+		if err != nil {
+			HandleErr(w, 0, err)
+			return
+		}
 	}
+	if r.Method == http.MethodPut {
+		payload := UserProfileResponse{}
+		err = json.NewDecoder(r.Body).Decode(&payload)
+		if err != nil {
+			HandleErr(w, 0, err)
+			return
+		}
+		user.SetUsername(payload.Username)
+		user.SetEmail(payload.Email)
+		user.SetShopManager(payload.ShopManage)
+		user.SetAdmin(payload.Admin)
+		user.SetDescription(payload.Description)
+		user.SetTelegramUsername(payload.TelegramUsername)
+		//user.SetBotChatId(payload.BotChatId)
 
-	w.WriteHeader(http.StatusOK)
-	err = json.NewEncoder(w).Encode(res)
-	if err != nil {
-		HandleErr(w, 0, err)
-		return
+		err = user.Save(r.Context())
+		if err != nil {
+			HandleErr(w, 0, err)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
 	}
 }
 
 type UserProfileResponse struct {
-	Username   string `json:"userName"`
-	Email      string `json:"email"`
-	ShopManage bool   `json:"shopManage"`
-	Admin      bool   `json:"admin"`
-	Id         string `json:"id"`
+	Username         string `json:"userName"`
+	Email            string `json:"email"`
+	ShopManage       bool   `json:"shopManage"`
+	Admin            bool   `json:"admin"`
+	Id               string `json:"id"`
+	Description      string `json:"description"`
+	TelegramUsername string `json:"telegramUsername"`
+	BotChatId        int64  `json:"botChatId"`
 }

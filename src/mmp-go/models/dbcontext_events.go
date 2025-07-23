@@ -63,6 +63,16 @@ var TokensByAT = make(map[string]TokenItem)
 
 func (dbc *DbContext) SetHandlers() error {
 
+	dbc.UserDef.AutoExpandFieldsForJSON = map[*elorm.FieldDef]bool{
+		dbc.UserDef.Ref:      true,
+		dbc.UserDef.Username: true,
+	}
+
+	dbc.ShopDef.AutoExpandFieldsForJSON = map[*elorm.FieldDef]bool{
+		dbc.ShopDef.Ref:     true,
+		dbc.ShopDef.Caption: true,
+	}
+
 	// BusinessObjects fragment
 	///////////////////////////
 
@@ -92,9 +102,8 @@ func (dbc *DbContext) SetHandlers() error {
 			}
 		}
 
-		isDeletedV := ent.GetValues()[elorm.IsDeletedFieldName].(*elorm.FieldValueBool)
-
-		if !ent.IsDeleted() && isDeletedV.GetOld() {
+		fld := ent.GetValues()[elorm.IsDeletedFieldName].(*elorm.FieldValueBool)
+		if !fld.Get() && fld.GetOld() {
 			et.SetDeletedAt(time.Now())
 			if user != nil {
 				et.SetDeletedBy(user)

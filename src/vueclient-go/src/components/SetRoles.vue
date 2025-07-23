@@ -44,6 +44,8 @@
 
   <h1>Admin</h1>
 
+    <button @click="Migrate()">Migrate</button>
+
   <table v-if="users.Data.length > 0" class="table table-sm">
     <thead>
       <tr>
@@ -65,7 +67,5 @@
       </tr>
     </tbody>
   </table>
-
-  <button @click="Migrate()">Migrate</button>
 
 </template>

@@ -58,15 +58,55 @@ func initServer() *http.Server {
 	// SPA routes
 	router.Handle("/", http.StripPrefix("/", fs))
 	router.HandleFunc("/login", SpaHandler())
+	router.HandleFunc("/shop/{shopref}", SpaHandler())
 
 	// API routes
+
+	//// shops
+
 	shopsRestApiConfig := elorm.CreateStdRestApiConfig(
 		*models.Dbc.ShopDef.EntityDef,
 		models.Dbc.LoadShop,
 		models.Dbc.ShopDef.SelectEntities,
 		models.Dbc.CreateShop)
 	shopsRestApiConfig.DefaultPageSize = 0
+	shopsRestApiConfig.AdditionalFilter = func(r *http.Request) []*elorm.Filter {
+		res := []*elorm.Filter{}
+		res = append(res, elorm.AddFilterEQ(models.Dbc.ShopDef.IsDeleted, false))
+		return res
+	}
+	shopsRestApiConfig.DefaultSorts = func(r *http.Request) []*elorm.SortItem {
+		return []*elorm.SortItem{
+			{Field: models.Dbc.ShopDef.Caption, Asc: true},
+		}
+	}
 	router.HandleFunc("/api/shops", elorm.HandleRestApi(shopsRestApiConfig))
+
+	//// goods
+
+	goodsRestApiConfig := elorm.CreateStdRestApiConfig(
+		*models.Dbc.GoodDef.EntityDef,
+		models.Dbc.LoadGood,
+		models.Dbc.GoodDef.SelectEntities,
+		models.Dbc.CreateGood)
+	goodsRestApiConfig.DefaultPageSize = 0
+	goodsRestApiConfig.AdditionalFilter = func(r *http.Request) []*elorm.Filter {
+		res := []*elorm.Filter{}
+		res = append(res, elorm.AddFilterEQ(models.Dbc.GoodDef.IsDeleted, false))
+		shopref := r.URL.Query().Get("shopref")
+		if shopref != "" {
+			res = append(res, elorm.AddFilterEQ(models.Dbc.GoodDef.OwnerShop, shopref))
+		}
+		return res
+	}
+	goodsRestApiConfig.DefaultSorts = func(r *http.Request) []*elorm.SortItem {
+		return []*elorm.SortItem{
+			{Field: models.Dbc.GoodDef.OrderInShop, Asc: true},
+		}
+	}
+	router.HandleFunc("/api/goods", elorm.HandleRestApi(goodsRestApiConfig))
+
+	//// allusers
 
 	allusersRestApiConfig := elorm.CreateStdRestApiConfig(
 		*models.Dbc.UserDef.EntityDef,
@@ -190,9 +230,8 @@ func main() {
 
 }
 
-//TODO expand nav. properties (Shop.Owner, ...)
-//TODO goods
 //TODO profile
+//TODO orders+lines
+//TODO goods images
 //TODO telegram middleware
-//TODO base filter func for std. rest api
-//TODO old as separated entity
+//TODO unmarshal json, autoexpand support

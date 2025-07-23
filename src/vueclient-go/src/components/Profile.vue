@@ -8,7 +8,7 @@
   const route = useRoute();
 
   const me = ref(false);
-  const user = ref({ id: 0, userName: "", email: "", telegramUserName: "", telegramVerified: false, telegramCheckCode: "", botChatId: 0, description: "" });
+  const user = ref({ id: "", userName: "", email: "", telegramUsername: "", TelegramVerified: false, TelegramCheckCode: "", botChatId: 0, description: "" });
   const newTelegramUserName = ref("");
   const telegramVerifyCode = ref("");
   const result = ref("");
@@ -56,25 +56,25 @@
       }
     }
     else {
-      let res = await fetch(ctx.rbUrl() + "/api/profiles/my",
+      let res = await fetch(ctx.rbUrl() + "/identity/myprofile",
         {
           headers: ctx.authHeadersAppJson()
         });
       if (res.ok) {
         user.value = await res.json();
-        newTelegramUserName.value = user.value.telegramUserName;
+        newTelegramUserName.value = user.value.telegramUsername;
       }
     }
   }
 
   const Save = async () => {
     if (!me.value) return;
-    if (user.value.telegramUserName != newTelegramUserName.value) {
-      user.value.telegramVerified = false;
-      user.value.telegramCheckCode = "";
+    if (user.value.telegramUsername != newTelegramUserName.value) {
+      user.value.TelegramVerified = false;
+      user.value.TelegramCheckCode = "";
     }
-    user.value.telegramUserName = newTelegramUserName.value;
-    let res = await fetch(ctx.rbUrl() + "/api/profiles",
+    user.value.telegramUsername = newTelegramUserName.value;
+    let res = await fetch(ctx.rbUrl() + "/identity/myprofile",
       {
         method: "PUT",
         body: JSON.stringify(user.value),
@@ -131,7 +131,7 @@
 
   <div v-if="me">
     <br />
-    <h4 v-if="!user.telegramVerified">
+    <h4 v-if="!user.TelegramVerified">
       Мы используем Telegam для уведомлений. Ваше имя пользователя не передается другим пользователям сайта. Для настройки уведомлений вам нужно
       добавить чат для
       <a href="https://t.me/RiverStoresBot" target="_blank">нашего бота</a>. После этого укажите ваше имя пользователя из Telegram ниже.
@@ -145,15 +145,15 @@
         <span class="text-success"><i class="bi bi-star-fill"></i></span>
       </div>
     </div>
-    <div class="row mb-3 text-danger" v-if="user.telegramUserName && !user.botChatId">
+    <div class="row mb-3 text-danger" v-if="user.telegramUsername && !user.botChatId">
       <p>Это имя пользователя не найдено. Добавьте чат, напишите в чат любое сообщение и перезагрузите эту страницу для продолжения.</p>
     </div>
-    <div class="row mb-3" v-if="user.botChatId && !user.telegramVerified && user.telegramUserName == newTelegramUserName">
+    <div class="row mb-3" v-if="user.botChatId && !user.TelegramVerified && user.telegramUsername == newTelegramUserName">
       <div class="col">
         <button class="btn btn-primary" @click="NewTelegramCode">Отослать проверочный код в чат для подтверждения</button>
       </div>
     </div>
-    <div class="row mb-3" v-if="user.botChatId && user.telegramCheckCode && !user.telegramVerified">
+    <div class="row mb-3" v-if="user.botChatId && user.TelegramCheckCode && !user.TelegramVerified">
       <div class="row mb-3">
         <label class="col-3 form-label">Введите новый код из чата</label>
         <div class="col-7">

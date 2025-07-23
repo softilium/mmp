@@ -30,6 +30,9 @@ func Migrate(w http.ResponseWriter, r *http.Request) {
 	}
 	defer mdb.Close()
 
+	usersMap := make(map[int64]*models.User)
+	shopsMap := make(map[int64]*models.Shop)
+
 	// Users
 	////////
 
@@ -63,8 +66,6 @@ order by "Id"
 		return
 	}
 	defer rows.Close()
-
-	usersMap := make(map[int64]*models.User)
 
 	for rows.Next() {
 
@@ -123,7 +124,7 @@ order by "Id"
 	
 select 
 "ID", "Caption", "Description", "DeliveryConditions", "CreatedByID", "CreatedOn", "ModifiedByID", "ModifiedOn", "DeletedByID", "DeletedOn" 
-from "Shops"
+from "Shops" order by "ID"
 	
 	`)
 	if err != nil {
@@ -170,9 +171,94 @@ from "Shops"
 			ns.SetDeletedBy(usersMap[deletedById.Int64])
 		}
 
+		ns.SetIsDeleted(deletedById.Valid && deletedById.Int64 > 0)
+
 		err = ns.Save(ctxMig)
 		if err != nil {
 			HandleErr(w, 0, fmt.Errorf("failed to save shop %d: %v", id, err))
+			return
+		}
+
+		shopsMap[id] = ns
+
+	}
+
+	goods, _, err := models.Dbc.GoodDef.SelectEntities(nil, nil, 0, 0)
+	if err != nil {
+		HandleErr(w, 0, fmt.Errorf("failed to fetch goods for migration: %v", err))
+		return
+	}
+	for _, good := range goods {
+		err := models.Dbc.DeleteEntity(ctxMig, good.RefString())
+		if err != nil {
+			HandleErr(w, 0, fmt.Errorf("failed to delete good %s: %v", good.RefString(), err))
+			return
+		}
+	}
+	rows, err = mdb.Query(`
+
+select 
+"ID", "OwnerShopID", "Caption", "Article", "Url", "Description", "Price", "CreatedByID", 
+"CreatedOn", "ModifiedByID", "ModifiedOn", "DeletedByID", "OrderInShop"
+from "Goods" order by "ID"
+
+`)
+	if err != nil {
+		HandleErr(w, 0, fmt.Errorf("failed to query goods from migration database: %v", err))
+		return
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		ng, err := models.Dbc.CreateGood()
+		if err != nil {
+			HandleErr(w, 0, fmt.Errorf("failed to create new good: %v", err))
+			return
+		}
+
+		var id, ownerShopId int64
+		var createdById, modifiedById, deletedById sql.NullInt64
+
+		err = rows.Scan(
+			&id,
+			&ownerShopId,
+			ng.Values["Caption"],
+			ng.Values["Article"],
+			ng.Values["Url"],
+			ng.Values["Description"],
+			ng.Values["Price"],
+			&createdById,
+			ng.Values["CreatedAt"],
+			&modifiedById,
+			ng.Values["ModifiedAt"],
+			&deletedById,
+			ng.Values["OrderInShop"])
+		if err != nil {
+			HandleErr(w, 0, fmt.Errorf("failed to scan good row: %v", err))
+			return
+		}
+
+		if createdById.Valid {
+			ng.SetCreatedBy(usersMap[createdById.Int64])
+		}
+
+		if modifiedById.Valid {
+			ng.SetModifiedBy(usersMap[modifiedById.Int64])
+		}
+
+		if deletedById.Valid {
+			ng.SetDeletedBy(usersMap[deletedById.Int64])
+		}
+
+		if ownerShopId > 0 {
+			ng.SetOwnerShop(shopsMap[ownerShopId])
+		}
+
+		ng.SetIsDeleted(deletedById.Valid && deletedById.Int64 > 0)
+
+		err = ng.Save(ctxMig)
+		if err != nil {
+			HandleErr(w, 0, fmt.Errorf("failed to scan good row: %v", err))
 			return
 		}
 

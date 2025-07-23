@@ -97,10 +97,6 @@
                     "Len": 100
                 },
                 {
-                    "Name": "BotChatId",
-                    "ColumnType": "int"
-                },
-                {
                     "Name": "Description",
                     "ColumnType": "string",
                     "Len": 300
@@ -128,6 +124,57 @@
                     "Name": "DeliveryConditions",
                     "ColumnType": "string",
                     "Len": 300
+                }
+            ]
+        },
+        {
+            "ObjectName": "Good",
+            "TableName": "Goods",
+            "Fragments": [
+                "BusinessObjects"
+            ],
+            "Indexes": [
+                {
+                    "Columns": [
+                        "OwnerShop"
+                    ],
+                    "Unique": false
+                }
+            ],
+            "Columns": [
+                {
+                    "Name": "OwnerShop",
+                    "ColumnType": "ref.Shop"
+                },
+                {
+                    "Name": "Caption",
+                    "ColumnType": "string",
+                    "Len": 100
+                },
+                {
+                    "Name": "Article",
+                    "ColumnType": "string",
+                    "Len": 50
+                },
+                {
+                    "Name": "Url",
+                    "ColumnType": "string",
+                    "Len": 500
+                },
+                {
+                    "Name": "Description",
+                    "ColumnType": "string",
+                    "Len": 4096
+                },
+                {
+                    "Name": "Price",
+                    "ColumnType": "numeric",
+                    "Precision": 10,
+                    "Scale": 2
+                },
+                {
+                    "Name": "OrderInShop",
+                    "ColumnType": "int"
                 }
             ]
         }
