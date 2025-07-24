@@ -37,7 +37,7 @@
     }
 
     res = await fetch(ctx.rbUrl() + "/api/orders/" + route.params.id, {
-      headers: ctx.authHeadersAppJson()
+      headers: await ctx.authHeadersAppJson()
     });
 
     if (res.ok) {
@@ -57,7 +57,7 @@
         {
           method: "PUT",
           body: JSON.stringify(order.value),
-          headers: ctx.authHeadersAppJson()
+          headers: await ctx.authHeadersAppJson()
         });
       if (req.ok) {
         router.push("/orders");
@@ -68,7 +68,7 @@
         {
           method: "PUT",
           body: JSON.stringify(order.value),
-          headers: ctx.authHeadersAppJson()
+          headers: await ctx.authHeadersAppJson()
         });
       if (req.ok) {
         router.push("/inc-orders");

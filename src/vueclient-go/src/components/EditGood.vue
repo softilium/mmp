@@ -42,7 +42,7 @@
       if (!imageSrc.value[i]) {
         let res = await fetch(`${ctx.rbUrl()}/api/goods/images/${gid}/${i}`, {
           method: "DELETE",
-          headers: ctx.authHeaders()
+          headers: await ctx.authHeaders()
         });
         if (!res.ok) console.log(res);
       } else {
@@ -51,7 +51,7 @@
         data.append("image", blob);
         let res = await fetch(`${ctx.rbUrl()}/api/goods/images/${gid}/${i}`, {
           method: "POST",
-          headers: ctx.authHeaders(),
+          headers: await ctx.authHeaders(),
           body: data
         });
         if (!res.ok) console.log(res);
@@ -63,7 +63,7 @@
     if (route.params.id) {
       let res = await fetch(ctx.rbUrl() + "/api/goods/" + route.params.id, {
         method: "PUT",
-        headers: ctx.authHeadersAppJson(),
+        headers: await ctx.authHeadersAppJson(),
         body: JSON.stringify(good.value)
       });
       if (res.ok) {
@@ -74,7 +74,7 @@
       good.value.ownerShop.id = route.params.shopid;
       let res = await fetch(ctx.rbUrl() + "/api/goods", {
         method: "POST",
-        headers: ctx.authHeadersAppJson(),
+        headers: await ctx.authHeadersAppJson(),
         body: JSON.stringify(good.value)
       });
       if (res.ok) {

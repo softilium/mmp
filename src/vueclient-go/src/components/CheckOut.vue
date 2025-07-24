@@ -20,7 +20,7 @@
     if (ctx.userInfo.userName) {
       let res = await fetch(ctx.rbUrl() + "/api/baskets/", {
         mathod: "GET",
-        headers: ctx.authHeadersAppJson()
+        headers: await ctx.authHeadersAppJson()
       });
       if (res.ok) {
         res = await res.json();
@@ -80,7 +80,7 @@
   const Checkout = async (senderRec) => {
     let res = await fetch(ctx.rbUrl() + "/api/orders/outbox/" + senderRec.senderID, {
       method: "POST",
-      headers: ctx.authHeadersAppJson(),
+      headers: await ctx.authHeadersAppJson(),
       body: senderRec.customerComment
     });
     if (res.ok) {
@@ -107,7 +107,7 @@
     }
     let res = await fetch(ctx.rbUrl() + "/api/baskets/increase/" + good.id, {
       method: "POST",
-      headers: ctx.authHeadersAppJson()
+      headers: await ctx.authHeadersAppJson()
     });
     if (res.ok) {
       await Load();
@@ -124,7 +124,7 @@
     }
     let res = await fetch(ctx.rbUrl() + "/api/baskets/decrease/" + good.id, {
       method: "POST",
-      headers: ctx.authHeadersAppJson()
+      headers: await ctx.authHeadersAppJson()
     });
     if (res.ok) {
       await Load();

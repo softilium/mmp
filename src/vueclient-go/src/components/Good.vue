@@ -65,11 +65,11 @@
     if (ctx.userInfo.id) {
       let res = await fetch(ctx.rbUrl() + "/api/baskets/" + good.value.OwnerShop.Ref, {
         method: "GET",
-        headers: ctx.authHeadersAppJson()
+        headers: await ctx.authHeadersAppJson()
       });
       if (res.ok) {
         res = await res.json();
-        res.forEach(l => {
+        res.Data.forEach(l => {
           if (l.good.id == good.value.Ref) {
             good.value.Basked = l.qty;
             basketQty.value = l.qty;
@@ -103,7 +103,7 @@
     }
     let res = await fetch(ctx.rbUrl() + "/api/baskets/increase/" + good.value.Ref, {
       method: "POST",
-      headers: ctx.authHeadersAppJson()
+      headers: await ctx.authHeadersAppJson()
     });
     if (res.ok) {
       LoadBasket();
@@ -120,7 +120,7 @@
     }
     let res = await fetch(ctx.rbUrl() + "/api/baskets/decrease/" + good.value.Ref, {
       method: "POST",
-      headers: ctx.authHeadersAppJson()
+      headers: await ctx.authHeadersAppJson()
     });
     if (res.ok) {
       LoadBasket();
@@ -134,7 +134,7 @@
 
     let res = await fetch(`${ctx.rbUrl()}/api/goods/${good.value.Ref}`, {
       method: "DELETE",
-      headers: ctx.authHeadersAppJson()
+      headers: await ctx.authHeadersAppJson()
     });
     if (res.ok) {
       router.push("/shop/" + route.params.shopid);

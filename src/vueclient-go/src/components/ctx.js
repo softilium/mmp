@@ -14,7 +14,8 @@ export const ctx = reactive({
   userInfo: newUserInfo(),
   accessToken: "",
   refreshToken: "",
-
+  accessTokenExpiresAt: 0,
+  refreshTokenExpiresAt: 0,
 
   async loadBasket() {
     this.basket.sum = 0;
@@ -25,7 +26,7 @@ export const ctx = reactive({
         this.basket.sum += item.price * item.quantity;
       });
     } else {
-      let res = await fetch(`${ctx.rbUrl()}/api/basket`, { headers: ctx.authHeaders() });
+      let res = await fetch(`${ctx.rbUrl()}/api/basket`, { headers: await ctx.authHeaders() });
       if (res.ok) {
         res = await res.json();
         res.Data.forEach((_) => {
@@ -79,34 +80,46 @@ export const ctx = reactive({
     return `tg ${this.tgInitData()}~~${uid}~~${un}`;
   },
 
-  authHeaders() {
+  async authHeaders() {
     if (this.isTg())
       return { "Authorization": this.tgAuthToken() }
     else
-      return { "Authorization": "Bearer " + this.accessToken };
+      if (this.accessTokenExpiresAt < Date.now()) {
+        await this.RefreshToken();
+      }
+
+    return { "Authorization": "Bearer " + this.accessToken };
   },
 
-  authHeadersAppJson() {
+  async authHeadersAppJson() {
     if (this.isTg())
       return {
         "Authorization": this.tgAuthToken(),
         "Content-Type": "application/json",
       };
-    else
+    else {
+      if (this.accessTokenExpiresAt < Date.now()) {
+        await this.RefreshToken();
+      }
       return {
         "Authorization": "Bearer " + this.accessToken,
         "Content-Type": "application/json",
       };
+    }
   },
 
-  SetAccessToken(newToken) {
+  SetAccessToken(newToken, expires) {
     this.accessToken = newToken;
+    this.accessTokenExpiresAt = expires;
     localStorage.setItem("accessToken", newToken);
+    localStorage.setItem("accessTokenExpiresAt", expires);
   },
 
-  SetRefreshToken(newToken) {
+  SetRefreshToken(newToken, expires) {
     this.refreshToken = newToken;
+    this.refreshTokenExpiresAt = expires;
     localStorage.setItem("refreshToken", newToken);
+    localStorage.setItem("refreshTokenExpiresAt", expires);
   },
 
   async RefreshToken() {
@@ -123,10 +136,9 @@ export const ctx = reactive({
         });
         if (res.ok) {
           res = await res.json();
-          this.SetAccessToken(res.accessToken);
-          this.SetRefreshToken(res.refreshToken);
-          console.log('tokens was refreshed');
-          this.CheckLogged();
+          this.SetAccessToken(res.accessToken, res.accessTokenExpiresAt);
+          this.SetRefreshToken(res.refreshToken, res.refreshTokenExpiresAt);
+          //this.CheckLogged();
         } else {
           this.SetAccessToken("");
           this.SetRefreshToken("");
@@ -142,7 +154,7 @@ export const ctx = reactive({
   async CheckLogged() {
 
     if (this.isTg()) {
-      let res = await fetch(`${this.rbUrl()}/api/profiles/public?email=0`, { headers: this.authHeaders() });
+      let res = await fetch(`${this.rbUrl()}/api/profiles/public?email=0`, { headers: await this.authHeaders() });
       if (res.ok) {
         res = await res.json();
         this.userInfo = res;
@@ -151,21 +163,18 @@ export const ctx = reactive({
     }
 
     if (this.accessToken != "") {
-      try {
-        let res = await fetch(this.rbUrl() + "/identity/myprofile", {
-          method: "GET",
-          signal: AbortSignal.timeout(5000),
-          headers: this.authHeaders()
-        });
-        if (res.ok) {
-          res = await res.json();
-          this.userInfo = res;
-        } else {
-          this.RefreshToken();
-        }
-      } catch (err) {
-        console.log(err);
-        this.RefreshToken();
+      let res = await fetch(this.rbUrl() + "/identity/myprofile", {
+        method: "GET",
+        signal: AbortSignal.timeout(5000),
+        headers: await this.authHeaders()
+      });
+      if (res.ok) {
+        res = await res.json();
+        this.userInfo = res;
+      } else {
+        this.userInfo = newUserInfo();
+        this.SetAccessToken("");
+        this.SetRefreshToken("");
       }
     } else await this.RefreshToken();
   },
@@ -183,8 +192,8 @@ export const ctx = reactive({
       });
       if (res.ok) {
         res = await res.json();
-        this.SetAccessToken(res.accessToken);
-        this.SetRefreshToken(res.refreshToken);
+        this.SetAccessToken(res.accessToken, res.accessTokenExpiresAt);
+        this.SetRefreshToken(res.refreshToken, res.refreshTokenExpiresAt);
         await this.mergeAnonymousBasket();
         this.CheckLogged();
       } else {
@@ -201,7 +210,7 @@ export const ctx = reactive({
     let response = await fetch(this.rbUrl() + "/identity/logout", {
       method: "POST",
       signal: AbortSignal.timeout(5000),
-      headers: this.authHeaders()
+      headers: await this.authHeaders()
     });
     if (response.ok) {
       this.userInfo = newUserInfo();
@@ -252,7 +261,7 @@ export const ctx = reactive({
 
     let res = await fetch(`${ctx.rbUrl()}/api/profiles/sendmsg/${userid}`, {
       method: "POST",
-      headers: ctx.authHeadersAppJson(),
+      headers: await ctx.authHeadersAppJson(),
       body: msgtext
     });
 
@@ -269,7 +278,7 @@ export const ctx = reactive({
     }));
     await fetch(`${this.rbUrl()}/api/baskets/merge`, {
       method: "POST",
-      headers: this.authHeadersAppJson(),
+      headers: await this.authHeadersAppJson(),
       body: JSON.stringify(payload)
     });
     localBasket.clear();

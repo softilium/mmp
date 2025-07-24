@@ -21,7 +21,7 @@
 
     let res = await fetch(ctx.rbUrl() + "/api/profiles/newtelegramcode", {
       method: "POST",
-      headers: ctx.authHeadersAppJson()
+      headers: await ctx.authHeadersAppJson()
     });
     if (res.ok) Load();
 
@@ -32,7 +32,7 @@
 
     let res = await fetch(ctx.rbUrl() + "/api/profiles/checktelegramcode/" + telegramVerifyCode.value, {
       method: "POST",
-      headers: ctx.authHeadersAppJson()
+      headers: await ctx.authHeadersAppJson()
     });
     if (res.ok) Load();
 
@@ -47,7 +47,7 @@
     if (!me.value) {
       let res = await fetch(ctx.rbUrl() + "/api/profiles/" + route.params.id,
         {
-          headers: ctx.authHeadersAppJson()
+          headers: await ctx.authHeadersAppJson()
         });
       if (res.ok) {
         user.value = await res.json();
@@ -58,7 +58,7 @@
     else {
       let res = await fetch(ctx.rbUrl() + "/identity/myprofile",
         {
-          headers: ctx.authHeadersAppJson()
+          headers: await ctx.authHeadersAppJson()
         });
       if (res.ok) {
         user.value = await res.json();
@@ -78,7 +78,7 @@
       {
         method: "PUT",
         body: JSON.stringify(user.value),
-        headers: ctx.authHeadersAppJson()
+        headers: await ctx.authHeadersAppJson()
       });
     if (res.ok) {
       result.value = "Изменения записаны";

@@ -128,7 +128,7 @@ func initServer() *http.Server {
 	router.HandleFunc("/api/admin/migrate", Migrate)
 
 	initRouterImages(router)
-	initRouterAUTH(router)
+	initRouterAuth(router)
 	initRouterBasket(router)
 
 	// CORE

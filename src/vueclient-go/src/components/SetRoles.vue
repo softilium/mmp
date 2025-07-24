@@ -8,7 +8,7 @@
   onMounted(async () => {
     let res = await fetch(ctx.rbUrl() + "/api/admin/allusers",
       {
-        headers: ctx.authHeadersAppJson()
+        headers: await ctx.authHeadersAppJson()
       });
     if (res.ok) {
       users.value = await res.json();
@@ -22,7 +22,7 @@
           {
             method: "PUT",
             body: JSON.stringify(u),
-            headers: ctx.authHeadersAppJson()
+            headers: await ctx.authHeadersAppJson()
           });
       }
     });
@@ -34,7 +34,7 @@
 
     await fetch(ctx.rbUrl() + "/api/admin/migrate", {
       method: "POST",
-      headers: ctx.authHeadersAppJson()
+      headers: await ctx.authHeadersAppJson()
     });
   };
 

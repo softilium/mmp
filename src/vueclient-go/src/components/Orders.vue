@@ -13,7 +13,7 @@
     if (showAll.value) url += "?showAll=1";
     let res = await fetch(url,
       {
-        headers: ctx.authHeadersAppJson()
+        headers: await ctx.authHeadersAppJson()
       });
 
     if (res.ok) {

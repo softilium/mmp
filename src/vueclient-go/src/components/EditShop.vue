@@ -38,7 +38,7 @@
       try {
         let res = await fetch(ctx.rbUrl() + "/api/shops", {
           method: "POST",
-          headers: ctx.authHeadersAppJson(),
+          headers: await ctx.authHeadersAppJson(),
           body: JSON.stringify(shop.value)
         });
 
@@ -52,7 +52,7 @@
       try {
         let res = await fetch(ctx.rbUrl() + "/api/shops/" + shopId, {
           method: "PUT",
-          headers: ctx.authHeadersAppJson(),
+          headers: await ctx.authHeadersAppJson(),
           body: JSON.stringify(shop.value)
         });
 

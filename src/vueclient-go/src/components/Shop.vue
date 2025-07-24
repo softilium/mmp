@@ -59,7 +59,7 @@
       try {
         let res = await fetch(ctx.rbUrl() + "/api/basket?shop=" + shop.value.Ref, {
           method: "GET",
-          headers: ctx.authHeadersAppJson()
+          headers: await ctx.authHeadersAppJson()
         });
         if (res.ok) {
 
@@ -111,7 +111,7 @@
     }
     let res = await fetch(ctx.rbUrl() + "/api/basket/increase?goodref=" + good.Ref, {
       method: "POST",
-      headers: ctx.authHeadersAppJson()
+      headers: await ctx.authHeadersAppJson()
     });
     if (res.ok) {
       if (!good.basked) good.basked = 0;
@@ -130,7 +130,7 @@
     }
     let res = await fetch(ctx.rbUrl() + "/api/basket/decrease?goodref=" + good.Ref, {
       method: "POST",
-      headers: ctx.authHeadersAppJson()
+      headers: await ctx.authHeadersAppJson()
     });
     if (res.ok) {
       if (good.basked && good.basked > 0) good.basked--;
@@ -147,7 +147,7 @@
     let res = await fetch(`${ctx.rbUrl()}/api/shops/${route.params.id}`,
       {
         method: "DELETE",
-        headers: ctx.authHeaders()
+        headers: await ctx.authHeaders()
       }
     );
     if (res.ok) {

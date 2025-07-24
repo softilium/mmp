@@ -18,8 +18,14 @@
 
   onMounted(async () => {
     ctx.basket.sum = 0;
-    ctx.SetAccessToken(localStorage.getItem("accessToken"));
-    ctx.SetRefreshToken(localStorage.getItem("refreshToken"));
+    ctx.SetAccessToken(
+      localStorage.getItem("accessToken"),
+      localStorage.getItem("accessTokenExpiresAt")
+    );
+    ctx.SetRefreshToken(
+      localStorage.getItem("refreshToken"),
+      localStorage.getItem("refreshTokenExpiresAt")
+    );
     ctx.CheckLogged();
     updateMyUrl();
     await ctx.loadBasket();

@@ -8,6 +8,15 @@ import (
 	"github.com/google/uuid"
 )
 
+type TokenItem struct {
+	AccessToken           string
+	RefreshToken          string
+	AccessTokenExpiresAt  time.Time
+	RefreshTokenExpiresAt time.Time
+}
+
+var TokensByAT = make(map[string]TokenItem)
+
 func UserFromHttpRequest(r *http.Request) (*User, error) {
 	raw := r.Header.Get("Authorization")
 	if raw == "" {
@@ -18,11 +27,21 @@ func UserFromHttpRequest(r *http.Request) (*User, error) {
 	}
 	token := raw[7:]
 
-	if item, ok := TokensByAT[token]; ok {
-		if !item.AccessTokenExpiresAt.After(time.Now()) {
-			return nil, fmt.Errorf("access token expired")
+	var foundToken *TokenItem
+	var foundUserRef string
+	for k, item := range TokensByAT {
+		if item.AccessToken == token {
+			if !item.AccessTokenExpiresAt.After(time.Now()) {
+				return nil, fmt.Errorf("access token expired")
+			}
+			foundToken = &item
+			foundUserRef = k
+			break
 		}
-		user, err := Dbc.LoadUser(item.UserRef)
+	}
+
+	if foundToken != nil {
+		user, err := Dbc.LoadUser(foundUserRef)
 		if err != nil {
 			return nil, fmt.Errorf("Unauthorized")
 		}
@@ -34,25 +53,13 @@ func UserFromHttpRequest(r *http.Request) (*User, error) {
 	return nil, fmt.Errorf("Unauthorized")
 }
 
-type TokenItem struct {
-	UserRef               string
-	RefreshToken          string
-	AccessTokenExpiresAt  time.Time
-	RefreshTokenExpiresAt time.Time
-}
-
-var TokensByAT = make(map[string]TokenItem)
-
-func GenerateToken(user *User) (TokenItem, string) {
+func GenerateToken(user *User) TokenItem {
 	newToken := TokenItem{
-		UserRef:               user.RefString(),
+		AccessToken:           uuid.NewString(),
 		RefreshToken:          uuid.NewString(),
-		AccessTokenExpiresAt:  time.Now().Add(1 * time.Hour),
-		RefreshTokenExpiresAt: time.Now().Add(24 * time.Hour * 30),
+		AccessTokenExpiresAt:  time.Now().Add(20 * time.Second),
+		RefreshTokenExpiresAt: time.Now().Add(24 * time.Hour * 90),
 	}
-
-	res := uuid.NewString()
-
-	TokensByAT[res] = newToken
-	return newToken, res
+	TokensByAT[user.RefString()] = newToken
+	return newToken
 }

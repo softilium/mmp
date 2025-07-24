@@ -11,7 +11,7 @@ import (
 	"github.com/softilium/mmp-go/models"
 )
 
-func initRouterAUTH(router *http.ServeMux) {
+func initRouterAuth(router *http.ServeMux) {
 	router.HandleFunc("/identity/register", UserRegister)
 	router.HandleFunc("/identity/login", UserLogin)
 	router.HandleFunc("/identity/logout", UserLogout)
@@ -36,8 +36,10 @@ type UserProfileResponse struct {
 }
 
 type tokensResponse struct {
-	AccessToken  string `json:"accessToken"`
-	RefreshToken string `json:"refreshToken"`
+	AccessToken           string `json:"accessToken"`
+	RefreshToken          string `json:"refreshToken"`
+	AccessTokenExporesAt  int64  `json:"accessTokenExpiresAt"`
+	RefreshTokenExpiresAt int64  `json:"refreshTokenExpiresAt"`
 }
 
 func HandleErr(w http.ResponseWriter, status int, err error) {
@@ -87,10 +89,19 @@ func UserRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, _ = models.GenerateToken(newUser)
-
+	newToken := models.GenerateToken(newUser)
 	w.WriteHeader(http.StatusCreated)
-
+	res := tokensResponse{
+		AccessToken:           newToken.AccessToken,
+		RefreshToken:          newToken.RefreshToken,
+		AccessTokenExporesAt:  newToken.AccessTokenExpiresAt.UnixMilli(),
+		RefreshTokenExpiresAt: newToken.RefreshTokenExpiresAt.UnixMilli(),
+	}
+	err = json.NewEncoder(w).Encode(res)
+	if err != nil {
+		HandleErr(w, 0, err)
+		return
+	}
 }
 
 func UserLogin(w http.ResponseWriter, r *http.Request) {
@@ -120,9 +131,14 @@ func UserLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	newToken, at := models.GenerateToken(users[0])
+	newToken := models.GenerateToken(users[0])
 	w.WriteHeader(http.StatusOK)
-	res := tokensResponse{AccessToken: at, RefreshToken: newToken.RefreshToken}
+	res := tokensResponse{
+		AccessToken:           newToken.AccessToken,
+		RefreshToken:          newToken.RefreshToken,
+		AccessTokenExporesAt:  newToken.AccessTokenExpiresAt.UnixMilli(),
+		RefreshTokenExpiresAt: newToken.RefreshTokenExpiresAt.UnixMilli(),
+	}
 	err = json.NewEncoder(w).Encode(res)
 	if err != nil {
 		HandleErr(w, 0, err)
@@ -141,11 +157,9 @@ func UserLogout(w http.ResponseWriter, r *http.Request) {
 		HandleErr(w, http.StatusUnauthorized, nil)
 		return
 	}
-	for token, item := range models.TokensByAT {
-		if item.UserRef == user.RefString() {
-			delete(models.TokensByAT, token)
-		}
-	}
+
+	delete(models.TokensByAT, user.RefString())
+
 	w.WriteHeader(http.StatusOK)
 }
 
@@ -218,15 +232,21 @@ func UserTokenRefresh(w http.ResponseWriter, r *http.Request) {
 		HandleErr(w, http.StatusBadRequest, fmt.Errorf("refresh token is required"))
 		return
 	}
-	for _, item := range models.TokensByAT {
+	for userKey, item := range models.TokensByAT {
 		if item.RefreshToken == payload.RefreshToken && item.RefreshTokenExpiresAt.After(time.Now()) {
-			user, err := models.Dbc.LoadUser(item.UserRef)
+			user, err := models.Dbc.LoadUser(userKey)
 			if err != nil {
 				HandleErr(w, http.StatusUnauthorized, fmt.Errorf("user not found"))
 				return
 			}
-			newToken, at := models.GenerateToken(user)
-			res := tokensResponse{AccessToken: at, RefreshToken: newToken.RefreshToken}
+			newToken := models.GenerateToken(user)
+			models.TokensByAT[userKey] = newToken
+			res := tokensResponse{
+				AccessToken:           newToken.AccessToken,
+				RefreshToken:          newToken.RefreshToken,
+				AccessTokenExporesAt:  newToken.AccessTokenExpiresAt.UnixMilli(),
+				RefreshTokenExpiresAt: newToken.RefreshTokenExpiresAt.UnixMilli(),
+			}
 			w.WriteHeader(http.StatusOK)
 			err = json.NewEncoder(w).Encode(res)
 			if err != nil {
