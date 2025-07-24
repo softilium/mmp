@@ -69,17 +69,15 @@ func initServer() *http.Server {
 		models.Dbc.LoadShop,
 		models.Dbc.ShopDef.SelectEntities,
 		models.Dbc.CreateShop)
-	shopsRestApiConfig.DefaultPageSize = 0
-	shopsRestApiConfig.AdditionalFilter = func(r *http.Request) []*elorm.Filter {
+	shopsRestApiConfig.AdditionalFilter = func(r *http.Request) ([]*elorm.Filter, error) {
 		res := []*elorm.Filter{}
 		res = append(res, elorm.AddFilterEQ(models.Dbc.ShopDef.IsDeleted, false))
-		return res
+		return res, nil
 	}
-	shopsRestApiConfig.DefaultSorts = func(r *http.Request) []*elorm.SortItem {
-		return []*elorm.SortItem{
-			{Field: models.Dbc.ShopDef.Caption, Asc: true},
-		}
+	shopsRestApiConfig.DefaultSorts = func(r *http.Request) ([]*elorm.SortItem, error) {
+		return []*elorm.SortItem{{Field: models.Dbc.ShopDef.Caption, Asc: true}}, nil
 	}
+	shopsRestApiConfig.Context = models.HttpUserContext
 	router.HandleFunc("/api/shops", elorm.HandleRestApi(shopsRestApiConfig))
 
 	//// goods
@@ -89,21 +87,19 @@ func initServer() *http.Server {
 		models.Dbc.LoadGood,
 		models.Dbc.GoodDef.SelectEntities,
 		models.Dbc.CreateGood)
-	goodsRestApiConfig.DefaultPageSize = 0
-	goodsRestApiConfig.AdditionalFilter = func(r *http.Request) []*elorm.Filter {
+	goodsRestApiConfig.AdditionalFilter = func(r *http.Request) ([]*elorm.Filter, error) {
 		res := []*elorm.Filter{}
 		res = append(res, elorm.AddFilterEQ(models.Dbc.GoodDef.IsDeleted, false))
 		shopref := r.URL.Query().Get("shopref")
 		if shopref != "" {
 			res = append(res, elorm.AddFilterEQ(models.Dbc.GoodDef.OwnerShop, shopref))
 		}
-		return res
+		return res, nil
 	}
-	goodsRestApiConfig.DefaultSorts = func(r *http.Request) []*elorm.SortItem {
-		return []*elorm.SortItem{
-			{Field: models.Dbc.GoodDef.OrderInShop, Asc: true},
-		}
+	goodsRestApiConfig.DefaultSorts = func(r *http.Request) ([]*elorm.SortItem, error) {
+		return []*elorm.SortItem{{Field: models.Dbc.GoodDef.OrderInShop, Asc: true}}, nil
 	}
+	goodsRestApiConfig.Context = models.HttpUserContext
 	router.HandleFunc("/api/goods", elorm.HandleRestApi(goodsRestApiConfig))
 
 	//// allusers
@@ -113,10 +109,7 @@ func initServer() *http.Server {
 		models.Dbc.LoadUser,
 		models.Dbc.UserDef.SelectEntities,
 		models.Dbc.CreateUser)
-	allusersRestApiConfig.DefaultPageSize = 0
-	allusersRestApiConfig.EnableDelete = true
 	allusersRestApiConfig.EnablePost = false
-	allusersRestApiConfig.EnablePut = true
 	allusersRestApiConfig.BeforeMiddleware = func(w http.ResponseWriter, r *http.Request) bool {
 		user, err := models.UserFromHttpRequest(r)
 		if err != nil {
@@ -136,6 +129,7 @@ func initServer() *http.Server {
 
 	initRouterImages(router)
 	initRouterAUTH(router)
+	initRouterBasket(router)
 
 	// CORE
 
@@ -226,7 +220,7 @@ func main() {
 
 }
 
-//TODO profile
 //TODO orders+lines
 //TODO telegram middleware
 //TODO unmarshal json, autoexpand support
+//TODO refresh tokens on expiration access token

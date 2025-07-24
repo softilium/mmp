@@ -57,7 +57,7 @@
     if (ctx.userInfo.id) {
 
       try {
-        let res = await fetch(ctx.rbUrl() + "/api/baskets/" + shop.value.Ref, {
+        let res = await fetch(ctx.rbUrl() + "/api/basket?shop=" + shop.value.Ref, {
           method: "GET",
           headers: ctx.authHeadersAppJson()
         });
@@ -65,16 +65,16 @@
 
           res = await res.json();
 
-          if (res.formData.length > 0) {
+          if (res.Data.length > 0) {
 
             let goodmap = new Map();
-            goods.value.Data.forEach(_ => { goodmap.set(_.id, _); });
+            goods.value.Data.forEach(_ => { goodmap.set(_.Ref, _); });
 
             res.Data.forEach(_ => {
-              let goodId = _.good.id;
+              let goodId = _.Good;
               let gObj = goodmap.get(goodId);
               if (gObj != null) {
-                gObj.basked = _.qty;
+                gObj.basked = _.Qty;
               }
             });
           }
@@ -84,7 +84,7 @@
       // Anonymous users: use localBasket
       const items = localBasket.getItems();
       goods.value.Data.forEach(good => {
-        const found = items.find(i => i.goodId === good.id);
+        const found = items.find(i => i.goodId === good.Ref);
         if (found) {
           good.basked = found.quantity;
         } else {
@@ -97,10 +97,10 @@
   const Inc = async (good) => {
     if (!ctx.userInfo.id) {
       localBasket.addItem({
-        goodId: good.id,
+        goodId: good.Ref,
         quantity: 1,
-        price: good.price,
-        title: good.caption,
+        price: good.Price,
+        title: good.Caption,
         shopTitle: shop.value.Caption,
         senderId: shop.value.CreatedBy.Ref,
         shopId: shop.value.Ref
@@ -109,7 +109,7 @@
       LoadBasket();
       return;
     }
-    let res = await fetch(ctx.rbUrl() + "/api/baskets/increase/" + good.id, {
+    let res = await fetch(ctx.rbUrl() + "/api/basket/increase?goodref=" + good.Ref, {
       method: "POST",
       headers: ctx.authHeadersAppJson()
     });
@@ -123,12 +123,12 @@
 
   const Dec = async (good) => {
     if (!ctx.userInfo.id) {
-      localBasket.decItem(good.id);
+      localBasket.decItem(good.Ref);
       LoadBasket();
       await ctx.loadBasket();
       return;
     }
-    let res = await fetch(ctx.rbUrl() + "/api/baskets/decrease/" + good.id, {
+    let res = await fetch(ctx.rbUrl() + "/api/basket/decrease?goodref=" + good.Ref, {
       method: "POST",
       headers: ctx.authHeadersAppJson()
     });

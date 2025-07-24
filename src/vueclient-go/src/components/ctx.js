@@ -25,11 +25,11 @@ export const ctx = reactive({
         this.basket.sum += item.price * item.quantity;
       });
     } else {
-      let res = await fetch(`${ctx.rbUrl()}/api/baskets`, { headers: ctx.authHeaders() });
+      let res = await fetch(`${ctx.rbUrl()}/api/basket`, { headers: ctx.authHeaders() });
       if (res.ok) {
         res = await res.json();
-        res.forEach((_) => {
-          this.basket.sum += _.sum;
+        res.Data.forEach((_) => {
+          this.basket.sum += _.Sum;
         });
       }
     }

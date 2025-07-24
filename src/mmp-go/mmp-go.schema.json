@@ -177,6 +177,82 @@
                     "ColumnType": "int"
                 }
             ]
+        },
+        {
+            "ObjectName": "CustomerOrder",
+            "TableName": "CustomerOrders",
+            "Fragments": [
+                "BusinessObjects"
+            ],
+            "Columns": [
+                {
+                    "Name": "Sender",
+                    "ColumnType": "ref.User"
+                },
+                {
+                    "Name": "Status",
+                    "ColumnType": "int"
+                },
+                {
+                    "Name": "Qty",
+                    "ColumnType": "numeric",
+                    "Precision": 15,
+                    "Scale": 2
+                },
+                {
+                    "Name": "Sum",
+                    "ColumnType": "numeric",
+                    "Precision": 15,
+                    "Scale": 2
+                },
+                {
+                    "Name": "SenderComment",
+                    "ColumnType": "string",
+                    "Len": 200
+                },
+                {
+                    "Name": "CustomerComment",
+                    "ColumnType": "string",
+                    "Len": 200
+                },
+                {
+                    "Name": "ExpectedDeliveryDate",
+                    "ColumnType": "datetime"
+                }
+            ]
+        },
+        {
+            "ObjectName": "OrderLine",
+            "TableName": "OrderLines",
+            "Fragments": [
+                "BusinessObjects"
+            ],
+            "Columns": [
+                {
+                    "Name": "Shop",
+                    "ColumnType": "ref.Shop"
+                },
+                {
+                    "Name": "CustomerOrder",
+                    "ColumnType": "ref.CustomerOrder"
+                },
+                {
+                    "Name": "Good",
+                    "ColumnType": "ref.Good"
+                },
+                {
+                    "Name": "Qty",
+                    "ColumnType": "numeric",
+                    "Precision": 15,
+                    "Scale": 2
+                },
+                {
+                    "Name": "Sum",
+                    "ColumnType": "numeric",
+                    "Precision": 15,
+                    "Scale": 2
+                }
+            ]
         }
     ]
 }

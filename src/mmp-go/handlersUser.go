@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/softilium/elorm"
 	"github.com/softilium/mmp-go/models"
 )
@@ -17,6 +16,7 @@ func initRouterAUTH(router *http.ServeMux) {
 	router.HandleFunc("/identity/login", UserLogin)
 	router.HandleFunc("/identity/logout", UserLogout)
 	router.HandleFunc("/identity/myprofile", UserPublicProfile)
+	router.HandleFunc("/identity/refresh", UserTokenRefresh)
 }
 
 type userPayLoad struct {
@@ -87,7 +87,7 @@ func UserRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, _ = generateToken(newUser)
+	_, _ = models.GenerateToken(newUser)
 
 	w.WriteHeader(http.StatusCreated)
 
@@ -120,7 +120,7 @@ func UserLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	newToken, at := generateToken(users[0])
+	newToken, at := models.GenerateToken(users[0])
 	w.WriteHeader(http.StatusOK)
 	res := tokensResponse{AccessToken: at, RefreshToken: newToken.RefreshToken}
 	err = json.NewEncoder(w).Encode(res)
@@ -147,20 +147,6 @@ func UserLogout(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	w.WriteHeader(http.StatusOK)
-}
-
-func generateToken(user *models.User) (models.TokenItem, string) {
-	newToken := models.TokenItem{
-		UserRef:               user.RefString(),
-		RefreshToken:          uuid.NewString(),
-		AccessTokenExpiresAt:  time.Now().Add(5 * time.Minute),
-		RefreshTokenExpiresAt: time.Now().Add(24 * time.Hour),
-	}
-
-	res := uuid.NewString()
-
-	models.TokensByAT[res] = newToken
-	return newToken, res
 }
 
 func UserPublicProfile(w http.ResponseWriter, r *http.Request) {
@@ -211,4 +197,44 @@ func UserPublicProfile(w http.ResponseWriter, r *http.Request) {
 		}
 		w.WriteHeader(http.StatusOK)
 	}
+}
+
+type refreshTokenPayload struct {
+	RefreshToken string `json:"refreshToken"`
+}
+
+func UserTokenRefresh(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		HandleErr(w, http.StatusMethodNotAllowed, nil)
+		return
+	}
+	payload := refreshTokenPayload{}
+	err := json.NewDecoder(r.Body).Decode(&payload)
+	if err != nil {
+		HandleErr(w, 0, err)
+		return
+	}
+	if payload.RefreshToken == "" {
+		HandleErr(w, http.StatusBadRequest, fmt.Errorf("refresh token is required"))
+		return
+	}
+	for _, item := range models.TokensByAT {
+		if item.RefreshToken == payload.RefreshToken && item.RefreshTokenExpiresAt.After(time.Now()) {
+			user, err := models.Dbc.LoadUser(item.UserRef)
+			if err != nil {
+				HandleErr(w, http.StatusUnauthorized, fmt.Errorf("user not found"))
+				return
+			}
+			newToken, at := models.GenerateToken(user)
+			res := tokensResponse{AccessToken: at, RefreshToken: newToken.RefreshToken}
+			w.WriteHeader(http.StatusOK)
+			err = json.NewEncoder(w).Encode(res)
+			if err != nil {
+				HandleErr(w, 0, err)
+				return
+			}
+			return
+		}
+	}
+	HandleErr(w, http.StatusUnauthorized, fmt.Errorf("invalid or expired refresh token"))
 }

@@ -92,12 +92,9 @@ func handleImages(w http.ResponseWriter, r *http.Request, downScale bool) {
 			return
 		}
 	}
-
-	//user, err := models.UserFromHttpRequest(r)
-
 }
 
 func init() {
 	images = expirable.NewLRU[string, *[]byte](1000, nil, time.Minute*60*24)
-	thumbs = expirable.NewLRU[string, *[]byte](1000, nil, time.Minute*60+24)
+	thumbs = expirable.NewLRU[string, *[]byte](1000, nil, time.Minute*60*24)
 }

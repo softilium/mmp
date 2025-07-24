@@ -6,6 +6,291 @@ import (
 	"time"
 )
 
+// CustomerOrder class
+//////
+
+type CustomerOrderDefStruct struct {
+	*elorm.EntityDef
+	Ref         *elorm.FieldDef
+	IsDeleted   *elorm.FieldDef
+	DataVersion *elorm.FieldDef
+
+	Sender *elorm.FieldDef
+
+	Status *elorm.FieldDef
+
+	Qty *elorm.FieldDef
+
+	Sum *elorm.FieldDef
+
+	SenderComment *elorm.FieldDef
+
+	CustomerComment *elorm.FieldDef
+
+	ExpectedDeliveryDate *elorm.FieldDef
+
+	CreatedBy *elorm.FieldDef
+
+	CreatedAt *elorm.FieldDef
+
+	ModifiedBy *elorm.FieldDef
+
+	ModifiedAt *elorm.FieldDef
+
+	DeletedBy *elorm.FieldDef
+
+	DeletedAt *elorm.FieldDef
+}
+
+func (T *CustomerOrderDefStruct) SelectEntities(filters []*elorm.Filter, sorts []*elorm.SortItem, pageNo int, pageSize int) (result []*CustomerOrder, pages int, err error) {
+
+	res, total, err := T.EntityDef.SelectEntities(filters, sorts, pageNo, pageSize)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	res2 := make([]*CustomerOrder, 0, len(res))
+
+	for _, r := range res {
+		if r == nil {
+			continue
+		}
+		rt := T.Wrap(r)
+		res2 = append(res2, rt.(*CustomerOrder))
+	}
+
+	return res2, total, nil
+
+}
+
+type CustomerOrder struct {
+	*elorm.Entity
+
+	field_Sender               *elorm.FieldValueRef
+	field_Status               *elorm.FieldValueInt
+	field_Qty                  *elorm.FieldValueNumeric
+	field_Sum                  *elorm.FieldValueNumeric
+	field_SenderComment        *elorm.FieldValueString
+	field_CustomerComment      *elorm.FieldValueString
+	field_ExpectedDeliveryDate *elorm.FieldValueDateTime
+	field_CreatedBy            *elorm.FieldValueRef
+	field_CreatedAt            *elorm.FieldValueDateTime
+	field_ModifiedBy           *elorm.FieldValueRef
+	field_ModifiedAt           *elorm.FieldValueDateTime
+	field_DeletedBy            *elorm.FieldValueRef
+	field_DeletedAt            *elorm.FieldValueDateTime
+}
+
+func (T *CustomerOrder) Sender() *User {
+	if T.field_Sender == nil {
+		T.field_Sender = T.Values["Sender"].(*elorm.FieldValueRef)
+	}
+	r, err := T.field_Sender.Get()
+	if err != nil {
+		panic(err)
+	}
+	return r.(*User)
+}
+
+func (T *CustomerOrder) SetSender(newValue *User) {
+	if T.field_Sender == nil {
+		T.field_Sender = T.Values["Sender"].(*elorm.FieldValueRef)
+	}
+	err := T.field_Sender.Set(newValue)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (T *CustomerOrder) Status() int64 {
+	if T.field_Status == nil {
+		T.field_Status = T.Values["Status"].(*elorm.FieldValueInt)
+	}
+	return T.field_Status.Get()
+}
+
+func (T *CustomerOrder) SetStatus(newValue int64) {
+	if T.field_Status == nil {
+		T.field_Status = T.Values["Status"].(*elorm.FieldValueInt)
+	}
+	T.field_Status.Set(newValue)
+}
+
+func (T *CustomerOrder) Qty() float64 {
+	if T.field_Qty == nil {
+		T.field_Qty = T.Values["Qty"].(*elorm.FieldValueNumeric)
+	}
+	return T.field_Qty.Get()
+}
+
+func (T *CustomerOrder) SetQty(newValue float64) {
+	if T.field_Qty == nil {
+		T.field_Qty = T.Values["Qty"].(*elorm.FieldValueNumeric)
+	}
+	T.field_Qty.Set(newValue)
+}
+
+func (T *CustomerOrder) Sum() float64 {
+	if T.field_Sum == nil {
+		T.field_Sum = T.Values["Sum"].(*elorm.FieldValueNumeric)
+	}
+	return T.field_Sum.Get()
+}
+
+func (T *CustomerOrder) SetSum(newValue float64) {
+	if T.field_Sum == nil {
+		T.field_Sum = T.Values["Sum"].(*elorm.FieldValueNumeric)
+	}
+	T.field_Sum.Set(newValue)
+}
+
+func (T *CustomerOrder) SenderComment() string {
+	if T.field_SenderComment == nil {
+		T.field_SenderComment = T.Values["SenderComment"].(*elorm.FieldValueString)
+	}
+	return T.field_SenderComment.Get()
+}
+
+func (T *CustomerOrder) SetSenderComment(newValue string) {
+	if T.field_SenderComment == nil {
+		T.field_SenderComment = T.Values["SenderComment"].(*elorm.FieldValueString)
+	}
+	T.field_SenderComment.Set(newValue)
+}
+
+func (T *CustomerOrder) CustomerComment() string {
+	if T.field_CustomerComment == nil {
+		T.field_CustomerComment = T.Values["CustomerComment"].(*elorm.FieldValueString)
+	}
+	return T.field_CustomerComment.Get()
+}
+
+func (T *CustomerOrder) SetCustomerComment(newValue string) {
+	if T.field_CustomerComment == nil {
+		T.field_CustomerComment = T.Values["CustomerComment"].(*elorm.FieldValueString)
+	}
+	T.field_CustomerComment.Set(newValue)
+}
+
+func (T *CustomerOrder) ExpectedDeliveryDate() time.Time {
+	if T.field_ExpectedDeliveryDate == nil {
+		T.field_ExpectedDeliveryDate = T.Values["ExpectedDeliveryDate"].(*elorm.FieldValueDateTime)
+	}
+	return T.field_ExpectedDeliveryDate.Get()
+}
+
+func (T *CustomerOrder) SetExpectedDeliveryDate(newValue time.Time) {
+	if T.field_ExpectedDeliveryDate == nil {
+		T.field_ExpectedDeliveryDate = T.Values["ExpectedDeliveryDate"].(*elorm.FieldValueDateTime)
+	}
+	T.field_ExpectedDeliveryDate.Set(newValue)
+}
+
+func (T *CustomerOrder) CreatedBy() *User {
+	if T.field_CreatedBy == nil {
+		T.field_CreatedBy = T.Values["CreatedBy"].(*elorm.FieldValueRef)
+	}
+	r, err := T.field_CreatedBy.Get()
+	if err != nil {
+		panic(err)
+	}
+	return r.(*User)
+}
+
+func (T *CustomerOrder) SetCreatedBy(newValue *User) {
+	if T.field_CreatedBy == nil {
+		T.field_CreatedBy = T.Values["CreatedBy"].(*elorm.FieldValueRef)
+	}
+	err := T.field_CreatedBy.Set(newValue)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (T *CustomerOrder) CreatedAt() time.Time {
+	if T.field_CreatedAt == nil {
+		T.field_CreatedAt = T.Values["CreatedAt"].(*elorm.FieldValueDateTime)
+	}
+	return T.field_CreatedAt.Get()
+}
+
+func (T *CustomerOrder) SetCreatedAt(newValue time.Time) {
+	if T.field_CreatedAt == nil {
+		T.field_CreatedAt = T.Values["CreatedAt"].(*elorm.FieldValueDateTime)
+	}
+	T.field_CreatedAt.Set(newValue)
+}
+
+func (T *CustomerOrder) ModifiedBy() *User {
+	if T.field_ModifiedBy == nil {
+		T.field_ModifiedBy = T.Values["ModifiedBy"].(*elorm.FieldValueRef)
+	}
+	r, err := T.field_ModifiedBy.Get()
+	if err != nil {
+		panic(err)
+	}
+	return r.(*User)
+}
+
+func (T *CustomerOrder) SetModifiedBy(newValue *User) {
+	if T.field_ModifiedBy == nil {
+		T.field_ModifiedBy = T.Values["ModifiedBy"].(*elorm.FieldValueRef)
+	}
+	err := T.field_ModifiedBy.Set(newValue)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (T *CustomerOrder) ModifiedAt() time.Time {
+	if T.field_ModifiedAt == nil {
+		T.field_ModifiedAt = T.Values["ModifiedAt"].(*elorm.FieldValueDateTime)
+	}
+	return T.field_ModifiedAt.Get()
+}
+
+func (T *CustomerOrder) SetModifiedAt(newValue time.Time) {
+	if T.field_ModifiedAt == nil {
+		T.field_ModifiedAt = T.Values["ModifiedAt"].(*elorm.FieldValueDateTime)
+	}
+	T.field_ModifiedAt.Set(newValue)
+}
+
+func (T *CustomerOrder) DeletedBy() *User {
+	if T.field_DeletedBy == nil {
+		T.field_DeletedBy = T.Values["DeletedBy"].(*elorm.FieldValueRef)
+	}
+	r, err := T.field_DeletedBy.Get()
+	if err != nil {
+		panic(err)
+	}
+	return r.(*User)
+}
+
+func (T *CustomerOrder) SetDeletedBy(newValue *User) {
+	if T.field_DeletedBy == nil {
+		T.field_DeletedBy = T.Values["DeletedBy"].(*elorm.FieldValueRef)
+	}
+	err := T.field_DeletedBy.Set(newValue)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (T *CustomerOrder) DeletedAt() time.Time {
+	if T.field_DeletedAt == nil {
+		T.field_DeletedAt = T.Values["DeletedAt"].(*elorm.FieldValueDateTime)
+	}
+	return T.field_DeletedAt.Get()
+}
+
+func (T *CustomerOrder) SetDeletedAt(newValue time.Time) {
+	if T.field_DeletedAt == nil {
+		T.field_DeletedAt = T.Values["DeletedAt"].(*elorm.FieldValueDateTime)
+	}
+	T.field_DeletedAt.Set(newValue)
+}
+
 // Good class
 //////
 
@@ -285,6 +570,271 @@ func (T *Good) DeletedAt() time.Time {
 }
 
 func (T *Good) SetDeletedAt(newValue time.Time) {
+	if T.field_DeletedAt == nil {
+		T.field_DeletedAt = T.Values["DeletedAt"].(*elorm.FieldValueDateTime)
+	}
+	T.field_DeletedAt.Set(newValue)
+}
+
+// OrderLine class
+//////
+
+type OrderLineDefStruct struct {
+	*elorm.EntityDef
+	Ref         *elorm.FieldDef
+	IsDeleted   *elorm.FieldDef
+	DataVersion *elorm.FieldDef
+
+	Shop *elorm.FieldDef
+
+	CustomerOrder *elorm.FieldDef
+
+	Good *elorm.FieldDef
+
+	Qty *elorm.FieldDef
+
+	Sum *elorm.FieldDef
+
+	CreatedBy *elorm.FieldDef
+
+	CreatedAt *elorm.FieldDef
+
+	ModifiedBy *elorm.FieldDef
+
+	ModifiedAt *elorm.FieldDef
+
+	DeletedBy *elorm.FieldDef
+
+	DeletedAt *elorm.FieldDef
+}
+
+func (T *OrderLineDefStruct) SelectEntities(filters []*elorm.Filter, sorts []*elorm.SortItem, pageNo int, pageSize int) (result []*OrderLine, pages int, err error) {
+
+	res, total, err := T.EntityDef.SelectEntities(filters, sorts, pageNo, pageSize)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	res2 := make([]*OrderLine, 0, len(res))
+
+	for _, r := range res {
+		if r == nil {
+			continue
+		}
+		rt := T.Wrap(r)
+		res2 = append(res2, rt.(*OrderLine))
+	}
+
+	return res2, total, nil
+
+}
+
+type OrderLine struct {
+	*elorm.Entity
+
+	field_Shop          *elorm.FieldValueRef
+	field_CustomerOrder *elorm.FieldValueRef
+	field_Good          *elorm.FieldValueRef
+	field_Qty           *elorm.FieldValueNumeric
+	field_Sum           *elorm.FieldValueNumeric
+	field_CreatedBy     *elorm.FieldValueRef
+	field_CreatedAt     *elorm.FieldValueDateTime
+	field_ModifiedBy    *elorm.FieldValueRef
+	field_ModifiedAt    *elorm.FieldValueDateTime
+	field_DeletedBy     *elorm.FieldValueRef
+	field_DeletedAt     *elorm.FieldValueDateTime
+}
+
+func (T *OrderLine) Shop() *Shop {
+	if T.field_Shop == nil {
+		T.field_Shop = T.Values["Shop"].(*elorm.FieldValueRef)
+	}
+	r, err := T.field_Shop.Get()
+	if err != nil {
+		panic(err)
+	}
+	return r.(*Shop)
+}
+
+func (T *OrderLine) SetShop(newValue *Shop) {
+	if T.field_Shop == nil {
+		T.field_Shop = T.Values["Shop"].(*elorm.FieldValueRef)
+	}
+	err := T.field_Shop.Set(newValue)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (T *OrderLine) CustomerOrder() *CustomerOrder {
+	if T.field_CustomerOrder == nil {
+		T.field_CustomerOrder = T.Values["CustomerOrder"].(*elorm.FieldValueRef)
+	}
+	r, err := T.field_CustomerOrder.Get()
+	if err != nil {
+		panic(err)
+	}
+	return r.(*CustomerOrder)
+}
+
+func (T *OrderLine) SetCustomerOrder(newValue *CustomerOrder) {
+	if T.field_CustomerOrder == nil {
+		T.field_CustomerOrder = T.Values["CustomerOrder"].(*elorm.FieldValueRef)
+	}
+	err := T.field_CustomerOrder.Set(newValue)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (T *OrderLine) Good() *Good {
+	if T.field_Good == nil {
+		T.field_Good = T.Values["Good"].(*elorm.FieldValueRef)
+	}
+	r, err := T.field_Good.Get()
+	if err != nil {
+		panic(err)
+	}
+	return r.(*Good)
+}
+
+func (T *OrderLine) SetGood(newValue *Good) {
+	if T.field_Good == nil {
+		T.field_Good = T.Values["Good"].(*elorm.FieldValueRef)
+	}
+	err := T.field_Good.Set(newValue)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (T *OrderLine) Qty() float64 {
+	if T.field_Qty == nil {
+		T.field_Qty = T.Values["Qty"].(*elorm.FieldValueNumeric)
+	}
+	return T.field_Qty.Get()
+}
+
+func (T *OrderLine) SetQty(newValue float64) {
+	if T.field_Qty == nil {
+		T.field_Qty = T.Values["Qty"].(*elorm.FieldValueNumeric)
+	}
+	T.field_Qty.Set(newValue)
+}
+
+func (T *OrderLine) Sum() float64 {
+	if T.field_Sum == nil {
+		T.field_Sum = T.Values["Sum"].(*elorm.FieldValueNumeric)
+	}
+	return T.field_Sum.Get()
+}
+
+func (T *OrderLine) SetSum(newValue float64) {
+	if T.field_Sum == nil {
+		T.field_Sum = T.Values["Sum"].(*elorm.FieldValueNumeric)
+	}
+	T.field_Sum.Set(newValue)
+}
+
+func (T *OrderLine) CreatedBy() *User {
+	if T.field_CreatedBy == nil {
+		T.field_CreatedBy = T.Values["CreatedBy"].(*elorm.FieldValueRef)
+	}
+	r, err := T.field_CreatedBy.Get()
+	if err != nil {
+		panic(err)
+	}
+	return r.(*User)
+}
+
+func (T *OrderLine) SetCreatedBy(newValue *User) {
+	if T.field_CreatedBy == nil {
+		T.field_CreatedBy = T.Values["CreatedBy"].(*elorm.FieldValueRef)
+	}
+	err := T.field_CreatedBy.Set(newValue)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (T *OrderLine) CreatedAt() time.Time {
+	if T.field_CreatedAt == nil {
+		T.field_CreatedAt = T.Values["CreatedAt"].(*elorm.FieldValueDateTime)
+	}
+	return T.field_CreatedAt.Get()
+}
+
+func (T *OrderLine) SetCreatedAt(newValue time.Time) {
+	if T.field_CreatedAt == nil {
+		T.field_CreatedAt = T.Values["CreatedAt"].(*elorm.FieldValueDateTime)
+	}
+	T.field_CreatedAt.Set(newValue)
+}
+
+func (T *OrderLine) ModifiedBy() *User {
+	if T.field_ModifiedBy == nil {
+		T.field_ModifiedBy = T.Values["ModifiedBy"].(*elorm.FieldValueRef)
+	}
+	r, err := T.field_ModifiedBy.Get()
+	if err != nil {
+		panic(err)
+	}
+	return r.(*User)
+}
+
+func (T *OrderLine) SetModifiedBy(newValue *User) {
+	if T.field_ModifiedBy == nil {
+		T.field_ModifiedBy = T.Values["ModifiedBy"].(*elorm.FieldValueRef)
+	}
+	err := T.field_ModifiedBy.Set(newValue)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (T *OrderLine) ModifiedAt() time.Time {
+	if T.field_ModifiedAt == nil {
+		T.field_ModifiedAt = T.Values["ModifiedAt"].(*elorm.FieldValueDateTime)
+	}
+	return T.field_ModifiedAt.Get()
+}
+
+func (T *OrderLine) SetModifiedAt(newValue time.Time) {
+	if T.field_ModifiedAt == nil {
+		T.field_ModifiedAt = T.Values["ModifiedAt"].(*elorm.FieldValueDateTime)
+	}
+	T.field_ModifiedAt.Set(newValue)
+}
+
+func (T *OrderLine) DeletedBy() *User {
+	if T.field_DeletedBy == nil {
+		T.field_DeletedBy = T.Values["DeletedBy"].(*elorm.FieldValueRef)
+	}
+	r, err := T.field_DeletedBy.Get()
+	if err != nil {
+		panic(err)
+	}
+	return r.(*User)
+}
+
+func (T *OrderLine) SetDeletedBy(newValue *User) {
+	if T.field_DeletedBy == nil {
+		T.field_DeletedBy = T.Values["DeletedBy"].(*elorm.FieldValueRef)
+	}
+	err := T.field_DeletedBy.Set(newValue)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (T *OrderLine) DeletedAt() time.Time {
+	if T.field_DeletedAt == nil {
+		T.field_DeletedAt = T.Values["DeletedAt"].(*elorm.FieldValueDateTime)
+	}
+	return T.field_DeletedAt.Get()
+}
+
+func (T *OrderLine) SetDeletedAt(newValue time.Time) {
 	if T.field_DeletedAt == nil {
 		T.field_DeletedAt = T.Values["DeletedAt"].(*elorm.FieldValueDateTime)
 	}
@@ -756,9 +1306,11 @@ type BusinessObjectsFragmentMethods interface {
 
 type DbContext struct {
 	*elorm.Factory
-	GoodDef GoodDefStruct
-	ShopDef ShopDefStruct
-	UserDef UserDefStruct
+	CustomerOrderDef CustomerOrderDefStruct
+	GoodDef          GoodDefStruct
+	OrderLineDef     OrderLineDefStruct
+	ShopDef          ShopDefStruct
+	UserDef          UserDefStruct
 }
 
 func CreateDbContext(dbDialect string, connectionString string) (*DbContext, error) {
@@ -773,6 +1325,18 @@ func CreateDbContext(dbDialect string, connectionString string) (*DbContext, err
 		return nil, err
 	}
 
+	r.CustomerOrderDef.EntityDef, err = r.CreateEntityDef("CustomerOrder", "CustomerOrders")
+	if err != nil {
+		return nil, err
+	}
+
+	r.CustomerOrderDef.Fragments = make([]string, 0)
+	frg = []string{}
+
+	frg = append(frg, "BusinessObjects")
+
+	r.CustomerOrderDef.Fragments = frg
+
 	r.GoodDef.EntityDef, err = r.CreateEntityDef("Good", "Goods")
 	if err != nil {
 		return nil, err
@@ -784,6 +1348,18 @@ func CreateDbContext(dbDialect string, connectionString string) (*DbContext, err
 	frg = append(frg, "BusinessObjects")
 
 	r.GoodDef.Fragments = frg
+
+	r.OrderLineDef.EntityDef, err = r.CreateEntityDef("OrderLine", "OrderLines")
+	if err != nil {
+		return nil, err
+	}
+
+	r.OrderLineDef.Fragments = make([]string, 0)
+	frg = []string{}
+
+	frg = append(frg, "BusinessObjects")
+
+	r.OrderLineDef.Fragments = frg
 
 	r.ShopDef.EntityDef, err = r.CreateEntityDef("Shop", "Shops")
 	if err != nil {
@@ -801,6 +1377,29 @@ func CreateDbContext(dbDialect string, connectionString string) (*DbContext, err
 	if err != nil {
 		return nil, err
 	}
+
+	// CustomerOrder
+	//////
+
+	r.CustomerOrderDef.Ref = r.CustomerOrderDef.FieldDefByName("Ref")
+	r.CustomerOrderDef.IsDeleted = r.CustomerOrderDef.FieldDefByName("IsDeleted")
+	r.CustomerOrderDef.DataVersion = r.CustomerOrderDef.FieldDefByName("DataVersion")
+
+	r.CustomerOrderDef.Sender, _ = r.CustomerOrderDef.AddRefFieldDef("Sender", r.UserDef.EntityDef)
+	r.CustomerOrderDef.Status, _ = r.CustomerOrderDef.AddIntFieldDef("Status", 0)
+	r.CustomerOrderDef.Qty, _ = r.CustomerOrderDef.AddNumericFieldDef("Qty", 15, 2, 0)
+	r.CustomerOrderDef.Sum, _ = r.CustomerOrderDef.AddNumericFieldDef("Sum", 15, 2, 0)
+	r.CustomerOrderDef.SenderComment, _ = r.CustomerOrderDef.AddStringFieldDef("SenderComment", 200, "")
+	r.CustomerOrderDef.CustomerComment, _ = r.CustomerOrderDef.AddStringFieldDef("CustomerComment", 200, "")
+	r.CustomerOrderDef.ExpectedDeliveryDate, _ = r.CustomerOrderDef.AddDateTimeFieldDef("ExpectedDeliveryDate")
+	r.CustomerOrderDef.CreatedBy, _ = r.CustomerOrderDef.AddRefFieldDef("CreatedBy", r.UserDef.EntityDef)
+	r.CustomerOrderDef.CreatedAt, _ = r.CustomerOrderDef.AddDateTimeFieldDef("CreatedAt")
+	r.CustomerOrderDef.ModifiedBy, _ = r.CustomerOrderDef.AddRefFieldDef("ModifiedBy", r.UserDef.EntityDef)
+	r.CustomerOrderDef.ModifiedAt, _ = r.CustomerOrderDef.AddDateTimeFieldDef("ModifiedAt")
+	r.CustomerOrderDef.DeletedBy, _ = r.CustomerOrderDef.AddRefFieldDef("DeletedBy", r.UserDef.EntityDef)
+	r.CustomerOrderDef.DeletedAt, _ = r.CustomerOrderDef.AddDateTimeFieldDef("DeletedAt")
+
+	r.CustomerOrderDef.Wrap = func(source *elorm.Entity) any { return &CustomerOrder{Entity: source} }
 
 	// Good
 	//////
@@ -831,6 +1430,27 @@ func CreateDbContext(dbDialect string, connectionString string) (*DbContext, err
 	if err != nil {
 		return nil, err
 	}
+
+	// OrderLine
+	//////
+
+	r.OrderLineDef.Ref = r.OrderLineDef.FieldDefByName("Ref")
+	r.OrderLineDef.IsDeleted = r.OrderLineDef.FieldDefByName("IsDeleted")
+	r.OrderLineDef.DataVersion = r.OrderLineDef.FieldDefByName("DataVersion")
+
+	r.OrderLineDef.Shop, _ = r.OrderLineDef.AddRefFieldDef("Shop", r.ShopDef.EntityDef)
+	r.OrderLineDef.CustomerOrder, _ = r.OrderLineDef.AddRefFieldDef("CustomerOrder", r.CustomerOrderDef.EntityDef)
+	r.OrderLineDef.Good, _ = r.OrderLineDef.AddRefFieldDef("Good", r.GoodDef.EntityDef)
+	r.OrderLineDef.Qty, _ = r.OrderLineDef.AddNumericFieldDef("Qty", 15, 2, 0)
+	r.OrderLineDef.Sum, _ = r.OrderLineDef.AddNumericFieldDef("Sum", 15, 2, 0)
+	r.OrderLineDef.CreatedBy, _ = r.OrderLineDef.AddRefFieldDef("CreatedBy", r.UserDef.EntityDef)
+	r.OrderLineDef.CreatedAt, _ = r.OrderLineDef.AddDateTimeFieldDef("CreatedAt")
+	r.OrderLineDef.ModifiedBy, _ = r.OrderLineDef.AddRefFieldDef("ModifiedBy", r.UserDef.EntityDef)
+	r.OrderLineDef.ModifiedAt, _ = r.OrderLineDef.AddDateTimeFieldDef("ModifiedAt")
+	r.OrderLineDef.DeletedBy, _ = r.OrderLineDef.AddRefFieldDef("DeletedBy", r.UserDef.EntityDef)
+	r.OrderLineDef.DeletedAt, _ = r.OrderLineDef.AddDateTimeFieldDef("DeletedAt")
+
+	r.OrderLineDef.Wrap = func(source *elorm.Entity) any { return &OrderLine{Entity: source} }
 
 	// Shop
 	//////
@@ -889,6 +1509,24 @@ func CreateDbContext(dbDialect string, connectionString string) (*DbContext, err
 	return r, nil
 }
 
+func (T *DbContext) CreateCustomerOrder() (*CustomerOrder, error) {
+	r, err := T.CreateEntityWrapped(T.CustomerOrderDef.EntityDef)
+	if err != nil {
+		return nil, err
+	}
+	rt := r.(*CustomerOrder)
+	return rt, nil
+}
+
+func (T *DbContext) LoadCustomerOrder(Ref string) (*CustomerOrder, error) {
+	r, err := T.LoadEntityWrapped(Ref)
+	if err != nil {
+		return nil, err
+	}
+	rt := r.(*CustomerOrder)
+	return rt, nil
+}
+
 func (T *DbContext) CreateGood() (*Good, error) {
 	r, err := T.CreateEntityWrapped(T.GoodDef.EntityDef)
 	if err != nil {
@@ -904,6 +1542,24 @@ func (T *DbContext) LoadGood(Ref string) (*Good, error) {
 		return nil, err
 	}
 	rt := r.(*Good)
+	return rt, nil
+}
+
+func (T *DbContext) CreateOrderLine() (*OrderLine, error) {
+	r, err := T.CreateEntityWrapped(T.OrderLineDef.EntityDef)
+	if err != nil {
+		return nil, err
+	}
+	rt := r.(*OrderLine)
+	return rt, nil
+}
+
+func (T *DbContext) LoadOrderLine(Ref string) (*OrderLine, error) {
+	r, err := T.LoadEntityWrapped(Ref)
+	if err != nil {
+		return nil, err
+	}
+	rt := r.(*OrderLine)
 	return rt, nil
 }
 
