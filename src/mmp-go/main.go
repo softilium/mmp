@@ -57,8 +57,6 @@ func initServer() *http.Server {
 
 	// SPA routes
 	router.Handle("/", http.StripPrefix("/", fs))
-	router.HandleFunc("/login", SpaHandler())
-	router.HandleFunc("/shop/{shopref}", SpaHandler())
 
 	// API routes
 
@@ -78,6 +76,7 @@ func initServer() *http.Server {
 		return []*elorm.SortItem{{Field: models.Dbc.ShopDef.Caption, Asc: true}}, nil
 	}
 	shopsRestApiConfig.Context = models.HttpUserContext
+	shopsRestApiConfig.BeforeMiddleware = UserRequiredForEdit
 	router.HandleFunc("/api/shops", elorm.HandleRestApi(shopsRestApiConfig))
 
 	//// goods
@@ -110,18 +109,7 @@ func initServer() *http.Server {
 		models.Dbc.UserDef.SelectEntities,
 		models.Dbc.CreateUser)
 	allusersRestApiConfig.EnablePost = false
-	allusersRestApiConfig.BeforeMiddleware = func(w http.ResponseWriter, r *http.Request) bool {
-		user, err := models.UserFromHttpRequest(r)
-		if err != nil {
-			HandleErr(w, 0, fmt.Errorf("unauthorized: %v", err))
-			return false
-		}
-		if !user.Admin() {
-			HandleErr(w, http.StatusForbidden, fmt.Errorf("user isn't admin"))
-			return false
-		}
-		return true
-	}
+	allusersRestApiConfig.BeforeMiddleware = UserAdminRequired
 	allusersRestApiConfig.Context = models.HttpUserContext
 	router.HandleFunc("/api/admin/allusers", elorm.HandleRestApi(allusersRestApiConfig))
 
@@ -220,7 +208,30 @@ func main() {
 
 }
 
-//TODO orders+lines
+func UserAdminRequired(w http.ResponseWriter, r *http.Request) bool {
+	user, err := models.UserFromHttpRequest(r)
+	if err != nil {
+		HandleErr(w, 0, fmt.Errorf("unauthorized: %v", err))
+		return false
+	}
+	if !user.Admin() {
+		HandleErr(w, http.StatusForbidden, fmt.Errorf("user isn't admin"))
+		return false
+	}
+	return true
+}
+
+func UserRequiredForEdit(w http.ResponseWriter, r *http.Request) bool {
+	if r.Method == http.MethodGet {
+		return true
+	}
+	_, err := models.UserFromHttpRequest(r)
+	if err != nil {
+		HandleErr(w, 0, fmt.Errorf("unauthorized: %v", err))
+		return false
+	}
+	return true
+}
+
+//TODO orders
 //TODO telegram middleware
-//TODO unmarshal json, autoexpand support
-//TODO refresh tokens on expiration access token

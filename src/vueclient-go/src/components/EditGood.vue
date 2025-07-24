@@ -7,13 +7,13 @@
   const route = useRoute()
   const router = useRouter()
 
-  const good = ref({ ownerShop: { id: 0 }, caption: "", description: "", article: "", url: "", price: 0, orderInShop: 100 });
+  const good = ref({ OwnerShop: { Ref: "" }, Caption: "", Description: "", Article: "", Url: "", Price: 0, OrderInShop: 100 });
   const isImageLoading = ref(true);
 
   onMounted(async () => {
     if (route.params.id) {
       try {
-        let res = await fetch(ctx.rbUrl() + "/api/goods/" + route.params.id);
+        let res = await fetch(ctx.rbUrl() + "/api/goods?ref=" + route.params.id);
         if (res.ok) {
           good.value = await res.json();
           await LoadImages();
@@ -61,7 +61,7 @@
 
   const Save = async () => {
     if (route.params.id) {
-      let res = await fetch(ctx.rbUrl() + "/api/goods/" + route.params.id, {
+      let res = await fetch(ctx.rbUrl() + "/api/goods?ref=" + route.params.id, {
         method: "PUT",
         headers: await ctx.authHeadersAppJson(),
         body: JSON.stringify(good.value)
@@ -71,7 +71,7 @@
         router.push("/shop/" + route.params.shopid);
       }
     } else {
-      good.value.ownerShop.id = route.params.shopid;
+      good.value.OwnerShop.Ref = route.params.shopid;
       let res = await fetch(ctx.rbUrl() + "/api/goods", {
         method: "POST",
         headers: await ctx.authHeadersAppJson(),
@@ -79,7 +79,7 @@
       });
       if (res.ok) {
         res = await res.json();
-        await SaveImages(res.id);
+        await SaveImages(res.Ref);
         router.push("/shop/" + route.params.shopid);
       }
     }
@@ -109,7 +109,6 @@
     curImgIndex.value = 0;
   };
 
-
 </script>
 
 <template>
@@ -122,7 +121,7 @@
     <div class="form-group form-group-sm row">
       <label class="col-3 form-label">Название</label>
       <div class="col-7">
-        <input class="form-control" v-model="good.caption" required maxlength="100" />
+        <input class="form-control" v-model="good.Caption" required maxlength="100" />
       </div>
     </div>
   </div>
@@ -130,7 +129,7 @@
     <div class="form-group form-group-sm row">
       <label class="col-3 form-label">Артикул</label>
       <div class="col-7">
-        <input class="form-control" v-model="good.article" maxlength="50" />
+        <input class="form-control" v-model="good.Article" maxlength="50" />
       </div>
     </div>
   </div>
@@ -138,7 +137,7 @@
     <div class="form-group form-group-sm row">
       <label class="col-3 form-label">Ссылка</label>
       <div class="col-7">
-        <input class="form-control" v-model="good.url"  maxlength="900"/>
+        <input class="form-control" v-model="good.Url"  maxlength="900"/>
       </div>
     </div>
   </div>
@@ -146,7 +145,7 @@
     <div class="form-group form-group-sm row">
       <label class="col-3 form-label">Описание</label>
       <div class="col-7">
-        <textarea class="form-control" v-model="good.description" rows="5" />
+        <textarea class="form-control" v-model="good.Description" rows="5" />
       </div>
     </div>
   </div>
@@ -154,7 +153,7 @@
     <div class="form-group form-group-sm row">
       <label class="col-3 form-label">Цена</label>
       <div class="col-7">
-        <input class="form-control" v-model="good.price" />
+        <input class="form-control" v-model="good.Price" />
       </div>
     </div>
   </div>
@@ -163,7 +162,7 @@
     <div class="form-group form-group-sm row">
       <label class="col-3 form-label">Порядок на витрине (меньше = выше)</label>
       <div class="col-7">
-        <input class="form-control" v-model="good.orderInShop" />
+        <input class="form-control" v-model="good.OrderInShop" />
       </div>
     </div>
   </div>

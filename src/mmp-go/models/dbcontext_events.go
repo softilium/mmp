@@ -2,6 +2,7 @@ package models
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -57,6 +58,9 @@ func (dbc *DbContext) SetHandlers() error {
 			et.SetCreatedAt(time.Now())
 			if user != nil {
 				et.SetCreatedBy(user)
+			}
+			if et.CreatedBy() == nil {
+				return fmt.Errorf("createdBy is required for new entity %s", ent.Def().ObjectName)
 			}
 		} else {
 			et.SetModifiedAt(time.Now())

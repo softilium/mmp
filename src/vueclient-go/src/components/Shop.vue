@@ -144,7 +144,7 @@
 
     if (!confirm("Удалить витрину, вы уверены?")) return;
 
-    let res = await fetch(`${ctx.rbUrl()}/api/shops/${route.params.id}`,
+    let res = await fetch(`${ctx.rbUrl()}/api/shops?ref=${route.params.id}`,
       {
         method: "DELETE",
         headers: await ctx.authHeaders()

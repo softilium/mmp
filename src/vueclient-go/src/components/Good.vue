@@ -132,7 +132,7 @@
 
     if (!confirm('Удалить товар, вы уверены?')) return;
 
-    let res = await fetch(`${ctx.rbUrl()}/api/goods/${good.value.Ref}`, {
+    let res = await fetch(`${ctx.rbUrl()}/api/goods?ref=${good.value.Ref}`, {
       method: "DELETE",
       headers: await ctx.authHeadersAppJson()
     });
