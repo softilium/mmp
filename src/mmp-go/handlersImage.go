@@ -13,8 +13,8 @@ import (
 	"github.com/nfnt/resize"
 )
 
-var images *expirable.LRU[string, *[]byte]
-var thumbs *expirable.LRU[string, *[]byte]
+var imagesCache *expirable.LRU[string, *[]byte]
+var thumbsCache *expirable.LRU[string, *[]byte]
 
 func initRouterImages(router *http.ServeMux) {
 	router.HandleFunc("/api/goods/images", func(w http.ResponseWriter, r *http.Request) {
@@ -39,9 +39,9 @@ func handleImages(w http.ResponseWriter, r *http.Request, downScale bool) {
 	}
 	fn := fmt.Sprintf("%s/goodImage-%s-%s", Cfg.ImagesFolder, ref, n)
 
-	cache := images
+	cache := imagesCache
 	if downScale {
-		cache = thumbs
+		cache = thumbsCache
 	}
 
 	if r.Method == http.MethodGet {
@@ -95,6 +95,6 @@ func handleImages(w http.ResponseWriter, r *http.Request, downScale bool) {
 }
 
 func init() {
-	images = expirable.NewLRU[string, *[]byte](1000, nil, time.Minute*60*24)
-	thumbs = expirable.NewLRU[string, *[]byte](1000, nil, time.Minute*60*24)
+	imagesCache = expirable.NewLRU[string, *[]byte](1000, nil, time.Minute*60*24)
+	thumbsCache = expirable.NewLRU[string, *[]byte](1000, nil, time.Minute*60*24)
 }

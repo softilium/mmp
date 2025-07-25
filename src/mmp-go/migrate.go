@@ -8,7 +8,9 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
+	"github.com/hashicorp/golang-lru/v2/expirable"
 	"github.com/softilium/mmp-go/models"
 )
 
@@ -36,6 +38,7 @@ func Migrate(w http.ResponseWriter, r *http.Request) {
 	usersMap := make(map[int64]*models.User)
 	shopsMap := make(map[int64]*models.Shop)
 	goodMap := make(map[int64]*models.Good)
+	ordersMap := make(map[int64]*models.CustomerOrder)
 
 	// Users
 	////////
@@ -60,8 +63,9 @@ func Migrate(w http.ResponseWriter, r *http.Request) {
 	rows, err := mdb.Query(`
 	
 select 
-"UserName", "Email", "Admin", "ShopManage", "TelegramCheckCode", "TelegramUserName", "TelegramVerified", "Description", "Id"
-from "AspNetUsers" 
+u."UserName", u."Email", u."Admin", u."ShopManage", u."TelegramCheckCode", u."TelegramUserName", u."TelegramVerified", u."Description", u."Id", c."ChatId"
+from "AspNetUsers" as u
+left join "BotChats" as c on u."UserName"=c."UserName"
 order by "Id"
 	
 	`)
@@ -77,8 +81,9 @@ order by "Id"
 		var admin, shopManage, telegramVerified bool
 		var telegramCheckCode sql.NullString
 		var id int64
+		var chatId sql.NullInt64
 
-		err := rows.Scan(&userName, &email, &admin, &shopManage, &telegramCheckCode, &telegramUserName, &telegramVerified, &description, &id)
+		err := rows.Scan(&userName, &email, &admin, &shopManage, &telegramCheckCode, &telegramUserName, &telegramVerified, &description, &id, &chatId)
 		if err != nil {
 			HandleErr(w, 0, fmt.Errorf("failed to scan user row: %v", err))
 			return
@@ -99,6 +104,11 @@ order by "Id"
 		newUser.SetTelegramUsername(telegramUserName)
 		newUser.SetTelegramVerified(telegramVerified)
 		newUser.SetDescription(description)
+
+		if chatId.Valid {
+			newUser.SetBotChatId(chatId.Int64)
+		}
+
 		err = newUser.Save(ctxMig)
 		if err != nil {
 			HandleErr(w, 0, fmt.Errorf("failed to save user %s: %v", userName, err))
@@ -312,7 +322,190 @@ from "Goods" order by "ID"
 			HandleErr(w, 0, fmt.Errorf("failed to read image file %s: %v", fn, err))
 			return
 		}
-
 	}
+
+	// orders
+	/////////
+
+	orders, _, err := models.Dbc.CustomerOrderDef.SelectEntities(nil, nil, 0, 0)
+	if err != nil {
+		HandleErr(w, 0, fmt.Errorf("failed to fetch orders for migration: %v", err))
+		return
+	}
+	for _, order := range orders {
+		err := models.Dbc.DeleteEntity(ctxMig, order.RefString())
+		if err != nil {
+			HandleErr(w, 0, fmt.Errorf("failed to delete order %s: %v", order.RefString(), err))
+			return
+		}
+	}
+	rows, err = mdb.Query(`
+
+select 
+	"ID", "SenderID", "Status", "Qty", "Sum", "CreatedByID", "CreatedOn", "ModifiedByID", "ModifiedOn", 
+	"IsDeleted", "DeletedByID", "DeletedOn", "CustomerComment", "ExpectedDeliveryDate", "SenderComment" 
+from "Orders"
+order by "ID"
+
+	`)
+	if err != nil {
+		HandleErr(w, 0, fmt.Errorf("failed to query orders from migration database: %v", err))
+		return
+	}
+	defer rows.Close()
+	for rows.Next() {
+		no, err := models.Dbc.CreateCustomerOrder()
+		if err != nil {
+			HandleErr(w, 0, fmt.Errorf("failed to create new order: %v", err))
+			return
+		}
+
+		var id, senderId int64
+		var createdById, modifiedById, deletedById sql.NullInt64
+		var status int64
+
+		err = rows.Scan(
+			&id,
+			&senderId,
+			&status,
+			no.Values["Qty"],
+			no.Values["Sum"],
+			&createdById,
+			no.Values["CreatedAt"],
+			&modifiedById,
+			no.Values["ModifiedAt"],
+			no.Values["IsDeleted"],
+			&deletedById,
+			no.Values["DeletedAt"],
+			no.Values["CustomerComment"],
+			no.Values["ExpectedDeliveryDate"],
+			no.Values["SenderComment"])
+		if err != nil {
+			HandleErr(w, 0, fmt.Errorf("failed to scan order row: %v", err))
+			return
+		}
+
+		if createdById.Valid {
+			no.SetCreatedBy(usersMap[createdById.Int64])
+		}
+
+		if modifiedById.Valid {
+			no.SetModifiedBy(usersMap[modifiedById.Int64])
+		}
+
+		if deletedById.Valid {
+			no.SetDeletedBy(usersMap[deletedById.Int64])
+		}
+
+		if senderId > 0 {
+			no.SetSender(usersMap[senderId])
+		}
+
+		no.SetStatus(status)
+
+		no.SetIsDeleted(deletedById.Valid && deletedById.Int64 > 0)
+
+		err = no.Save(ctxMig)
+		if err != nil {
+			HandleErr(w, 0, fmt.Errorf("failed to save order %d: %v", id, err))
+			return
+		}
+		ordersMap[id] = no
+	}
+
+	// order lines
+	///////////
+
+	orderLines, _, err := models.Dbc.OrderLineDef.SelectEntities(nil, nil, 0, 0)
+	if err != nil {
+		HandleErr(w, 0, fmt.Errorf("failed to fetch order lines for migration: %v", err))
+		return
+	}
+	for _, orderLine := range orderLines {
+		err := models.Dbc.DeleteEntity(ctxMig, orderLine.RefString())
+		if err != nil {
+			HandleErr(w, 0, fmt.Errorf("failed to delete order line %s: %v", orderLine.RefString(), err))
+			return
+		}
+	}
+
+	rows, err = mdb.Query(`
+
+select 
+"ID", "ShopID", "OrderID", "GoodID", "Qty", "Sum", "CreatedByID", "CreatedOn", "ModifiedByID", "ModifiedOn", "IsDeleted", "DeletedByID", "DeletedOn"
+from "OrderLines"
+order by "ID"
+
+	`)
+	if err != nil {
+		HandleErr(w, 0, fmt.Errorf("failed to query order lines from migration database: %v", err))
+		return
+	}
+	defer rows.Close()
+	for rows.Next() {
+		nol, err := models.Dbc.CreateOrderLine()
+		if err != nil {
+			HandleErr(w, 0, fmt.Errorf("failed to create new order line: %v", err))
+			return
+		}
+
+		var id, shopId, orderId, goodId int64
+		var createdById, modifiedById, deletedById sql.NullInt64
+
+		err = rows.Scan(
+			&id,
+			&shopId,
+			&orderId,
+			&goodId,
+			nol.Values["Qty"],
+			nol.Values["Sum"],
+			&createdById,
+			nol.Values["CreatedAt"],
+			&modifiedById,
+			nol.Values["ModifiedAt"],
+			nol.Values["IsDeleted"],
+			&deletedById,
+			nol.Values["DeletedAt"])
+		if err != nil {
+			HandleErr(w, 0, fmt.Errorf("failed to scan order line row: %v", err))
+			return
+		}
+
+		if createdById.Valid {
+			nol.SetCreatedBy(usersMap[createdById.Int64])
+		}
+
+		if modifiedById.Valid {
+			nol.SetModifiedBy(usersMap[modifiedById.Int64])
+		}
+
+		if deletedById.Valid {
+			nol.SetDeletedBy(usersMap[deletedById.Int64])
+		}
+
+		if shopId > 0 {
+			nol.SetShop(shopsMap[shopId])
+		}
+
+		if orderId > 0 {
+			nol.SetCustomerOrder(ordersMap[orderId])
+		}
+
+		if goodId > 0 {
+			nol.SetGood(goodMap[goodId])
+		}
+
+		nol.SetIsDeleted(deletedById.Valid && deletedById.Int64 > 0)
+
+		err = nol.Save(ctxMig)
+		if err != nil {
+			HandleErr(w, 0, fmt.Errorf("failed to save order line %d: %v", id, err))
+			return
+		}
+	}
+
+	models.TokensByAT = make(map[string]models.TokenItem)
+	imagesCache = expirable.NewLRU[string, *[]byte](1000, nil, time.Minute*60*24)
+	thumbsCache = expirable.NewLRU[string, *[]byte](1000, nil, time.Minute*60*24)
 
 }

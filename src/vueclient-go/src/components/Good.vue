@@ -63,16 +63,16 @@
     basketQty.value = null;
     good.value.Basked = null;
     if (ctx.userInfo.id) {
-      let res = await fetch(ctx.rbUrl() + "/api/baskets/" + good.value.OwnerShop.Ref, {
+      let res = await fetch(ctx.rbUrl() + "/api/basket?shop=" + good.value.OwnerShop.Ref, {
         method: "GET",
         headers: await ctx.authHeadersAppJson()
       });
       if (res.ok) {
         res = await res.json();
         res.Data.forEach(l => {
-          if (l.good.id == good.value.Ref) {
-            good.value.Basked = l.qty;
-            basketQty.value = l.qty;
+          if (l.Good.Ref == good.value.Ref) {
+            good.value.Basked = l.Qty;
+            basketQty.value = l.Qty;
           }
         });
       }
@@ -101,7 +101,7 @@
       await LoadBasket();
       await ctx.loadBasket();
     }
-    let res = await fetch(ctx.rbUrl() + "/api/baskets/increase/" + good.value.Ref, {
+    let res = await fetch(ctx.rbUrl() + "/api/basket/increase?goodref=" + good.value.Ref, {
       method: "POST",
       headers: await ctx.authHeadersAppJson()
     });
@@ -118,7 +118,7 @@
       await ctx.loadBasket();
       return;
     }
-    let res = await fetch(ctx.rbUrl() + "/api/baskets/decrease/" + good.value.Ref, {
+    let res = await fetch(ctx.rbUrl() + "/api/basket/decrease?goodref=" + good.value.Ref, {
       method: "POST",
       headers: await ctx.authHeadersAppJson()
     });

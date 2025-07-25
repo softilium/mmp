@@ -26,9 +26,9 @@
       localStorage.getItem("refreshToken"),
       localStorage.getItem("refreshTokenExpiresAt")
     );
-    ctx.CheckLogged();
-    updateMyUrl();
+    await ctx.CheckLogged();
     await ctx.loadBasket();
+    updateMyUrl();
   });
 
   // update myurl when user navigate within SPA

@@ -100,6 +100,10 @@
                     "Name": "Description",
                     "ColumnType": "string",
                     "Len": 300
+                },
+                {
+                    "Name": "BotChatId",
+                    "ColumnType": "int"
                 }
             ]
         },

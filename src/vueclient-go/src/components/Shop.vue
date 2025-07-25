@@ -48,8 +48,7 @@
     } catch (err) { console.log(err); }
 
     await nextTick();
-
-    LoadBasket();
+    await LoadBasket();
 
   });
 
@@ -71,7 +70,7 @@
             goods.value.Data.forEach(_ => { goodmap.set(_.Ref, _); });
 
             res.Data.forEach(_ => {
-              let goodId = _.Good;
+              let goodId = _.Good.Ref;
               let gObj = goodmap.get(goodId);
               if (gObj != null) {
                 gObj.basked = _.Qty;

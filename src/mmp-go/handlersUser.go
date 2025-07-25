@@ -15,7 +15,8 @@ func initRouterAuth(router *http.ServeMux) {
 	router.HandleFunc("/identity/register", UserRegister)
 	router.HandleFunc("/identity/login", UserLogin)
 	router.HandleFunc("/identity/logout", UserLogout)
-	router.HandleFunc("/identity/myprofile", UserPublicProfile)
+	router.HandleFunc("/identity/myprofile", UserMyProfile)
+	router.HandleFunc("/identity/profiles", UserPublicProfile)
 	router.HandleFunc("/identity/refresh", UserTokenRefresh)
 }
 
@@ -25,14 +26,16 @@ type userPayLoad struct {
 }
 
 type UserProfileResponse struct {
-	Username         string `json:"userName"`
-	Email            string `json:"email"`
-	ShopManage       bool   `json:"shopManage"`
-	Admin            bool   `json:"admin"`
-	Id               string `json:"id"`
-	Description      string `json:"description"`
-	TelegramUsername string `json:"telegramUsername"`
-	BotChatId        int64  `json:"botChatId"`
+	Username          string `json:"userName"`
+	Email             string `json:"email"`
+	ShopManage        bool   `json:"shopManage"`
+	Admin             bool   `json:"admin"`
+	Id                string `json:"id"`
+	Description       string `json:"description"`
+	TelegramUsername  string `json:"telegramUsername"`
+	BotChatId         int64  `json:"botChatId"`
+	TelegramVerified  bool   `json:"telegramVerified"`
+	TelegramCheckCode string `json:"telegramCheckCode"`
 }
 
 type tokensResponse struct {
@@ -163,7 +166,7 @@ func UserLogout(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func UserPublicProfile(w http.ResponseWriter, r *http.Request) {
+func UserMyProfile(w http.ResponseWriter, r *http.Request) {
 
 	user, err := models.UserFromHttpRequest(r)
 	if err != nil {
@@ -172,14 +175,16 @@ func UserPublicProfile(w http.ResponseWriter, r *http.Request) {
 	}
 	if r.Method == http.MethodGet {
 		res := UserProfileResponse{
-			Username:         user.Username(),
-			Email:            user.Email(),
-			ShopManage:       user.ShopManager(),
-			Admin:            user.Admin(),
-			Id:               user.RefString(),
-			Description:      user.Description(),
-			TelegramUsername: user.TelegramUsername(),
-			//BotChatId:        user.BotChatId(),
+			Username:          user.Username(),
+			Email:             user.Email(),
+			ShopManage:        user.ShopManager(),
+			Admin:             user.Admin(),
+			Id:                user.RefString(),
+			Description:       user.Description(),
+			TelegramUsername:  user.TelegramUsername(),
+			BotChatId:         user.BotChatId(),
+			TelegramVerified:  user.TelegramVerified(),
+			TelegramCheckCode: user.TelegramCheckCode(),
 		}
 
 		w.WriteHeader(http.StatusOK)
@@ -203,6 +208,8 @@ func UserPublicProfile(w http.ResponseWriter, r *http.Request) {
 		user.SetDescription(payload.Description)
 		user.SetTelegramUsername(payload.TelegramUsername)
 		//user.SetBotChatId(payload.BotChatId)
+		//user.SetTelegramVerified(payload.TelegramVerified)
+		//user.SetTelegramCheckCode(payload.TelegramCheckCode)
 
 		err = user.Save(r.Context())
 		if err != nil {
@@ -257,4 +264,43 @@ func UserTokenRefresh(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	HandleErr(w, http.StatusUnauthorized, fmt.Errorf("invalid or expired refresh token"))
+}
+
+func UserPublicProfile(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		HandleErr(w, http.StatusMethodNotAllowed, nil)
+		return
+	}
+
+	userref := r.URL.Query().Get("userref")
+	if userref == "" {
+		HandleErr(w, http.StatusBadRequest, fmt.Errorf("userref is required"))
+		return
+	}
+
+	user, err := models.Dbc.LoadUser(userref)
+	if err != nil {
+		HandleErr(w, http.StatusNotFound, fmt.Errorf("user not found: %s", userref))
+		return
+	}
+
+	res := UserProfileResponse{
+		Username:         user.Username(),
+		Email:            user.Email(),
+		ShopManage:       user.ShopManager(),
+		Admin:            user.Admin(),
+		Id:               user.RefString(),
+		Description:      user.Description(),
+		TelegramUsername: user.TelegramUsername(),
+		//BotChatId:        user.BotChatId(),
+		TelegramVerified: user.TelegramVerified(),
+		//TelegramCheckCode: user.TelegramCheckCode(),
+	}
+
+	w.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(w).Encode(res)
+	if err != nil {
+		HandleErr(w, 0, err)
+		return
+	}
 }

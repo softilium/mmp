@@ -9,6 +9,15 @@ import (
 	"github.com/softilium/elorm"
 )
 
+const (
+	OrderStatusNew            = 100
+	OrderStatusInProcess      = 200
+	OrderStatusReadyToDeliver = 300
+	OrderStatusDelivering     = 400
+	OrderStatusDone           = 500
+	OrderStatusCanceled       = 600
+)
+
 var Dbc *DbContext
 
 // global enrished http request context func
@@ -35,6 +44,12 @@ func (dbc *DbContext) SetHandlers() error {
 	dbc.ShopDef.AutoExpandFieldsForJSON = map[*elorm.FieldDef]bool{
 		dbc.ShopDef.Ref:     true,
 		dbc.ShopDef.Caption: true,
+	}
+
+	dbc.GoodDef.AutoExpandFieldsForJSON = map[*elorm.FieldDef]bool{
+		dbc.GoodDef.Ref:       true,
+		dbc.GoodDef.Caption:   true,
+		dbc.GoodDef.CreatedBy: true,
 	}
 
 	// BusinessObjects fragment

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 
   import { onMounted, ref } from 'vue';
   import { useRouter } from 'vue-router'
@@ -18,26 +18,32 @@
     basket.value = [];
 
     if (ctx.userInfo.userName) {
-      let res = await fetch(ctx.rbUrl() + "/api/baskets/", {
-        mathod: "GET",
+      let res = await fetch(ctx.rbUrl() + "/api/basket", {
+        method: "GET",
         headers: await ctx.authHeadersAppJson()
       });
       if (res.ok) {
         res = await res.json();
+        res = res.Data;
         const senderMap = new Map();
         res.forEach(_ => {
-          senderMap.set(_.good.createdByID, 1);
+          senderMap.set(_.Good.CreatedBy.Ref, 1);
         });
         basket.value = [];
         for (let [k] of senderMap.entries()) {
-          let senderRec = { senderID: k, lines: [], qtyTotal: 0, sumTotal: 0, customerComment: "" };
+          let senderRec = { senderID: k, lines: [], qtyTotal: 0, sumTotal: 0, customerComment: "", senderInfo: {} };
           basket.value.push(senderRec);
           res.forEach(r => {
-            if (r.good.createdByID == k) {
+            r.good =  {
+              id: r.Good.Ref,
+              caption: r.Good.Caption,
+              createdByInfo: r.Good.CreatedBy
+            }
+            if (r.Good.CreatedBy.Ref == k) {
               senderRec.lines.push(r);
-              senderRec.qtyTotal += r.qty;
-              senderRec.sumTotal += r.sum;
-              senderRec.senderInfo = r.good.createdByInfo;
+              senderRec.qtyTotal += r.Qty;
+              senderRec.sumTotal += r.Sum;
+              senderRec.senderInfo = r.Good.CreatedBy;
             }
           });
         }
@@ -47,7 +53,7 @@
       const items = localBasket.getItems();
       const senderMap = new Map();
       for (const item of items) {
-        const res = await fetch(`${ctx.rbUrl()}/api/goods/${item.goodId}`);
+        const res = await fetch(`${ctx.rbUrl()}/api/goods?ref=${item.goodId}`);
         if (res.ok) {
           const good = await res.json();
           senderMap.set(item.senderId, 1); // Use senderId from local basket
@@ -58,16 +64,16 @@
           }
           senderRec.lines.push({
             good: {
-              id: good.id,
-              caption: good.caption,
-              createdByInfo: good.createdByInfo
+              id: good.Ref,
+              caption: good.Caption,
+              createdByInfo: good.CreatedBy
             },
             qty: item.quantity,
-            sum: item.quantity * good.price
+            sum: item.quantity * good.Price
           });
           senderRec.qtyTotal += item.quantity;
-          senderRec.sumTotal += item.quantity * good.price;
-          senderRec.senderInfo = good.createdByInfo;
+          senderRec.sumTotal += item.quantity * good.Price;
+          senderRec.senderInfo = good.CreatedBy;
         }
       }
     }
@@ -105,7 +111,7 @@
       await ctx.loadBasket();
       return;
     }
-    let res = await fetch(ctx.rbUrl() + "/api/baskets/increase/" + good.id, {
+    let res = await fetch(ctx.rbUrl() + "/api/basket/increase?goodref=" + good.id, {
       method: "POST",
       headers: await ctx.authHeadersAppJson()
     });
@@ -122,7 +128,7 @@
       await ctx.loadBasket();
       return;
     }
-    let res = await fetch(ctx.rbUrl() + "/api/baskets/decrease/" + good.id, {
+    let res = await fetch(ctx.rbUrl() + "/api/basket/decrease?goodref=" + good.id, {
       method: "POST",
       headers: await ctx.authHeadersAppJson()
     });

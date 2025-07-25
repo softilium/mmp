@@ -233,5 +233,7 @@ func UserRequiredForEdit(w http.ResponseWriter, r *http.Request) bool {
 	return true
 }
 
-//TODO orders
+//TODO checkout
+//TODO orders, edit orders
+//TODO orders history
 //TODO telegram middleware

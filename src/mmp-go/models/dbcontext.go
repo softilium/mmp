@@ -1081,6 +1081,8 @@ type UserDefStruct struct {
 	TelegramChatId *elorm.FieldDef
 
 	Description *elorm.FieldDef
+
+	BotChatId *elorm.FieldDef
 }
 
 func (T *UserDefStruct) SelectEntities(filters []*elorm.Filter, sorts []*elorm.SortItem, pageNo int, pageSize int) (result []*User, pages int, err error) {
@@ -1118,6 +1120,7 @@ type User struct {
 	field_TelegramVerified  *elorm.FieldValueBool
 	field_TelegramChatId    *elorm.FieldValueString
 	field_Description       *elorm.FieldValueString
+	field_BotChatId         *elorm.FieldValueInt
 }
 
 func (T *User) Username() string {
@@ -1272,6 +1275,20 @@ func (T *User) SetDescription(newValue string) {
 		T.field_Description = T.Values["Description"].(*elorm.FieldValueString)
 	}
 	T.field_Description.Set(newValue)
+}
+
+func (T *User) BotChatId() int64 {
+	if T.field_BotChatId == nil {
+		T.field_BotChatId = T.Values["BotChatId"].(*elorm.FieldValueInt)
+	}
+	return T.field_BotChatId.Get()
+}
+
+func (T *User) SetBotChatId(newValue int64) {
+	if T.field_BotChatId == nil {
+		T.field_BotChatId = T.Values["BotChatId"].(*elorm.FieldValueInt)
+	}
+	T.field_BotChatId.Set(newValue)
 }
 
 // BusinessObjects fragment
@@ -1489,6 +1506,7 @@ func CreateDbContext(dbDialect string, connectionString string) (*DbContext, err
 	r.UserDef.TelegramVerified, _ = r.UserDef.AddBoolFieldDef("TelegramVerified", false)
 	r.UserDef.TelegramChatId, _ = r.UserDef.AddStringFieldDef("TelegramChatId", 100, "")
 	r.UserDef.Description, _ = r.UserDef.AddStringFieldDef("Description", 300, "")
+	r.UserDef.BotChatId, _ = r.UserDef.AddIntFieldDef("BotChatId", 0)
 
 	r.UserDef.Wrap = func(source *elorm.Entity) any { return &User{Entity: source} }
 

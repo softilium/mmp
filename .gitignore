@@ -373,3 +373,4 @@ FodyWeavers.xsd
 /devops/backup.sql
 src/mmp-go/todo.db
 /src/mmp-go/todo.db
+src/mmp-go/migrate.go

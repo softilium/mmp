@@ -8,7 +8,7 @@
   const route = useRoute();
 
   const me = ref(false);
-  const user = ref({ id: "", userName: "", email: "", telegramUsername: "", TelegramVerified: false, TelegramCheckCode: "", botChatId: 0, description: "" });
+  const user = ref({ id: "", userName: "", email: "", telegramUsername: "", telegramVerified: false, telegramCheckCode: "", botChatId: 0, description: "" });
   const newTelegramUserName = ref("");
   const telegramVerifyCode = ref("");
   const result = ref("");
@@ -45,7 +45,7 @@
 
   const Load = async () => {
     if (!me.value) {
-      let res = await fetch(ctx.rbUrl() + "/api/profiles/" + route.params.id,
+      let res = await fetch(ctx.rbUrl() + "/identity/profiles?userref=" + route.params.id,
         {
           headers: await ctx.authHeadersAppJson()
         });
@@ -131,7 +131,7 @@
 
   <div v-if="me">
     <br />
-    <h4 v-if="!user.TelegramVerified">
+    <h4 v-if="!user.telegramVerified">
       Мы используем Telegam для уведомлений. Ваше имя пользователя не передается другим пользователям сайта. Для настройки уведомлений вам нужно
       добавить чат для
       <a href="https://t.me/RiverStoresBot" target="_blank">нашего бота</a>. После этого укажите ваше имя пользователя из Telegram ниже.
@@ -148,12 +148,12 @@
     <div class="row mb-3 text-danger" v-if="user.telegramUsername && !user.botChatId">
       <p>Это имя пользователя не найдено. Добавьте чат, напишите в чат любое сообщение и перезагрузите эту страницу для продолжения.</p>
     </div>
-    <div class="row mb-3" v-if="user.botChatId && !user.TelegramVerified && user.telegramUsername == newTelegramUserName">
+    <div class="row mb-3" v-if="user.botChatId && !user.telegramVerified && user.telegramUsername == newTelegramUserName">
       <div class="col">
         <button class="btn btn-primary" @click="NewTelegramCode">Отослать проверочный код в чат для подтверждения</button>
       </div>
     </div>
-    <div class="row mb-3" v-if="user.botChatId && user.TelegramCheckCode && !user.TelegramVerified">
+    <div class="row mb-3" v-if="user.botChatId && user.telegramCheckCode && !user.telegramVerified">
       <div class="row mb-3">
         <label class="col-3 form-label">Введите новый код из чата</label>
         <div class="col-7">
