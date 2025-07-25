@@ -60,8 +60,6 @@ func initServer() *http.Server {
 
 	// API routes
 
-	//// shops
-
 	shopsRestApiConfig := elorm.CreateStdRestApiConfig(
 		*models.Dbc.ShopDef.EntityDef,
 		models.Dbc.LoadShop,
