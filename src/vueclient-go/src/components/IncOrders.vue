@@ -18,7 +18,7 @@
 
     if (res.ok) {
       res = await res.json();
-      orders.value = res;
+      orders.value = res.Data;
     } else console.log(res);
   }
 
@@ -49,18 +49,18 @@
           <th class="col-2 text-end">Сумма</th>
         </tr>
       </thead>
-      <tr v-for="order in orders" :key="order.id">
+      <tr v-for="order in orders" :key="order.Ref">
         <td>
-          <RouterLink :to="`/order/${order.id}`">{{ order.createdByInfo.userName }}</RouterLink>
+          <RouterLink :to="`/order/${order.Ref}`">{{ order.CreatedBy.Username }}</RouterLink>
         </td>
         <td>
-          <RouterLink :to="`/order/${order.id}`">{{ statuses[order.status] }}</RouterLink>
+          <RouterLink :to="`/order/${order.Ref}`">{{ statuses[order.Status] }}</RouterLink>
         </td>
         <td>
-          <RouterLink :to="`/order/${order.id}`">{{ ctx.fmtDate(order.createdOn) }}</RouterLink>
+          <RouterLink :to="`/order/${order.Ref}`">{{ ctx.fmtDate(order.CreatedAt) }}</RouterLink>
         </td>
         <td class="text-end">
-          <RouterLink :to="`/order/${order.id}`">{{ order.sum }}</RouterLink>
+          <RouterLink :to="`/order/${order.Ref}`">{{ order.Sum }}</RouterLink>
         </td>
       </tr>
     </table>

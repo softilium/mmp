@@ -10,19 +10,17 @@
   const router = useRouter()
 
   const order = ref({
-    customerComment: "",
-    senderComment: "",
-    expectedDeliveryDate: "",
-    createdOn: "",
-    senderID: 0,
-    senderInfo: { id:0, userName: "", description: "" },
-    createdByInfo: { id:0, userName: "", description: "" },
-    status: 0,
-    id: 0,
-    lines: [],
-    qty: 0,
-    sum: 0,
-    createdByID: 0
+    CustomerComment: "",
+    SenderComment: "",
+    ExpectedDeliveryDate: "",
+    CreatedAt: "",
+    Sender: { Ref:"", Username: "", Description: "" },
+    CreatedBy: { Ref:"", Username: "", Description: "" },
+    Status: 0,
+    Ref: 0,
+    Lines: [],
+    Qty: 0,
+    Sum: 0
   });
   const statuses = ref([]);
 
@@ -42,8 +40,8 @@
 
     if (res.ok) {
       order.value = await res.json();
-      isCustomer.value = order.value.createdByID == ctx.userInfo.id;
-      isSender.value = order.value.senderID == ctx.userInfo.id;
+      isCustomer.value = order.value.CreatedBy.Ref == ctx.userInfo.id;
+      isSender.value = order.value.Sender.Ref == ctx.userInfo.id;
     }
   });
 
@@ -82,10 +80,10 @@
 
   <div v-if="order">
     <button :disabled="!isCustomer && !isSender" class="btn btn-primary" @click="Save()">Сохранить</button>
-    <h1>Заказ {{ order.id }}</h1>
-    <h6>{{ ctx.fmtDate(order.createdOn) }}</h6>
-    <h6>Отправитель <ProfileLink :userInfo="order.senderInfo"></ProfileLink></h6>
-    <h6>Заказчик <ProfileLink :userInfo="order.createdByInfo"></ProfileLink></h6>
+    <h1>Заказ {{ order.Ref }}</h1>
+    <h6>{{ ctx.fmtDate(order.CreatedAt) }}</h6>
+    <h6>Отправитель <ProfileLink :userInfo="order.Sender"></ProfileLink></h6>
+    <h6>Заказчик <ProfileLink :userInfo="order.CreatedBy"></ProfileLink></h6>
     <div>&nbsp;</div>
 
     <table class="table table-sm">
@@ -97,18 +95,18 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="line in order.lines" v-bind:key="line.id">
-          <td v-if="line.good.isDeleted==true">{{line.good.caption}} (удалено)</td>
-          <td v-if="line.good.isDeleted==false"><RouterLink :to="`/good/${line.good.id}`">{{line.good.caption}}</RouterLink></td>
-          <td>{{line.qty}}</td>
-          <td>{{line.sum}}</td>
+        <tr v-for="line in order.Lines" v-bind:key="line.id">
+          <td v-if="line.good.isDeleted==true">{{line.good.Caption}} (удалено)</td>
+          <td v-if="line.good.isDeleted==false"><RouterLink :to="`/good/${line.Good.Ref}`">{{line.good.Caption}}</RouterLink></td>
+          <td>{{line.Qty}}</td>
+          <td>{{line.Sum}}</td>
         </tr>
       </tbody>
       <tfoot class="table-primary">
         <tr>
           <td>ИТОГО</td>
-          <td>{{ order.qty}}</td>
-          <td>{{ order.sum}}</td>
+          <td>{{ order.Qty}}</td>
+          <td>{{ order.Sum}}</td>
         </tr>
       </tfoot>
     </table>
@@ -118,7 +116,7 @@
     <div class="form-group form-group-sm row">
       <label class="col-3 form-label">Статус</label>
       <div class="col-9">
-        <select :disabled="!isSender" class="form-select form-control-sm" v-model="order.status">
+        <select :disabled="!isSender" class="form-select form-control-sm" v-model="order.Status">
           <template v-for="(value,key) in statuses">
             <option v-bind:value="Number(key)">{{ value }}</option>
           </template>
@@ -130,7 +128,7 @@
     <div class="form-group form-group-sm row">
       <label class="col-3 form-label">Примечание покупателя</label>
       <div class="col-9">
-        <textarea :disabled="!isCustomer" class="form-control" v-model="order.customerComment" rows="5" />
+        <textarea :disabled="!isCustomer" class="form-control" v-model="order.CustomerComment" rows="5" />
       </div>
     </div>
   </div>
@@ -138,7 +136,7 @@
     <div class="form-group form-group-sm row">
       <label class="col-3 form-label">Примечание продавца</label>
       <div class="col-9">
-        <textarea :disabled="!isSender" class="form-control" v-model="order.senderComment" rows="5" />
+        <textarea :disabled="!isSender" class="form-control" v-model="order.SenderComment" rows="5" />
       </div>
     </div>
   </div>
@@ -146,7 +144,7 @@
     <div class="form-group form-group-sm row">
       <label class="col-3 form-label">Ожидаемая дата доставки</label>
       <div class="col-9">
-        <input :disabled="!isSender" type="datetime-local" class="form-control" v-model="order.expectedDeliveryDate" />
+        <input :disabled="!isSender" type="datetime-local" class="form-control" v-model="order.ExpectedDeliveryDate" />
       </div>
     </div>
   </div>

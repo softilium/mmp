@@ -116,6 +116,7 @@ func initServer() *http.Server {
 	initRouterImages(router)
 	initRouterAuth(router)
 	initRouterBasket(router)
+	initRouterOrders(router)
 
 	// CORE
 
@@ -219,6 +220,15 @@ func UserAdminRequired(w http.ResponseWriter, r *http.Request) bool {
 	return true
 }
 
+func UserRequired(w http.ResponseWriter, r *http.Request) bool {
+	_, err := models.UserFromHttpRequest(r)
+	if err != nil {
+		HandleErr(w, 0, fmt.Errorf("unauthorized: %v", err))
+		return false
+	}
+	return true
+}
+
 func UserRequiredForEdit(w http.ResponseWriter, r *http.Request) bool {
 	if r.Method == http.MethodGet {
 		return true
@@ -233,5 +243,4 @@ func UserRequiredForEdit(w http.ResponseWriter, r *http.Request) bool {
 
 //TODO checkout
 //TODO orders, edit orders
-//TODO orders history
 //TODO telegram middleware

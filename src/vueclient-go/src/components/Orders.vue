@@ -17,7 +17,8 @@
       });
 
     if (res.ok) {
-      orders.value = await res.json();
+      res = await res.json();
+      orders.value = res.Data;
     }
   }
 
