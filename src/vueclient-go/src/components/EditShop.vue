@@ -38,6 +38,7 @@
           headers: await ctx.authHeadersAppJson(),
           body: JSON.stringify(shop.value)
         });
+        if (await ctx.CheckUnauth(res)) return;
         if (res.ok) {
           res = await res.json();
           shop.value.Ref = res.Ref;
@@ -51,7 +52,7 @@
           headers: await ctx.authHeadersAppJson(),
           body: JSON.stringify(shop.value)
         });
-
+        if (await ctx.CheckUnauth(res)) return;
         if (res.ok)
           router.push(`/shop/${shop.value.Ref}`);
 

@@ -144,7 +144,7 @@ func checkoutHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	user, err := models.UserFromHttpRequest(r)
 	if err != nil {
-		HandleErr(w, 0, fmt.Errorf("error getting user from request: %w", err))
+		HandleErr(w, http.StatusUnauthorized, fmt.Errorf("error getting user from request: %w", err))
 		return
 	}
 
@@ -155,7 +155,7 @@ func checkoutHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	senderObj, err := models.Dbc.LoadUser(sender)
 	if err != nil {
-		HandleErr(w, 0, fmt.Errorf("error loading sender user: %w", err))
+		HandleErr(w, http.StatusNotFound, fmt.Errorf("error loading sender user: %w", err))
 		return
 	}
 

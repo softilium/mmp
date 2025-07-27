@@ -32,19 +32,19 @@
 
   <div class="row">
 
-    <div class="col-5">
+    <div class="col">
 
       <h1>Вход</h1>
 
       <div class="row mb-3">
         <label class="col-3 form-label">Email</label>
-        <div class="col-7">
+        <div class="col-9">
           <input class="form-control" v-model="emailString" required />
         </div>
       </div>
       <div class="row mb-3">
         <label class="col-3 form-label">Пароль</label>
-        <div class="col-7">
+        <div class="col-9">
           <input class="form-control" v-model="passwordString" type="password" />
         </div>
       </div>
@@ -53,20 +53,22 @@
 
     </div>
 
-    <div class="col-2"></div>
+  </div>
 
-    <div class="col-5">
+  <div class="row">
+
+    <div class="col">
       <h1>Регистрация</h1>
 
       <div class="row mb-3">
         <label class="col-3 form-label">Email</label>
-        <div class="col-7">
+        <div class="col">
           <input class="form-control" v-model="emailStringreg" required />
         </div>
       </div>
       <div class="row mb-3">
         <label class="col-3 form-label">Пароль</label>
-        <div class="col-7">
+        <div class="col">
           <input class="form-control" v-model="passwordStringreg" type="password" />
         </div>
       </div>

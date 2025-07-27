@@ -19,7 +19,7 @@ func initRouterBasket(router *http.ServeMux) {
 	basketRestApiConfig.BeforeMiddleware = func(w http.ResponseWriter, r *http.Request) bool {
 		_, err := models.UserFromHttpRequest(r)
 		if err != nil {
-			HandleErr(w, 0, fmt.Errorf("unauthorized: %v", err))
+			HandleErr(w, http.StatusUnauthorized, fmt.Errorf("unauthorized: %v", err))
 			return false
 		}
 		return true
@@ -74,7 +74,7 @@ func increaseBasket(w http.ResponseWriter, r *http.Request) {
 			elorm.AddFilterEQ(models.Dbc.OrderLineDef.Good, gref),
 		}, nil, 0, 0)
 	if err != nil {
-		HandleErr(w, 0, err)
+		HandleErr(w, http.StatusNotFound, err)
 		return
 	}
 	if len(exists) > 1 {

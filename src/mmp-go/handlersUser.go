@@ -117,7 +117,7 @@ func UserLogin(w http.ResponseWriter, r *http.Request) {
 	payload := userPayLoad{}
 	err := json.NewDecoder(r.Body).Decode(&payload)
 	if err != nil {
-		HandleErr(w, 0, err)
+		HandleErr(w, http.StatusBadRequest, err)
 		return
 	}
 	users, _, err := models.Dbc.UserDef.SelectEntities(
@@ -202,7 +202,7 @@ func UserMyProfile(w http.ResponseWriter, r *http.Request) {
 		payload := UserProfileResponse{}
 		err = json.NewDecoder(r.Body).Decode(&payload)
 		if err != nil {
-			HandleErr(w, 0, err)
+			HandleErr(w, http.StatusBadRequest, err)
 			return
 		}
 		user.SetUsername(payload.Username)
@@ -236,7 +236,7 @@ func UserTokenRefresh(w http.ResponseWriter, r *http.Request) {
 	payload := refreshTokenPayload{}
 	err := json.NewDecoder(r.Body).Decode(&payload)
 	if err != nil {
-		HandleErr(w, 0, err)
+		HandleErr(w, http.StatusBadRequest, err)
 		return
 	}
 	if payload.RefreshToken == "" {
@@ -247,7 +247,7 @@ func UserTokenRefresh(w http.ResponseWriter, r *http.Request) {
 		if item.RefreshToken == payload.RefreshToken && item.RefreshTokenExpiresAt.After(time.Now()) {
 			user, err := models.Dbc.LoadUser(userKey)
 			if err != nil {
-				HandleErr(w, http.StatusUnauthorized, fmt.Errorf("user not found"))
+				HandleErr(w, 0, err)
 				return
 			}
 			newToken := models.GenerateToken(user)

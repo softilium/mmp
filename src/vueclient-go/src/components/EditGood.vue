@@ -44,6 +44,7 @@
           method: "DELETE",
           headers: await ctx.authHeaders()
         });
+        if (await ctx.CheckUnauth(res)) return;
         if (!res.ok) console.log(res);
       } else {
         let blob = await fetch(imageSrc.value[i]).then(r => r.blob()); // load image from blob url
@@ -54,6 +55,7 @@
           headers: await ctx.authHeaders(),
           body: data
         });
+        if (await ctx.CheckUnauth(res)) return;
         if (!res.ok) console.log(res);
       }
     }
@@ -66,6 +68,7 @@
         headers: await ctx.authHeadersAppJson(),
         body: JSON.stringify(good.value)
       });
+      if (await ctx.CheckUnauth(res)) return;
       if (res.ok) {
         await SaveImages(route.params.id);
         router.push("/shop/" + route.params.shopid);
@@ -77,6 +80,7 @@
         headers: await ctx.authHeadersAppJson(),
         body: JSON.stringify(good.value)
       });
+      if (await ctx.CheckUnauth(res)) return;
       if (res.ok) {
         res = await res.json();
         await SaveImages(res.Ref);

@@ -22,6 +22,7 @@
         method: "GET",
         headers: await ctx.authHeadersAppJson()
       });
+      if (await ctx.CheckUnauth(res)) return;
       if (res.ok) {
         res = await res.json();
         res = res.Data;
@@ -89,6 +90,7 @@
       headers: await ctx.authHeadersAppJson(),
       body: senderRec.customerComment
     });
+    if (await ctx.CheckUnauth(res)) return;
     if (res.ok) {
       await ctx.loadBasket();
       res = await res.json();
@@ -115,6 +117,7 @@
       method: "POST",
       headers: await ctx.authHeadersAppJson()
     });
+    if (await ctx.CheckUnauth(res)) return;
     if (res.ok) {
       await Load();
       ctx.loadBasket();
@@ -132,6 +135,7 @@
       method: "POST",
       headers: await ctx.authHeadersAppJson()
     });
+    if (await ctx.CheckUnauth(res)) return;
     if (res.ok) {
       await Load();
       ctx.loadBasket();

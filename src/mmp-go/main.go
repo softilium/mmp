@@ -210,7 +210,7 @@ func main() {
 func UserAdminRequired(w http.ResponseWriter, r *http.Request) bool {
 	user, err := models.UserFromHttpRequest(r)
 	if err != nil {
-		HandleErr(w, 0, fmt.Errorf("unauthorized: %v", err))
+		HandleErr(w, http.StatusUnauthorized, fmt.Errorf("unauthorized: %v", err))
 		return false
 	}
 	if !user.Admin() {
@@ -223,7 +223,7 @@ func UserAdminRequired(w http.ResponseWriter, r *http.Request) bool {
 func UserRequired(w http.ResponseWriter, r *http.Request) bool {
 	_, err := models.UserFromHttpRequest(r)
 	if err != nil {
-		HandleErr(w, 0, fmt.Errorf("unauthorized: %v", err))
+		HandleErr(w, http.StatusUnauthorized, fmt.Errorf("unauthorized: %v", err))
 		return false
 	}
 	return true
@@ -235,7 +235,7 @@ func UserRequiredForEdit(w http.ResponseWriter, r *http.Request) bool {
 	}
 	_, err := models.UserFromHttpRequest(r)
 	if err != nil {
-		HandleErr(w, 0, fmt.Errorf("unauthorized: %v", err))
+		HandleErr(w, http.StatusUnauthorized, fmt.Errorf("unauthorized: %v", err))
 		return false
 	}
 	return true

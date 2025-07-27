@@ -15,7 +15,7 @@
       {
         headers: await ctx.authHeadersAppJson()
       });
-
+    if (await ctx.CheckUnauth(res)) return;
     if (res.ok) {
       res = await res.json();
       orders.value = res.Data;

@@ -67,6 +67,7 @@
         method: "GET",
         headers: await ctx.authHeadersAppJson()
       });
+      if (await ctx.CheckUnauth(res)) return;
       if (res.ok) {
         res = await res.json();
         res.Data.forEach(l => {
@@ -105,6 +106,7 @@
       method: "POST",
       headers: await ctx.authHeadersAppJson()
     });
+    if (await ctx.CheckUnauth(res)) return;
     if (res.ok) {
       LoadBasket();
       await ctx.loadBasket();
@@ -122,6 +124,7 @@
       method: "POST",
       headers: await ctx.authHeadersAppJson()
     });
+    if (await ctx.CheckUnauth(res)) return;
     if (res.ok) {
       LoadBasket();
       await ctx.loadBasket();
@@ -136,6 +139,7 @@
       method: "DELETE",
       headers: await ctx.authHeadersAppJson()
     });
+    if (await ctx.CheckUnauth(res)) return;
     if (res.ok) {
       router.push("/shop/" + route.params.shopid);
     }

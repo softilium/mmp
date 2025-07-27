@@ -10,6 +10,7 @@
       {
         headers: await ctx.authHeadersAppJson()
       });
+    if (await ctx.CheckUnauth(res)) return;
     if (res.ok) {
       users.value = await res.json();
     }
@@ -18,12 +19,13 @@
   const Save = async (Ref) => {
     users.value.Data.forEach(async (u) => {
       if (u.Ref == Ref) {
-        await fetch(ctx.rbUrl() + "/api/admin/allusers?ref=" + u.Ref,
+        let res = await fetch(ctx.rbUrl() + "/api/admin/allusers?ref=" + u.Ref,
           {
             method: "PUT",
             body: JSON.stringify(u),
             headers: await ctx.authHeadersAppJson()
           });
+        if (await ctx.CheckUnauth(res)) return;
       }
     });
   }
@@ -32,10 +34,11 @@
 
     if (confirm("Start migration?") == false) return;
 
-    await fetch(ctx.rbUrl() + "/api/admin/migrate", {
+    let res = await fetch(ctx.rbUrl() + "/api/admin/migrate", {
       method: "POST",
       headers: await ctx.authHeadersAppJson()
     });
+    if (await ctx.CheckUnauth(res)) return;
   };
 
 </script>

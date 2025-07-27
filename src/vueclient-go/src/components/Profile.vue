@@ -23,6 +23,7 @@
       method: "POST",
       headers: await ctx.authHeadersAppJson()
     });
+    if (await ctx.CheckUnauth(res)) return;
     if (res.ok) Load();
 
   }
@@ -34,6 +35,7 @@
       method: "POST",
       headers: await ctx.authHeadersAppJson()
     });
+    if (await ctx.CheckUnauth(res)) return;
     if (res.ok) Load();
 
   }
@@ -49,6 +51,7 @@
         {
           headers: await ctx.authHeadersAppJson()
         });
+      if (await ctx.CheckUnauth(res)) return;
       if (res.ok) {
         user.value = await res.json();
         userDescription.value = ctx.linkify(user.value.description);
@@ -60,6 +63,7 @@
         {
           headers: await ctx.authHeadersAppJson()
         });
+      if (await ctx.CheckUnauth(res)) return;
       if (res.ok) {
         user.value = await res.json();
         newTelegramUserName.value = user.value.telegramUsername;
@@ -80,6 +84,7 @@
         body: JSON.stringify(user.value),
         headers: await ctx.authHeadersAppJson()
       });
+    if (await ctx.CheckUnauth(res)) return;
     if (res.ok) {
       result.value = "Изменения записаны";
       await Load();

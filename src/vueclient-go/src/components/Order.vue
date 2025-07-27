@@ -37,7 +37,7 @@
     res = await fetch(ctx.rbUrl() + "/api/orders?ref=" + route.params.id, {
       headers: await ctx.authHeadersAppJson()
     });
-
+    if (await ctx.CheckUnauth(res)) return;
     if (res.ok) {
       order.value = await res.json();
 
@@ -49,6 +49,7 @@
         res = await fetch(ctx.rbUrl() + "/api/orderlines?orderref=" + order.value.Ref, {
           headers: await ctx.authHeadersAppJson()
         });
+        if (await ctx.CheckUnauth(res)) return;
         if (res.ok) {
           const lines = await res.json();
           order.value.lines = lines.Data;
@@ -66,6 +67,7 @@
           body: JSON.stringify(order.value),
           headers: await ctx.authHeadersAppJson()
         });
+      if (await ctx.CheckUnauth(req)) return;
         ok = req.ok;
     }
     if (ok && isCustomer.value) {

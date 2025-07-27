@@ -27,6 +27,7 @@ export const ctx = reactive({
       });
     } else {
       let res = await fetch(`${ctx.rbUrl()}/api/basket`, { headers: await ctx.authHeaders() });
+      if (await this.CheckUnauth(res)) return;
       if (res.ok) {
         res = await res.json();
         res.Data.forEach((_) => {
@@ -123,31 +124,20 @@ export const ctx = reactive({
   },
 
   async RefreshToken() {
-
     if (this.isTg()) return;
-
     if (this.refreshToken != "") {
-      try {
-        let res = await fetch(this.rbUrl() + "/identity/refresh", {
-          method: "POST",
-          signal: AbortSignal.timeout(5000),
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ "refreshToken": this.refreshToken })
-        });
-        if (res.ok) {
-          res = await res.json();
-          this.SetAccessToken(res.accessToken, res.accessTokenExpiresAt);
-          this.SetRefreshToken(res.refreshToken, res.refreshTokenExpiresAt);
-          //this.CheckLogged();
-        } else {
-          this.SetAccessToken("");
-          this.SetRefreshToken("");
-          console.log("unauthorized tokens was cleared");
-        }
+      let res = await fetch(this.rbUrl() + "/identity/refresh", {
+        method: "POST",
+        signal: AbortSignal.timeout(5000),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ "refreshToken": this.refreshToken })
+      });
+      if (await this.CheckUnauth(res)) return;
+      if (res.ok) {
+        res = await res.json();
+        this.SetAccessToken(res.accessToken, res.accessTokenExpiresAt);
+        this.SetRefreshToken(res.refreshToken, res.refreshTokenExpiresAt);
       }
-      catch (err) {
-        console.log(err);
-      };
     }
   },
 
@@ -161,22 +151,28 @@ export const ctx = reactive({
       }
       return;
     }
-
     if (this.accessToken != "") {
       let res = await fetch(this.rbUrl() + "/identity/myprofile", {
         method: "GET",
         signal: AbortSignal.timeout(5000),
         headers: await this.authHeaders()
       });
+      if (await this.CheckUnauth(res)) return;
       if (res.ok) {
         res = await res.json();
         this.userInfo = res;
-      } else {
-        this.userInfo = newUserInfo();
-        this.SetAccessToken("");
-        this.SetRefreshToken("");
       }
     }
+  },
+
+  async CheckUnauth(res) {
+    if (res.status == 401) {
+      this.userInfo = newUserInfo();
+      this.SetAccessToken("");
+      this.SetRefreshToken("");
+      return true;
+    }
+    return false;
   },
 
   async Login(emailString, passwordString) {
