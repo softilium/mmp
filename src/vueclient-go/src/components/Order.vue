@@ -18,7 +18,7 @@
     CreatedBy: { Ref:"", Username: "", Description: "" },
     Status: 0,
     Ref: 0,
-    Lines: [],
+    lines: [],
     Qty: 0,
     Sum: 0
   });
@@ -34,43 +34,45 @@
       statuses.value = await res.json();
     }
 
-    res = await fetch(ctx.rbUrl() + "/api/orders/" + route.params.id, {
+    res = await fetch(ctx.rbUrl() + "/api/orders?ref=" + route.params.id, {
       headers: await ctx.authHeadersAppJson()
     });
 
     if (res.ok) {
       order.value = await res.json();
+
+      order.value.Nbr = order.value.Ref.substring(7, 12);
       isCustomer.value = order.value.CreatedBy.Ref == ctx.userInfo.id;
       isSender.value = order.value.Sender.Ref == ctx.userInfo.id;
+
+      if (isCustomer.value || isSender.value) {
+        res = await fetch(ctx.rbUrl() + "/api/orderlines?orderref=" + order.value.Ref, {
+          headers: await ctx.authHeadersAppJson()
+        });
+        if (res.ok) {
+          const lines = await res.json();
+          order.value.lines = lines.Data;
+        }
+      }
     }
   });
 
   const Save = async () => {
-
-    //order.value.senderInfo = null;
-    //order.value.createdByInfo = null;
-
-    if (isCustomer.value) {
-      let req = await fetch(`${ctx.rbUrl()}/api/orders/outbox/${route.params.id}`,
+    let ok = false;
+    if (isCustomer.value || isSender.value) {
+      let req = await fetch(`${ctx.rbUrl()}/api/orders?ref=${route.params.id}`,
         {
           method: "PUT",
           body: JSON.stringify(order.value),
           headers: await ctx.authHeadersAppJson()
         });
-      if (req.ok) {
-        router.push("/orders");
-      }
+        ok = req.ok;
     }
-    if (isSender.value) {
-      let req = await fetch(`${ctx.rbUrl()}/api/orders/inbox/${route.params.id}`,
-        {
-          method: "PUT",
-          body: JSON.stringify(order.value),
-          headers: await ctx.authHeadersAppJson()
-        });
-      if (req.ok) {
-        router.push("/inc-orders");
-      }
+    if (ok && isCustomer.value) {
+      router.push("/orders");
+    }
+    if (ok && isSender.value) {
+      router.push("/inc-orders");
     }
   }
 
@@ -80,7 +82,7 @@
 
   <div v-if="order">
     <button :disabled="!isCustomer && !isSender" class="btn btn-primary" @click="Save()">Сохранить</button>
-    <h1>Заказ {{ order.Ref }}</h1>
+    <h1>Заказ {{ order.Nbr }}</h1>
     <h6>{{ ctx.fmtDate(order.CreatedAt) }}</h6>
     <h6>Отправитель <ProfileLink :userInfo="order.Sender"></ProfileLink></h6>
     <h6>Заказчик <ProfileLink :userInfo="order.CreatedBy"></ProfileLink></h6>
@@ -95,9 +97,8 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="line in order.Lines" v-bind:key="line.id">
-          <td v-if="line.good.isDeleted==true">{{line.good.Caption}} (удалено)</td>
-          <td v-if="line.good.isDeleted==false"><RouterLink :to="`/good/${line.Good.Ref}`">{{line.good.Caption}}</RouterLink></td>
+        <tr v-for="line in order.lines" v-bind:key="line.Ref">
+          <td><RouterLink :to="`/good/${line.Good.Ref}`">{{line.Good.Caption}}</RouterLink></td>
           <td>{{line.Qty}}</td>
           <td>{{line.Sum}}</td>
         </tr>
@@ -144,7 +145,7 @@
     <div class="form-group form-group-sm row">
       <label class="col-3 form-label">Ожидаемая дата доставки</label>
       <div class="col-9">
-        <input :disabled="!isSender" type="datetime-local" class="form-control" v-model="order.ExpectedDeliveryDate" />
+        <input :disabled="!isSender" type="date" v-model="order.ExpectedDeliveryDate" />
       </div>
     </div>
   </div>

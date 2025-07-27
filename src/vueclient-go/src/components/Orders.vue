@@ -50,16 +50,16 @@
       </thead>
       <tr v-for="order in orders" v-bind:key="order.id">
         <td>
-          <RouterLink :to="`/order/${order.id}`">{{ order.senderInfo.userName }} </RouterLink>
+          <RouterLink :to="`/order/${order.Ref}`">{{ order.Sender.Username }} </RouterLink>
         </td>
         <td>
-          <RouterLink :to="`/order/${order.id}`">{{ statuses[order.status] }}</RouterLink>
+          <RouterLink :to="`/order/${order.Ref}`">{{ statuses[order.Status] }}</RouterLink>
         </td>
         <td>
-          <RouterLink :to="`/order/${order.id}`">{{ ctx.fmtDate(order.createdOn) }}</RouterLink>
+          <RouterLink :to="`/order/${order.Ref}`">{{ ctx.fmtDate(order.CreatedAt) }}</RouterLink>
         </td>
         <td class="text-end">
-          <RouterLink :to="`/order/${order.id}`">{{ order.sum }}</RouterLink>
+          <RouterLink :to="`/order/${order.Ref}`">{{ order.Sum }}</RouterLink>
         </td>
       </tr>
     </table>

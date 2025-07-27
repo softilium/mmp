@@ -66,12 +66,13 @@ func increaseBasket(w http.ResponseWriter, r *http.Request) {
 		HandleErr(w, http.StatusNotFound, fmt.Errorf("good not found: %v", err))
 		return
 	}
-	flt := []*elorm.Filter{}
-	flt = append(flt, elorm.AddFilterEQ(models.Dbc.OrderLineDef.IsDeleted, false))
-	flt = append(flt, elorm.AddFilterEQ(models.Dbc.OrderLineDef.CustomerOrder, "")) // only active basket lines (order is empty)
-	flt = append(flt, elorm.AddFilterEQ(models.Dbc.OrderLineDef.CreatedBy, user.RefString()))
-	flt = append(flt, elorm.AddFilterEQ(models.Dbc.OrderLineDef.Good, gref))
-	exists, _, err := models.Dbc.OrderLineDef.SelectEntities(flt, nil, 0, 0)
+	exists, _, err := models.Dbc.OrderLineDef.SelectEntities(
+		[]*elorm.Filter{
+			elorm.AddFilterEQ(models.Dbc.OrderLineDef.IsDeleted, false),
+			elorm.AddFilterEQ(models.Dbc.OrderLineDef.CustomerOrder, ""), // only active basket lines (order is empty)
+			elorm.AddFilterEQ(models.Dbc.OrderLineDef.CreatedBy, user.RefString()),
+			elorm.AddFilterEQ(models.Dbc.OrderLineDef.Good, gref),
+		}, nil, 0, 0)
 	if err != nil {
 		HandleErr(w, 0, err)
 		return
@@ -129,12 +130,13 @@ func decreaseBasket(w http.ResponseWriter, r *http.Request) {
 		HandleErr(w, http.StatusNotFound, fmt.Errorf("good not found: %v", err))
 		return
 	}
-	flt := []*elorm.Filter{}
-	flt = append(flt, elorm.AddFilterEQ(models.Dbc.OrderLineDef.IsDeleted, false))
-	flt = append(flt, elorm.AddFilterEQ(models.Dbc.OrderLineDef.CustomerOrder, "")) // only active basket lines (order is empty)
-	flt = append(flt, elorm.AddFilterEQ(models.Dbc.OrderLineDef.CreatedBy, user.RefString()))
-	flt = append(flt, elorm.AddFilterEQ(models.Dbc.OrderLineDef.Good, gref))
-	exists, _, err := models.Dbc.OrderLineDef.SelectEntities(flt, nil, 0, 0)
+	exists, _, err := models.Dbc.OrderLineDef.SelectEntities(
+		[]*elorm.Filter{
+			elorm.AddFilterEQ(models.Dbc.OrderLineDef.IsDeleted, false),
+			elorm.AddFilterEQ(models.Dbc.OrderLineDef.CustomerOrder, ""), // only active basket lines (order is empty)
+			elorm.AddFilterEQ(models.Dbc.OrderLineDef.CreatedBy, user.RefString()),
+			elorm.AddFilterEQ(models.Dbc.OrderLineDef.Good, gref),
+		}, nil, 0, 0)
 	if err != nil {
 		HandleErr(w, 0, err)
 		return

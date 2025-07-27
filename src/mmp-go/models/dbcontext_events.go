@@ -25,16 +25,24 @@ type contextKey string
 
 const userContextKey contextKey = "user"
 
-func HttpUserContext(r *http.Request) context.Context {
-	ctx := r.Context()
-	user, _ := UserFromHttpRequest(r)
+func AddUserContext(ctx context.Context, user *User) context.Context {
 	if user != nil {
 		ctx = context.WithValue(ctx, userContextKey, user)
 	}
 	return ctx
 }
 
+func HttpUserContext(r *http.Request) context.Context {
+	user, err := UserFromHttpRequest(r)
+	if err != nil {
+		return AddUserContext(r.Context(), user)
+	}
+	return r.Context()
+}
+
 func (dbc *DbContext) SetHandlers() error {
+
+	dbc.CustomerOrderDef.ExpectedDeliveryDate.DateTimeJSONFormat = time.DateOnly
 
 	dbc.UserDef.AutoExpandFieldsForJSON = map[*elorm.FieldDef]bool{
 		dbc.UserDef.Ref:      true,

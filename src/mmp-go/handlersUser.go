@@ -69,7 +69,9 @@ func UserRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	exist, _, err := models.Dbc.UserDef.SelectEntities(
-		[]*elorm.Filter{elorm.AddFilterEQ(models.Dbc.UserDef.Email, payload.Email)}, nil, 0, 0)
+		[]*elorm.Filter{
+			elorm.AddFilterEQ(models.Dbc.UserDef.Email, payload.Email),
+		}, nil, 0, 0)
 	if err != nil {
 		HandleErr(w, 0, err)
 		return
@@ -119,7 +121,9 @@ func UserLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	users, _, err := models.Dbc.UserDef.SelectEntities(
-		[]*elorm.Filter{elorm.AddFilterEQ(models.Dbc.UserDef.Email, payload.Email)}, nil, 1, 1)
+		[]*elorm.Filter{
+			elorm.AddFilterEQ(models.Dbc.UserDef.Email, payload.Email),
+		}, nil, 1, 1)
 	if err != nil {
 		HandleErr(w, 0, err)
 		return

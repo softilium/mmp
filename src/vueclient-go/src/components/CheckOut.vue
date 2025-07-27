@@ -84,7 +84,7 @@
   };
 
   const Checkout = async (senderRec) => {
-    let res = await fetch(ctx.rbUrl() + "/api/orders/outbox/" + senderRec.senderID, {
+    let res = await fetch(ctx.rbUrl() + "/api/orders/checkout?sender=" + senderRec.senderInfo.Ref, {
       method: "POST",
       headers: await ctx.authHeadersAppJson(),
       body: senderRec.customerComment
@@ -92,7 +92,7 @@
     if (res.ok) {
       await ctx.loadBasket();
       res = await res.json();
-      router.push(`/order/${res.id}`);
+      router.push(`/order/${res.Ref}`);
     }
   };
 
@@ -142,7 +142,7 @@
 
 <template>
 
-  <div v-for="sender in basket">
+  <div v-for="sender in basket" v-bind:key="sender.senderID">
     <h1>
       Отправитель <ProfileLink :userInfo="sender.senderInfo"></ProfileLink>
     </h1>
@@ -158,11 +158,12 @@
       <tbody>
         <tr v-for="line in sender.lines" v-bind:key="line.id">
           <td class="col-8"><RouterLink :to="`/good/${line.good.id}`">{{ line.good.caption }}</RouterLink></td>
-          <td class="text-end">
-            {{ line.qty }}
+          <td>
             &nbsp;<button class="btn btn-primary btn-sm" @click="Inc(line.good)">+</button>
             &nbsp;<button class="btn btn-primary btn-sm" @click="Dec(line.good)">-</button>
+            {{ line.Qty }}
           </td>
+          <td class="text-end">{{ line.Sum }}</td>
           <td class="text-end">{{ line.sum }}</td>
         </tr>
       </tbody>
@@ -185,7 +186,7 @@
     </div>
 
     <div class="row mb-3" v-if="ctx.userInfo.id">
-      <button class="btn btn-primary btn-sm" @click="Checkout(sender)">Оформить заказ для {{sender.senderInfo.userName}}</button>
+      <button class="btn btn-primary btn-sm" @click="Checkout(sender)">Оформить заказ для {{sender.senderInfo.Username}}</button>
     </div>
     <div class="row mb-3" v-if="!ctx.userInfo.id">
       <RouterLink class="btn btn-primary btn-sm" to="/login" >

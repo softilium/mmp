@@ -176,7 +176,7 @@ export const ctx = reactive({
         this.SetAccessToken("");
         this.SetRefreshToken("");
       }
-    } else await this.RefreshToken();
+    }
   },
 
   async Login(emailString, passwordString) {
@@ -195,7 +195,8 @@ export const ctx = reactive({
         this.SetAccessToken(res.accessToken, res.accessTokenExpiresAt);
         this.SetRefreshToken(res.refreshToken, res.refreshTokenExpiresAt);
         await this.mergeAnonymousBasket();
-        this.CheckLogged();
+        await this.CheckLogged();
+        await this.loadBasket();
       } else {
         return await res.text();
       }
@@ -216,6 +217,7 @@ export const ctx = reactive({
       this.userInfo = newUserInfo();
       this.SetAccessToken("");
       this.SetRefreshToken("");
+      await this.loadBasket();
       await this.CheckLogged();
     }
 

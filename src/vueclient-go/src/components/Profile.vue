@@ -70,8 +70,8 @@
   const Save = async () => {
     if (!me.value) return;
     if (user.value.telegramUsername != newTelegramUserName.value) {
-      user.value.TelegramVerified = false;
-      user.value.TelegramCheckCode = "";
+      user.value.telegramVerified = false;
+      user.value.telegramCheckCode = "";
     }
     user.value.telegramUsername = newTelegramUserName.value;
     let res = await fetch(ctx.rbUrl() + "/identity/myprofile",
