@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -43,6 +44,7 @@ func initRouterBasket(router *http.ServeMux) {
 
 	router.HandleFunc("/api/basket/increase", increaseBasket)
 	router.HandleFunc("/api/basket/decrease", decreaseBasket)
+	router.HandleFunc("/api/basket/merge", mergeBasket)
 
 }
 
@@ -165,4 +167,80 @@ func decreaseBasket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusNotFound)
+}
+
+type MergeBasketItem struct {
+	GoodId   string  `json:"goodId"`
+	Quantity float64 `json:"quantity"`
+}
+
+func mergeBasket(w http.ResponseWriter, r *http.Request) {
+
+	user, err := models.UserFromHttpRequest(r)
+	if err != nil {
+		HandleErr(w, http.StatusUnauthorized, nil)
+		return
+	}
+
+	dbCtx := models.AddUserContext(r.Context(), user)
+
+	var newItems []MergeBasketItem
+	err = json.NewDecoder(r.Body).Decode(&newItems)
+	if err != nil {
+		HandleErr(w, http.StatusBadRequest, fmt.Errorf("invalid request body: %v", err))
+		return
+	}
+
+	existItems, _, err := models.Dbc.OrderLineDef.SelectEntities(
+		[]*elorm.Filter{
+			elorm.AddFilterEQ(models.Dbc.OrderLineDef.IsDeleted, false),
+			elorm.AddFilterEQ(models.Dbc.OrderLineDef.CustomerOrder, ""), // only active basket lines (order is empty)
+			elorm.AddFilterEQ(models.Dbc.OrderLineDef.CreatedBy, user.RefString()),
+		}, nil, 0, 0)
+	if err != nil {
+		HandleErr(w, 0, fmt.Errorf("error selecting basket lines: %w", err))
+		return
+	}
+
+	for _, newItem := range newItems {
+		updated := false
+		for _, existItem := range existItems {
+			if existItem.Good().RefString() == newItem.GoodId {
+				// Update existing item
+				existItem.SetQty(existItem.Qty() + newItem.Quantity)
+				existItem.SetSum(existItem.Qty() * existItem.Good().Price())
+				err = existItem.Save(dbCtx)
+				if err != nil {
+					HandleErr(w, 0, fmt.Errorf("error updating existing item: %w", err))
+					return
+				}
+				updated = true
+				break
+			}
+		}
+		if !updated {
+			// Create new item
+			good, err := models.Dbc.LoadGood(newItem.GoodId)
+			if err != nil {
+				HandleErr(w, http.StatusNotFound, fmt.Errorf("good not found: %v", err))
+				return
+			}
+			newLine, err := models.Dbc.CreateOrderLine()
+			if err != nil {
+				HandleErr(w, 0, fmt.Errorf("error creating new order line: %w", err))
+				return
+			}
+			newLine.SetGood(good)
+			newLine.SetQty(newItem.Quantity)
+			newLine.SetSum(newItem.Quantity * good.Price())
+			newLine.SetShop(good.OwnerShop())
+			newLine.SetCreatedBy(user)
+			err = newLine.Save(dbCtx)
+			if err != nil {
+				HandleErr(w, 0, fmt.Errorf("error saving new order line: %w", err))
+				return
+			}
+		}
+	}
+	w.WriteHeader(http.StatusOK)
 }

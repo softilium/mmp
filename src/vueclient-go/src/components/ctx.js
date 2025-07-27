@@ -274,7 +274,7 @@ export const ctx = reactive({
       goodId: item.goodId,
       quantity: item.quantity
     }));
-    await fetch(`${this.rbUrl()}/api/baskets/merge`, {
+    await fetch(`${this.rbUrl()}/api/basket/merge`, {
       method: "POST",
       headers: await this.authHeadersAppJson(),
       body: JSON.stringify(payload)
