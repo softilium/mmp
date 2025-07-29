@@ -1,122 +1,147 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
+import { onMounted, ref } from "vue";
+import { useRoute } from "vue-router";
+import { ctx } from "./ctx.js";
 
-  import { onMounted, ref } from 'vue';
-  import { useRoute } from 'vue-router'
-  import { ctx } from './ctx.js';
+const route = useRoute();
 
-  const route = useRoute();
+const me = ref(false);
+const user = ref({
+  id: "",
+  userName: "",
+  email: "",
+  telegramUsername: "",
+  telegramVerified: false,
+  telegramCheckCode: "",
+  botChatId: 0,
+  description: "",
+});
+const newTelegramUserName = ref("");
+const telegramVerifyCode = ref("");
+const result = ref("");
+const userDescription = ref("");
+const msgtext = ref("");
 
-  const me = ref(false);
-  const user = ref({ id: "", userName: "", email: "", telegramUsername: "", telegramVerified: false, telegramCheckCode: "", botChatId: 0, description: "" });
-  const newTelegramUserName = ref("");
-  const telegramVerifyCode = ref("");
-  const result = ref("");
-  const userDescription = ref("");
-  const msgtext = ref("");
+const NewTelegramCode = async () => {
+  if (me.value != true) return;
 
-  const NewTelegramCode = async () => {
-
-    if (me.value != true) return;
-
-    let res = await fetch(ctx.rbUrl() + "/api/profiles/newtelegramcode", {
-      method: "POST",
-      headers: await ctx.authHeadersAppJson()
-    });
-    if (await ctx.CheckUnauth(res)) return;
-    if (res.ok) Load();
-
-  }
-  const CheckTelegramCode = async () => {
-
-    if (me.value != true) return;
-
-    let res = await fetch(ctx.rbUrl() + "/api/profiles/checktelegramcode/" + telegramVerifyCode.value, {
-      method: "POST",
-      headers: await ctx.authHeadersAppJson()
-    });
-    if (await ctx.CheckUnauth(res)) return;
-    if (res.ok) Load();
-
-  }
-
-  onMounted(async () => {
-    me.value = !route.params.id;
-    Load();
+  let res = await fetch(ctx.rbUrl() + "/api/profiles/newtelegramcode", {
+    method: "POST",
+    headers: await ctx.authHeadersAppJson(),
   });
+  if (await ctx.CheckUnauth(res)) return;
+  if (res.ok) Load();
+};
+const CheckTelegramCode = async () => {
+  if (me.value != true) return;
 
-  const Load = async () => {
-    if (!me.value) {
-      let res = await fetch(ctx.rbUrl() + "/identity/profiles?userref=" + route.params.id,
-        {
-          headers: await ctx.authHeadersAppJson()
-        });
-      if (await ctx.CheckUnauth(res)) return;
-      if (res.ok) {
-        user.value = await res.json();
-        userDescription.value = ctx.linkify(user.value.description);
-        me.value = !route.params.id;
-      }
+  let res = await fetch(
+    ctx.rbUrl() + "/api/profiles/checktelegramcode/" + telegramVerifyCode.value,
+    {
+      method: "POST",
+      headers: await ctx.authHeadersAppJson(),
     }
-    else {
-      let res = await fetch(ctx.rbUrl() + "/identity/myprofile",
-        {
-          headers: await ctx.authHeadersAppJson()
-        });
-      if (await ctx.CheckUnauth(res)) return;
-      if (res.ok) {
-        user.value = await res.json();
-        newTelegramUserName.value = user.value.telegramUsername;
-      }
-    }
-  }
+  );
+  if (await ctx.CheckUnauth(res)) return;
+  if (res.ok) Load();
+};
 
-  const Save = async () => {
-    if (!me.value) return;
-    if (user.value.telegramUsername != newTelegramUserName.value) {
-      user.value.telegramVerified = false;
-      user.value.telegramCheckCode = "";
-    }
-    user.value.telegramUsername = newTelegramUserName.value;
-    let res = await fetch(ctx.rbUrl() + "/identity/myprofile",
+onMounted(async () => {
+  me.value = !route.params.id;
+  Load();
+});
+
+const Load = async () => {
+  if (!me.value) {
+    let res = await fetch(
+      ctx.rbUrl() + "/identity/profiles?userref=" + route.params.id,
       {
-        method: "PUT",
-        body: JSON.stringify(user.value),
-        headers: await ctx.authHeadersAppJson()
-      });
+        headers: await ctx.authHeadersAppJson(),
+      }
+    );
     if (await ctx.CheckUnauth(res)) return;
     if (res.ok) {
-      result.value = "Изменения записаны";
-      await Load();
+      user.value = await res.json();
+      userDescription.value = ctx.linkify(user.value.description);
+      me.value = !route.params.id;
     }
-    else
-      result.value = await res.text();
-  }
-
-  const SendMsg = async () => {
-    if (await ctx.SendMsg(user.value.id, msgtext.value)) {
-      msgtext.value = "";
-      alert("Сообщение отослано");
+  } else {
+    let res = await fetch(ctx.rbUrl() + "/identity/myprofile", {
+      headers: await ctx.authHeadersAppJson(),
+    });
+    if (await ctx.CheckUnauth(res)) return;
+    if (res.ok) {
+      user.value = await res.json();
+      newTelegramUserName.value = user.value.telegramUsername;
     }
   }
+};
 
+const Save = async () => {
+  if (!me.value) return;
+  if (user.value.telegramUsername != newTelegramUserName.value) {
+    user.value.telegramVerified = false;
+    user.value.telegramCheckCode = "";
+  }
+  user.value.telegramUsername = newTelegramUserName.value;
+  let res = await fetch(ctx.rbUrl() + "/identity/myprofile", {
+    method: "PUT",
+    body: JSON.stringify(user.value),
+    headers: await ctx.authHeadersAppJson(),
+  });
+  if (await ctx.CheckUnauth(res)) return;
+  if (res.ok) {
+    result.value = "Изменения записаны";
+    await Load();
+  } else result.value = await res.text();
+};
+
+const SendMsg = async () => {
+  if (await ctx.SendMsg(user.value.id, msgtext.value)) {
+    msgtext.value = "";
+    alert("Сообщение отослано");
+  }
+};
 </script>
 
 <template>
-
   <h1>
     Профиль пользователя {{ user.userName }}&nbsp;<br />
-    <button v-if="!me" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#sendMsgModal"><i class="bi bi-chat-quote"></i>&nbsp;Написать</button>
+    <button
+      v-if="!me"
+      class="btn btn-warning btn-sm"
+      data-bs-toggle="modal"
+      data-bs-target="#sendMsgModal"
+    >
+      <i class="bi bi-chat-quote"></i>&nbsp;Написать
+    </button>
     <br />
-    <button v-if="me && !ctx.isTg()" class="btn btn-outline-secondary btn-sm" @click="ctx.Logout(); $router.push('/');">Выйти</button>&nbsp;
-    <RouterLink v-if="me" class="btn btn-outline-secondary btn-sm" to="/orders">История заказов</RouterLink>
+    <button
+      v-if="me && !ctx.isTg()"
+      class="btn btn-outline-secondary btn-sm"
+      @click="
+        ctx.Logout();
+        $router.push('/');
+      "
+    >
+      Выйти</button
+    >&nbsp;
+    <RouterLink v-if="me" class="btn btn-outline-secondary btn-sm" to="/orders"
+      >История заказов</RouterLink
+    >
   </h1>
   <br />
 
   <div class="row mb-3">
     <label class="col-4 form-label">Имя пользователя</label>
     <div class="col-7">
-      <input class="form-control" v-model="user.userName" required :disabled="!me" />
+      <input
+        class="form-control"
+        v-model="user.userName"
+        required
+        :disabled="!me"
+      />
     </div>
   </div>
   <div class="row mb-3" v-if="me">
@@ -130,42 +155,74 @@
     <label class="col-4 form-label">Обо мне</label>
     <div class="col-7">
       <span v-if="!me" v-html="userDescription"></span>
-      <textarea v-if="me" class="form-control" v-model="user.description" rows="7" maxlength="300" />
+      <textarea
+        v-if="me"
+        class="form-control"
+        v-model="user.description"
+        rows="7"
+        maxlength="300"
+      />
     </div>
   </div>
 
   <div v-if="me">
     <br />
     <h4 v-if="!user.telegramVerified">
-      Мы используем Telegam для уведомлений. Ваше имя пользователя не передается другим пользователям сайта. Для настройки уведомлений вам нужно
-      добавить чат для
-      <a href="https://t.me/RiverStoresBot" target="_blank">нашего бота</a>. После этого укажите ваше имя пользователя из Telegram ниже.
+      Мы используем Telegam для уведомлений. Ваше имя пользователя не передается
+      другим пользователям сайта. Для настройки уведомлений вам нужно добавить
+      чат для
+      <a href="https://t.me/RiverStoresBot" target="_blank">нашего бота</a>.
+      После этого укажите ваше имя пользователя из Telegram ниже.
     </h4>
     <div class="row mb-3">
       <label class="col-4 form-label">Пользователь телеграм</label>
       <div class="col-7">
-        <input class="form-control" v-model="newTelegramUserName" :readonly="ctx.isTg()" />
+        <input
+          class="form-control"
+          v-model="newTelegramUserName"
+          :readonly="ctx.isTg()"
+        />
       </div>
       <div class="col-1">
         <span class="text-success"><i class="bi bi-star-fill"></i></span>
       </div>
     </div>
-    <div class="row mb-3 text-danger" v-if="user.telegramUsername && !user.botChatId">
-      <p>Это имя пользователя не найдено. Добавьте чат, напишите в чат любое сообщение и перезагрузите эту страницу для продолжения.</p>
+    <div
+      class="row mb-3 text-danger"
+      v-if="user.telegramUsername && !user.botChatId"
+    >
+      <p>
+        Это имя пользователя не найдено. Добавьте чат, напишите в чат любое
+        сообщение и перезагрузите эту страницу для продолжения.
+      </p>
     </div>
-    <div class="row mb-3" v-if="user.botChatId && !user.telegramVerified && user.telegramUsername == newTelegramUserName">
+    <div
+      class="row mb-3"
+      v-if="
+        user.botChatId &&
+        !user.telegramVerified &&
+        user.telegramUsername == newTelegramUserName
+      "
+    >
       <div class="col">
-        <button class="btn btn-primary" @click="NewTelegramCode">Отослать проверочный код в чат для подтверждения</button>
+        <button class="btn btn-primary" @click="NewTelegramCode">
+          Отослать проверочный код в чат для подтверждения
+        </button>
       </div>
     </div>
-    <div class="row mb-3" v-if="user.botChatId && user.telegramCheckCode && !user.telegramVerified">
+    <div
+      class="row mb-3"
+      v-if="user.botChatId && user.telegramCheckCode && !user.telegramVerified"
+    >
       <div class="row mb-3">
         <label class="col-3 form-label">Введите новый код из чата</label>
         <div class="col-7">
           <input class="form-control" v-model="telegramVerifyCode" />
         </div>
         <div class="col-1">
-          <button class="btn btn-primary" @click="CheckTelegramCode">Проверить</button>
+          <button class="btn btn-primary" @click="CheckTelegramCode">
+            Проверить
+          </button>
         </div>
       </div>
     </div>
@@ -173,21 +230,39 @@
     <div v-if="!route.params.id">
       <button class="btn btn-secondary btn-sm" @click="Save">Сохранить</button>
     </div>
-
   </div>
 
   <div v-if="!me">
-    <div class="modal fade" id="sendMsgModal" tabindex="-1" aria-labelledby="sendMsgModalLabel" aria-hidden="true">
+    <div
+      class="modal fade"
+      id="sendMsgModal"
+      tabindex="-1"
+      aria-labelledby="sendMsgModalLabel"
+      aria-hidden="true"
+    >
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="sendMsgModalLabel">Отправка сообщения в бот пользователю</h5>
+            <h5 class="modal-title" id="sendMsgModalLabel">
+              Отправка сообщения в бот пользователю
+            </h5>
           </div>
           <div class="modal-body">
-            <textarea class="form-control" rows="5" v-model="msgtext"></textarea>
+            <textarea
+              class="form-control"
+              rows="5"
+              v-model="msgtext"
+            ></textarea>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-warning btn-sm" data-bs-dismiss="modal" @click="SendMsg()">Послать</button>
+            <button
+              type="button"
+              class="btn btn-warning btn-sm"
+              data-bs-dismiss="modal"
+              @click="SendMsg()"
+            >
+              Послать
+            </button>
           </div>
         </div>
       </div>
@@ -197,5 +272,4 @@
   <div v-if="result" class="alert alert-primary">
     {{ result }}
   </div>
-
 </template>

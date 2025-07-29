@@ -1,5 +1,5 @@
-import { createApp } from 'vue';
-import { createWebHistory, createRouter } from 'vue-router';
+import { createApp } from "vue";
+import { createWebHistory, createRouter } from "vue-router";
 import Home from "./components/Home.vue";
 import Login from "./components/Login.vue";
 import EditShop from "./components/EditShop.vue";
@@ -13,31 +13,29 @@ import SetRoles from "./components/SetRoles.vue";
 import IncOrders from "./components/IncOrders.vue";
 import Good from "./components/Good.vue";
 
-import App from './App.vue'
+import App from "./App.vue";
 
 const routes = [
-  { path: '/', component: Home },
-  { path: '/login', component: Login },
-  { path: '/edit-shop/', component: EditShop },
-  { path: '/edit-shop/:id', component: EditShop },
-  { path: '/shop/:id', component: Shop },
-  { path: '/edit-good/:shopid', component: EditGood },
-  { path: '/edit-good/:shopid/:id', component: EditGood },
-  { path: '/checkout', component: CheckOut },
-  { path: '/orders', component: Orders },
-  { path: '/order/:id', component: Order },
-  { path: '/myprofile', component: Profile },
-  { path: '/profile/:id', component: Profile },
-  { path: '/set-roles', component: SetRoles },
-  { path: '/inc-orders', component: IncOrders },
-  { path: '/good/:id', component: Good },
+  { path: "/", component: Home },
+  { path: "/login", component: Login },
+  { path: "/edit-shop/", component: EditShop },
+  { path: "/edit-shop/:id", component: EditShop },
+  { path: "/shop/:id", component: Shop },
+  { path: "/edit-good/:shopid", component: EditGood },
+  { path: "/edit-good/:shopid/:id", component: EditGood },
+  { path: "/checkout", component: CheckOut },
+  { path: "/orders", component: Orders },
+  { path: "/order/:id", component: Order },
+  { path: "/myprofile", component: Profile },
+  { path: "/profile/:id", component: Profile },
+  { path: "/set-roles", component: SetRoles },
+  { path: "/inc-orders", component: IncOrders },
+  { path: "/good/:id", component: Good },
 ];
 
 const router = createRouter({
   history: createWebHistory(),
-  routes
+  routes,
 });
 
-createApp(App)
-  .use(router)
-  .mount('#app');
+createApp(App).use(router).mount("#app");

@@ -1,4 +1,4 @@
-const LOCAL_BASKET_KEY = 'anonymous_basket';
+const LOCAL_BASKET_KEY = "anonymous_basket";
 
 export const localBasket = {
   getItems() {
@@ -7,7 +7,7 @@ export const localBasket = {
   },
   addItem(item) {
     const items = this.getItems();
-    const existing = items.find(i => i.goodId === item.goodId);
+    const existing = items.find((i) => i.goodId === item.goodId);
     if (existing) {
       existing.quantity += item.quantity;
     } else {
@@ -18,14 +18,14 @@ export const localBasket = {
         title: item.title,
         shopTitle: item.shopTitle,
         senderId: item.senderId,
-        shopId: item.shopId
+        shopId: item.shopId,
       });
     }
     localStorage.setItem(LOCAL_BASKET_KEY, JSON.stringify(items));
   },
   decItem(goodId) {
     let items = this.getItems();
-    const idx = items.findIndex(i => i.goodId === goodId);
+    const idx = items.findIndex((i) => i.goodId === goodId);
     if (idx !== -1) {
       if (items[idx].quantity > 1) {
         items[idx].quantity -= 1;
@@ -37,5 +37,5 @@ export const localBasket = {
   },
   clear() {
     localStorage.removeItem(LOCAL_BASKET_KEY);
-  }
+  },
 };

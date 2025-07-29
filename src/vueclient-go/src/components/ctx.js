@@ -1,15 +1,14 @@
-import { reactive } from 'vue'
-import moment from 'moment';
-import 'moment/dist/locale/ru';
-import linkifyHtml from 'linkify-html';
-import { localBasket } from '../services/localBasket';
+import { reactive } from "vue";
+import moment from "moment";
+import "moment/dist/locale/ru";
+import linkifyHtml from "linkify-html";
+import { localBasket } from "../services/localBasket";
 
 function newUserInfo() {
-  return { userName: null, shopManage: false, admin: false, id: "" }
+  return { userName: null, shopManage: false, admin: false, id: "" };
 }
 
 export const ctx = reactive({
-
   basket: { sum: 0 },
   userInfo: newUserInfo(),
   accessToken: "",
@@ -22,11 +21,13 @@ export const ctx = reactive({
     if (!this.userInfo.id) {
       // Anonymous user: calculate sum from localBasket
       const items = localBasket.getItems();
-      items.forEach(item => {
+      items.forEach((item) => {
         this.basket.sum += item.price * item.quantity;
       });
     } else {
-      let res = await fetch(`${ctx.rbUrl()}/api/basket`, { headers: await ctx.authHeaders() });
+      let res = await fetch(`${ctx.rbUrl()}/api/basket`, {
+        headers: await ctx.authHeaders(),
+      });
       if (await this.CheckUnauth(res)) return;
       if (res.ok) {
         res = await res.json();
@@ -38,7 +39,7 @@ export const ctx = reactive({
   },
 
   fmtDate(date) {
-    moment.locale('ru');
+    moment.locale("ru");
     return moment(date).fromNow();
   },
 
@@ -53,14 +54,16 @@ export const ctx = reactive({
   },
 
   tgInitData() {
-    if (window.Telegram == undefined || window.Telegram.WebApp == undefined) return null;
+    if (window.Telegram == undefined || window.Telegram.WebApp == undefined)
+      return null;
     let r = window.Telegram.WebApp.initData;
-    if (typeof (r) != "string" || r == "") return null;
+    if (typeof r != "string" || r == "") return null;
     return r;
   },
 
   tgInitDataStruct() {
-    if (window.Telegram == undefined || window.Telegram.WebApp == undefined) return null;
+    if (window.Telegram == undefined || window.Telegram.WebApp == undefined)
+      return null;
     return window.Telegram.WebApp.initDataUnsafe;
   },
 
@@ -82,20 +85,20 @@ export const ctx = reactive({
   },
 
   async authHeaders() {
-    if (this.isTg())
-      return { "Authorization": this.tgAuthToken() }
-    else
+    if (this.isTg()) return { Authorization: this.tgAuthToken() };
+    else {
       if (this.accessTokenExpiresAt < Date.now()) {
         await this.RefreshToken();
       }
+    }
 
-    return { "Authorization": "Bearer " + this.accessToken };
+    return { Authorization: "Bearer " + this.accessToken };
   },
 
   async authHeadersAppJson() {
     if (this.isTg())
       return {
-        "Authorization": this.tgAuthToken(),
+        Authorization: this.tgAuthToken(),
         "Content-Type": "application/json",
       };
     else {
@@ -103,7 +106,7 @@ export const ctx = reactive({
         await this.RefreshToken();
       }
       return {
-        "Authorization": "Bearer " + this.accessToken,
+        Authorization: "Bearer " + this.accessToken,
         "Content-Type": "application/json",
       };
     }
@@ -130,7 +133,7 @@ export const ctx = reactive({
         method: "POST",
         signal: AbortSignal.timeout(5000),
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ "refreshToken": this.refreshToken })
+        body: JSON.stringify({ refreshToken: this.refreshToken }),
       });
       if (await this.CheckUnauth(res)) return;
       if (res.ok) {
@@ -142,9 +145,10 @@ export const ctx = reactive({
   },
 
   async CheckLogged() {
-
     if (this.isTg()) {
-      let res = await fetch(`${this.rbUrl()}/api/profiles/public?email=0`, { headers: await this.authHeaders() });
+      let res = await fetch(`${this.rbUrl()}/api/profiles/public?email=0`, {
+        headers: await this.authHeaders(),
+      });
       if (res.ok) {
         res = await res.json();
         this.userInfo = res;
@@ -155,7 +159,7 @@ export const ctx = reactive({
       let res = await fetch(this.rbUrl() + "/identity/myprofile", {
         method: "GET",
         signal: AbortSignal.timeout(5000),
-        headers: await this.authHeaders()
+        headers: await this.authHeaders(),
       });
       if (await this.CheckUnauth(res)) return;
       if (res.ok) {
@@ -167,6 +171,15 @@ export const ctx = reactive({
 
   async CheckUnauth(res) {
     if (res.status == 401) {
+      let responseText = await res.text();
+      if (responseText.includes("token expired") && this.accessToken != "") {
+        this.accessToken = "";
+        await this.RefreshToken();
+        if (this.accessToken != "") {
+          this.CheckLogged();
+          return;
+        }
+      }
       this.userInfo = newUserInfo();
       this.SetAccessToken("");
       this.SetRefreshToken("");
@@ -176,7 +189,6 @@ export const ctx = reactive({
   },
 
   async Login(emailString, passwordString) {
-
     if (this.isTg()) return;
 
     try {
@@ -184,7 +196,7 @@ export const ctx = reactive({
         method: "POST",
         signal: AbortSignal.timeout(5000),
         body: JSON.stringify({ email: emailString, password: passwordString }),
-        headers: { "Content-Type": "application/json" }
+        headers: { "Content-Type": "application/json" },
       });
       if (res.ok) {
         res = await res.json();
@@ -196,18 +208,19 @@ export const ctx = reactive({
       } else {
         return await res.text();
       }
-    } catch (err) { return err; }
+    } catch (err) {
+      return err;
+    }
     return "";
   },
 
   async Logout() {
-
     if (this.isTg()) return;
 
     let response = await fetch(this.rbUrl() + "/identity/logout", {
       method: "POST",
       signal: AbortSignal.timeout(5000),
-      headers: await this.authHeaders()
+      headers: await this.authHeaders(),
     });
     if (response.ok) {
       this.userInfo = newUserInfo();
@@ -216,20 +229,18 @@ export const ctx = reactive({
       await this.loadBasket();
       await this.CheckLogged();
     }
-
   },
 
   errFormat(obj) {
     let r = `${obj.title}: `;
     if (obj.errors)
-      Object.values(obj.errors).forEach(_ => {
-        r += _ + " "
+      Object.values(obj.errors).forEach((_) => {
+        r += _ + " ";
       });
     return r;
   },
 
   async Register(emailString, passwordString) {
-
     if (this.isTg()) return;
 
     let request = { email: emailString, password: passwordString };
@@ -238,15 +249,14 @@ export const ctx = reactive({
         method: "POST",
         body: JSON.stringify(request),
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
       });
       let r = "";
       if (response.ok) {
         r = await this.Login(emailString, passwordString);
         await this.mergeAnonymousBasket();
-      } else
-        r = this.errFormat(await response.json());
+      } else r = this.errFormat(await response.json());
       return r;
     } catch (err) {
       return err;
@@ -254,13 +264,12 @@ export const ctx = reactive({
   },
 
   async SendMsg(userid, msgtext) {
-
     if (!msgtext) return false;
 
     let res = await fetch(`${ctx.rbUrl()}/api/profiles/sendmsg/${userid}`, {
       method: "POST",
       headers: await ctx.authHeadersAppJson(),
-      body: msgtext
+      body: msgtext,
     });
 
     return res.ok;
@@ -270,16 +279,15 @@ export const ctx = reactive({
     const items = localBasket.getItems();
     if (!items.length) return;
     // Prepare payload for API
-    const payload = items.map(item => ({
+    const payload = items.map((item) => ({
       goodId: item.goodId,
-      quantity: item.quantity
+      quantity: item.quantity,
     }));
     await fetch(`${this.rbUrl()}/api/basket/merge`, {
       method: "POST",
       headers: await this.authHeadersAppJson(),
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     localBasket.clear();
-  }
-
-})
+  },
+});

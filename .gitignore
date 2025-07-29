@@ -374,3 +374,4 @@ FodyWeavers.xsd
 src/mmp-go/todo.db
 /src/mmp-go/todo.db
 src/mmp-go/migrate.go
+/src/mmp-go/mmp-go

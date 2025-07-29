@@ -55,7 +55,7 @@ func increaseBasket(w http.ResponseWriter, r *http.Request) {
 	}
 	user, err := models.UserFromHttpRequest(r)
 	if err != nil {
-		HandleErr(w, http.StatusUnauthorized, nil)
+		HandleErr(w, http.StatusUnauthorized, fmt.Errorf("unauthorized: %v", err))
 		return
 	}
 	gref := r.URL.Query().Get("goodref")
@@ -119,7 +119,7 @@ func decreaseBasket(w http.ResponseWriter, r *http.Request) {
 	}
 	user, err := models.UserFromHttpRequest(r)
 	if err != nil {
-		HandleErr(w, http.StatusUnauthorized, nil)
+		HandleErr(w, http.StatusUnauthorized, fmt.Errorf("unauthorized: %v", err))
 		return
 	}
 	gref := r.URL.Query().Get("goodref")
@@ -178,7 +178,7 @@ func mergeBasket(w http.ResponseWriter, r *http.Request) {
 
 	user, err := models.UserFromHttpRequest(r)
 	if err != nil {
-		HandleErr(w, http.StatusUnauthorized, nil)
+		HandleErr(w, http.StatusUnauthorized, fmt.Errorf("unauthorized: %v", err))
 		return
 	}
 

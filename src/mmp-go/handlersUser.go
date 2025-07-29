@@ -161,7 +161,7 @@ func UserLogout(w http.ResponseWriter, r *http.Request) {
 
 	user, err := models.UserFromHttpRequest(r)
 	if err != nil {
-		HandleErr(w, http.StatusUnauthorized, nil)
+		HandleErr(w, http.StatusUnauthorized, fmt.Errorf("unauthorized: %v", err))
 		return
 	}
 
@@ -267,7 +267,7 @@ func UserTokenRefresh(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	HandleErr(w, http.StatusUnauthorized, fmt.Errorf("invalid or expired refresh token"))
+	HandleErr(w, http.StatusUnauthorized, fmt.Errorf("refresh token is expired or invalid"))
 }
 
 func UserPublicProfile(w http.ResponseWriter, r *http.Request) {
