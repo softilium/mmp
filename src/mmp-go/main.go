@@ -56,6 +56,14 @@ func initServer() *http.Server {
 	fs := http.FileServer(http.Dir(Cfg.FrontEndFolder))
 
 	// SPA routes
+	SPAroutes := []string{
+		"/login", "/edit-shop", "/shop/", "/edit-good", "/checkout",
+		"/orders", "/myprofile", "/profile", "/set-roles", "/inc-orders", "/good/",
+	}
+	for _, route := range SPAroutes {
+		router.HandleFunc(route, SpaHandler())
+	}
+
 	router.Handle("/", http.StripPrefix("/", fs))
 
 	// API routes
@@ -242,3 +250,5 @@ func UserRequiredForEdit(w http.ResponseWriter, r *http.Request) bool {
 }
 
 //TODO telegram middleware
+//TODO store tokens
+//TODO Cfg to CORS hosts

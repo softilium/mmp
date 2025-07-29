@@ -174,7 +174,7 @@ func UserMyProfile(w http.ResponseWriter, r *http.Request) {
 
 	user, err := models.UserFromHttpRequest(r)
 	if err != nil {
-		HandleErr(w, http.StatusUnauthorized, nil)
+		HandleErr(w, http.StatusUnauthorized, fmt.Errorf("unauthorized: %v", err))
 		return
 	}
 	if r.Method == http.MethodGet {

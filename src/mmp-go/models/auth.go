@@ -20,10 +20,10 @@ var TokensByAT = make(map[string]TokenItem)
 func UserFromHttpRequest(r *http.Request) (*User, error) {
 	raw := r.Header.Get("Authorization")
 	if raw == "" {
-		return nil, fmt.Errorf("Unauthorized")
+		return nil, fmt.Errorf("no auth header")
 	}
 	if len(raw) < 7 || raw[:7] != "Bearer " {
-		return nil, fmt.Errorf("Unauthorized")
+		return nil, fmt.Errorf("invalid auth header")
 	}
 	token := raw[7:]
 
@@ -43,14 +43,14 @@ func UserFromHttpRequest(r *http.Request) (*User, error) {
 	if foundToken != nil {
 		user, err := Dbc.LoadUser(foundUserRef)
 		if err != nil {
-			return nil, fmt.Errorf("Unauthorized")
+			return nil, fmt.Errorf("unable to load user: %v", err)
 		}
 		if !user.IsActive() {
 			return nil, fmt.Errorf("user isn't active")
 		}
 		return user, nil
 	}
-	return nil, fmt.Errorf("Unauthorized")
+	return nil, fmt.Errorf("unregistered token")
 }
 
 func GenerateToken(user *User) TokenItem {
