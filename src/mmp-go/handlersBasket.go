@@ -18,7 +18,7 @@ func initRouterBasket(router *http.ServeMux) {
 		models.Dbc.CreateOrderLine)
 	basketRestApiConfig.EnablePost = false
 	basketRestApiConfig.BeforeMiddleware = func(w http.ResponseWriter, r *http.Request) bool {
-		_, err := models.UserFromHttpRequest(r)
+		_, _, err := models.UserFromHttpRequest(r)
 		if err != nil {
 			HandleErr(w, http.StatusUnauthorized, fmt.Errorf("unauthorized: %v", err))
 			return false
@@ -26,7 +26,7 @@ func initRouterBasket(router *http.ServeMux) {
 		return true
 	}
 	basketRestApiConfig.AdditionalFilter = func(r *http.Request) ([]*elorm.Filter, error) {
-		user, err := models.UserFromHttpRequest(r)
+		user, _, err := models.UserFromHttpRequest(r)
 		if err != nil {
 			return nil, err
 		}
@@ -53,7 +53,7 @@ func increaseBasket(w http.ResponseWriter, r *http.Request) {
 		HandleErr(w, http.StatusMethodNotAllowed, nil)
 		return
 	}
-	user, err := models.UserFromHttpRequest(r)
+	user, _, err := models.UserFromHttpRequest(r)
 	if err != nil {
 		HandleErr(w, http.StatusUnauthorized, fmt.Errorf("unauthorized: %v", err))
 		return
@@ -117,7 +117,7 @@ func decreaseBasket(w http.ResponseWriter, r *http.Request) {
 		HandleErr(w, http.StatusMethodNotAllowed, nil)
 		return
 	}
-	user, err := models.UserFromHttpRequest(r)
+	user, _, err := models.UserFromHttpRequest(r)
 	if err != nil {
 		HandleErr(w, http.StatusUnauthorized, fmt.Errorf("unauthorized: %v", err))
 		return
@@ -176,7 +176,7 @@ type MergeBasketItem struct {
 
 func mergeBasket(w http.ResponseWriter, r *http.Request) {
 
-	user, err := models.UserFromHttpRequest(r)
+	user, _, err := models.UserFromHttpRequest(r)
 	if err != nil {
 		HandleErr(w, http.StatusUnauthorized, fmt.Errorf("unauthorized: %v", err))
 		return

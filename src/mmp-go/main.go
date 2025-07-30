@@ -180,6 +180,21 @@ func main() {
 	logError(err)
 	fmt.Println("Database structure ensured successfully.")
 
+	tokensToDelete, _, err := models.Dbc.TokenDef.SelectEntities([]*elorm.Filter{
+		elorm.AddFilterLT(models.Dbc.TokenDef.RefreshTokenExpiresAt, time.Now()),
+	}, nil, 0, 0)
+	if err != nil {
+		logError(err)
+	} else {
+		for _, token := range tokensToDelete {
+			err = models.Dbc.DeleteEntity(context.Background(), token.RefString())
+			if err != nil {
+				logError(err)
+			}
+		}
+		fmt.Printf("Deleted %d expired tokens\n", len(tokensToDelete))
+	}
+
 	users, _, err := models.Dbc.UserDef.SelectEntities(nil, nil, 0, 0)
 	if err != nil {
 		logError(err)
@@ -218,7 +233,7 @@ func main() {
 }
 
 func UserAdminRequired(w http.ResponseWriter, r *http.Request) bool {
-	user, err := models.UserFromHttpRequest(r)
+	user, _, err := models.UserFromHttpRequest(r)
 	if err != nil {
 		HandleErr(w, http.StatusUnauthorized, fmt.Errorf("unauthorized: %v", err))
 		return false
@@ -231,7 +246,7 @@ func UserAdminRequired(w http.ResponseWriter, r *http.Request) bool {
 }
 
 func UserRequired(w http.ResponseWriter, r *http.Request) bool {
-	_, err := models.UserFromHttpRequest(r)
+	_, _, err := models.UserFromHttpRequest(r)
 	if err != nil {
 		HandleErr(w, http.StatusUnauthorized, fmt.Errorf("unauthorized: %v", err))
 		return false
@@ -243,7 +258,7 @@ func UserRequiredForEdit(w http.ResponseWriter, r *http.Request) bool {
 	if r.Method == http.MethodGet {
 		return true
 	}
-	_, err := models.UserFromHttpRequest(r)
+	_, _, err := models.UserFromHttpRequest(r)
 	if err != nil {
 		HandleErr(w, http.StatusUnauthorized, fmt.Errorf("unauthorized: %v", err))
 		return false
@@ -251,7 +266,6 @@ func UserRequiredForEdit(w http.ResponseWriter, r *http.Request) bool {
 	return true
 }
 
-//TODO store tokens
 //TODO password salt+hash
 //TODO messages on telegram (via api, updates)
 //TODO locks for elorm public methods (for def, factory, entity)

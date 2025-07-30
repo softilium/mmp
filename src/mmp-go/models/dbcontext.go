@@ -1051,6 +1051,134 @@ func (T *Shop) SetDeletedAt(newValue time.Time) {
 	T.field_DeletedAt.Set(newValue)
 }
 
+// Token class
+//////
+
+type TokenDefStruct struct {
+	*elorm.EntityDef
+	Ref         *elorm.FieldDef
+	IsDeleted   *elorm.FieldDef
+	DataVersion *elorm.FieldDef
+
+	User *elorm.FieldDef
+
+	AccessToken *elorm.FieldDef
+
+	AccessTokenExpiresAt *elorm.FieldDef
+
+	RefreshToken *elorm.FieldDef
+
+	RefreshTokenExpiresAt *elorm.FieldDef
+}
+
+func (T *TokenDefStruct) SelectEntities(filters []*elorm.Filter, sorts []*elorm.SortItem, pageNo int, pageSize int) (result []*Token, pages int, err error) {
+
+	res, total, err := T.EntityDef.SelectEntities(filters, sorts, pageNo, pageSize)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	res2 := make([]*Token, 0, len(res))
+
+	for _, r := range res {
+		if r == nil {
+			continue
+		}
+		rt := T.Wrap(r)
+		res2 = append(res2, rt.(*Token))
+	}
+
+	return res2, total, nil
+
+}
+
+type Token struct {
+	*elorm.Entity
+
+	field_User                  *elorm.FieldValueRef
+	field_AccessToken           *elorm.FieldValueString
+	field_AccessTokenExpiresAt  *elorm.FieldValueDateTime
+	field_RefreshToken          *elorm.FieldValueString
+	field_RefreshTokenExpiresAt *elorm.FieldValueDateTime
+}
+
+func (T *Token) User() *User {
+	if T.field_User == nil {
+		T.field_User = T.Values["User"].(*elorm.FieldValueRef)
+	}
+	r, err := T.field_User.Get()
+	if err != nil {
+		panic(err)
+	}
+	return r.(*User)
+}
+
+func (T *Token) SetUser(newValue *User) {
+	if T.field_User == nil {
+		T.field_User = T.Values["User"].(*elorm.FieldValueRef)
+	}
+	err := T.field_User.Set(newValue)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (T *Token) AccessToken() string {
+	if T.field_AccessToken == nil {
+		T.field_AccessToken = T.Values["AccessToken"].(*elorm.FieldValueString)
+	}
+	return T.field_AccessToken.Get()
+}
+
+func (T *Token) SetAccessToken(newValue string) {
+	if T.field_AccessToken == nil {
+		T.field_AccessToken = T.Values["AccessToken"].(*elorm.FieldValueString)
+	}
+	T.field_AccessToken.Set(newValue)
+}
+
+func (T *Token) AccessTokenExpiresAt() time.Time {
+	if T.field_AccessTokenExpiresAt == nil {
+		T.field_AccessTokenExpiresAt = T.Values["AccessTokenExpiresAt"].(*elorm.FieldValueDateTime)
+	}
+	return T.field_AccessTokenExpiresAt.Get()
+}
+
+func (T *Token) SetAccessTokenExpiresAt(newValue time.Time) {
+	if T.field_AccessTokenExpiresAt == nil {
+		T.field_AccessTokenExpiresAt = T.Values["AccessTokenExpiresAt"].(*elorm.FieldValueDateTime)
+	}
+	T.field_AccessTokenExpiresAt.Set(newValue)
+}
+
+func (T *Token) RefreshToken() string {
+	if T.field_RefreshToken == nil {
+		T.field_RefreshToken = T.Values["RefreshToken"].(*elorm.FieldValueString)
+	}
+	return T.field_RefreshToken.Get()
+}
+
+func (T *Token) SetRefreshToken(newValue string) {
+	if T.field_RefreshToken == nil {
+		T.field_RefreshToken = T.Values["RefreshToken"].(*elorm.FieldValueString)
+	}
+	T.field_RefreshToken.Set(newValue)
+}
+
+func (T *Token) RefreshTokenExpiresAt() time.Time {
+	if T.field_RefreshTokenExpiresAt == nil {
+		T.field_RefreshTokenExpiresAt = T.Values["RefreshTokenExpiresAt"].(*elorm.FieldValueDateTime)
+	}
+	return T.field_RefreshTokenExpiresAt.Get()
+}
+
+func (T *Token) SetRefreshTokenExpiresAt(newValue time.Time) {
+	if T.field_RefreshTokenExpiresAt == nil {
+		T.field_RefreshTokenExpiresAt = T.Values["RefreshTokenExpiresAt"].(*elorm.FieldValueDateTime)
+	}
+	T.field_RefreshTokenExpiresAt.Set(newValue)
+}
+
 // User class
 //////
 
@@ -1310,6 +1438,7 @@ type DbContext struct {
 	GoodDef          GoodDefStruct
 	OrderLineDef     OrderLineDefStruct
 	ShopDef          ShopDefStruct
+	TokenDef         TokenDefStruct
 	UserDef          UserDefStruct
 }
 
@@ -1372,6 +1501,11 @@ func CreateDbContext(dbDialect string, connectionString string) (*DbContext, err
 	frg = append(frg, "BusinessObjects")
 
 	r.ShopDef.Fragments = frg
+
+	r.TokenDef.EntityDef, err = r.CreateEntityDef("Token", "Tokens")
+	if err != nil {
+		return nil, err
+	}
 
 	r.UserDef.EntityDef, err = r.CreateEntityDef("User", "Users")
 	if err != nil {
@@ -1470,6 +1604,42 @@ func CreateDbContext(dbDialect string, connectionString string) (*DbContext, err
 	r.ShopDef.DeletedAt, _ = r.ShopDef.AddDateTimeFieldDef("DeletedAt")
 
 	r.ShopDef.Wrap = func(source *elorm.Entity) any { return &Shop{Entity: source} }
+
+	// Token
+	//////
+
+	r.TokenDef.Ref = r.TokenDef.FieldDefByName("Ref")
+	r.TokenDef.IsDeleted = r.TokenDef.FieldDefByName("IsDeleted")
+	r.TokenDef.DataVersion = r.TokenDef.FieldDefByName("DataVersion")
+
+	r.TokenDef.User, _ = r.TokenDef.AddRefFieldDef("User", r.UserDef.EntityDef)
+	r.TokenDef.AccessToken, _ = r.TokenDef.AddStringFieldDef("AccessToken", 50, "")
+	r.TokenDef.AccessTokenExpiresAt, _ = r.TokenDef.AddDateTimeFieldDef("AccessTokenExpiresAt")
+	r.TokenDef.RefreshToken, _ = r.TokenDef.AddStringFieldDef("RefreshToken", 50, "")
+	r.TokenDef.RefreshTokenExpiresAt, _ = r.TokenDef.AddDateTimeFieldDef("RefreshTokenExpiresAt")
+
+	r.TokenDef.Wrap = func(source *elorm.Entity) any { return &Token{Entity: source} }
+
+	err = r.TokenDef.AddIndex(false,
+		*r.TokenDef.User,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	err = r.TokenDef.AddIndex(true,
+		*r.TokenDef.AccessToken, *r.TokenDef.AccessTokenExpiresAt,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	err = r.TokenDef.AddIndex(true,
+		*r.TokenDef.RefreshToken, *r.TokenDef.RefreshTokenExpiresAt,
+	)
+	if err != nil {
+		return nil, err
+	}
 
 	// User
 	//////
@@ -1578,6 +1748,24 @@ func (T *DbContext) LoadShop(Ref string) (*Shop, error) {
 		return nil, err
 	}
 	rt := r.(*Shop)
+	return rt, nil
+}
+
+func (T *DbContext) CreateToken() (*Token, error) {
+	r, err := T.CreateEntityWrapped(T.TokenDef.EntityDef)
+	if err != nil {
+		return nil, err
+	}
+	rt := r.(*Token)
+	return rt, nil
+}
+
+func (T *DbContext) LoadToken(Ref string) (*Token, error) {
+	r, err := T.LoadEntityWrapped(Ref)
+	if err != nil {
+		return nil, err
+	}
+	rt := r.(*Token)
 	return rt, nil
 }
 

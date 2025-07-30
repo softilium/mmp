@@ -103,6 +103,56 @@
             ]
         },
         {
+            "ObjectName": "Token",
+            "TableName": "Tokens",
+            "Indexes": [
+                {
+                    "Columns": [
+                        "User"
+                    ],
+                    "Unique": false
+                },
+                {
+                    "Columns": [
+                        "AccessToken",
+                        "AccessTokenExpiresAt"
+                    ],
+                    "Unique": true
+                },
+                {
+                    "Columns": [
+                        "RefreshToken",
+                        "RefreshTokenExpiresAt"
+                    ],
+                    "Unique": true
+                }
+            ],
+            "Columns": [
+                {
+                    "Name": "User",
+                    "ColumnType": "ref.User"
+                },
+                {
+                    "Name": "AccessToken",
+                    "ColumnType": "string",
+                    "Len": 50
+                },
+                {
+                    "Name": "AccessTokenExpiresAt",
+                    "ColumnType": "datetime"
+                },
+                {
+                    "Name": "RefreshToken",
+                    "ColumnType": "string",
+                    "Len": 50
+                },
+                {
+                    "Name": "RefreshTokenExpiresAt",
+                    "ColumnType": "datetime"
+                }
+            ]
+        },
+        {
             "ObjectName": "Shop",
             "TableName": "Shops",
             "Fragments": [

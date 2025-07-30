@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -17,7 +18,7 @@ func initRouterAuth(router *http.ServeMux) {
 	router.HandleFunc("/identity/logout", UserLogout)
 	router.HandleFunc("/identity/myprofile", UserMyProfile)
 	router.HandleFunc("/identity/profiles", UserPublicProfile)
-	router.HandleFunc("/identity/refresh", UserTokenRefresh)
+	router.HandleFunc("/identity/refresh", RefreshToken)
 }
 
 type userPayLoad struct {
@@ -94,13 +95,17 @@ func UserRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	newToken := models.GenerateToken(newUser)
+	newToken, err := models.GenerateToken(newUser)
+	if err != nil {
+		HandleErr(w, 0, err)
+		return
+	}
 	w.WriteHeader(http.StatusCreated)
 	res := tokensResponse{
-		AccessToken:           newToken.AccessToken,
-		RefreshToken:          newToken.RefreshToken,
-		AccessTokenExporesAt:  newToken.AccessTokenExpiresAt.UnixMilli(),
-		RefreshTokenExpiresAt: newToken.RefreshTokenExpiresAt.UnixMilli(),
+		AccessToken:           newToken.AccessToken(),
+		RefreshToken:          newToken.RefreshToken(),
+		AccessTokenExporesAt:  newToken.AccessTokenExpiresAt().UnixMilli(),
+		RefreshTokenExpiresAt: newToken.RefreshTokenExpiresAt().UnixMilli(),
 	}
 	err = json.NewEncoder(w).Encode(res)
 	if err != nil {
@@ -138,13 +143,17 @@ func UserLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	newToken := models.GenerateToken(users[0])
+	newToken, err := models.GenerateToken(users[0])
+	if err != nil {
+		HandleErr(w, 0, err)
+		return
+	}
 	w.WriteHeader(http.StatusOK)
 	res := tokensResponse{
-		AccessToken:           newToken.AccessToken,
-		RefreshToken:          newToken.RefreshToken,
-		AccessTokenExporesAt:  newToken.AccessTokenExpiresAt.UnixMilli(),
-		RefreshTokenExpiresAt: newToken.RefreshTokenExpiresAt.UnixMilli(),
+		AccessToken:           newToken.AccessToken(),
+		RefreshToken:          newToken.RefreshToken(),
+		AccessTokenExporesAt:  newToken.AccessTokenExpiresAt().UnixMilli(),
+		RefreshTokenExpiresAt: newToken.RefreshTokenExpiresAt().UnixMilli(),
 	}
 	err = json.NewEncoder(w).Encode(res)
 	if err != nil {
@@ -159,20 +168,18 @@ func UserLogout(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := models.UserFromHttpRequest(r)
+	_, token, err := models.UserFromHttpRequest(r)
 	if err != nil {
 		HandleErr(w, http.StatusUnauthorized, fmt.Errorf("unauthorized: %v", err))
 		return
 	}
-
-	delete(models.TokensByAT, user.RefString())
-
+	models.Dbc.DeleteEntity(r.Context(), token.RefString())
 	w.WriteHeader(http.StatusOK)
 }
 
 func UserMyProfile(w http.ResponseWriter, r *http.Request) {
 
-	user, err := models.UserFromHttpRequest(r)
+	user, _, err := models.UserFromHttpRequest(r)
 	if err != nil {
 		HandleErr(w, http.StatusUnauthorized, fmt.Errorf("unauthorized: %v", err))
 		return
@@ -227,7 +234,7 @@ type refreshTokenPayload struct {
 	RefreshToken string `json:"refreshToken"`
 }
 
-func UserTokenRefresh(w http.ResponseWriter, r *http.Request) {
+func RefreshToken(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		HandleErr(w, http.StatusMethodNotAllowed, nil)
 		return
@@ -242,29 +249,44 @@ func UserTokenRefresh(w http.ResponseWriter, r *http.Request) {
 		HandleErr(w, http.StatusBadRequest, fmt.Errorf("refresh token is required"))
 		return
 	}
-	for userKey, item := range models.TokensByAT {
-		if item.RefreshToken == payload.RefreshToken && item.RefreshTokenExpiresAt.After(time.Now()) {
-			user, err := models.Dbc.LoadUser(userKey)
-			if err != nil {
-				HandleErr(w, 0, err)
-				return
-			}
-			newToken := models.GenerateToken(user)
-			models.TokensByAT[userKey] = newToken
-			res := tokensResponse{
-				AccessToken:           newToken.AccessToken,
-				RefreshToken:          newToken.RefreshToken,
-				AccessTokenExporesAt:  newToken.AccessTokenExpiresAt.UnixMilli(),
-				RefreshTokenExpiresAt: newToken.RefreshTokenExpiresAt.UnixMilli(),
-			}
-			w.WriteHeader(http.StatusOK)
-			err = json.NewEncoder(w).Encode(res)
-			if err != nil {
-				HandleErr(w, 0, err)
-				return
-			}
+	dbrt, _, err := models.Dbc.TokenDef.SelectEntities([]*elorm.Filter{
+		elorm.AddFilterEQ(models.Dbc.TokenDef.RefreshToken, payload.RefreshToken),
+		elorm.AddFilterGT(models.Dbc.TokenDef.RefreshTokenExpiresAt, time.Now()),
+	}, nil, 1, 1)
+	if err != nil {
+		HandleErr(w, 0, err)
+		return
+	}
+	if len(dbrt) == 1 {
+		user := dbrt[0].User()
+		if !user.IsActive() {
+			HandleErr(w, http.StatusUnauthorized, fmt.Errorf("user isn't active"))
 			return
 		}
+		newToken, err := models.GenerateToken(user)
+		if err != nil {
+			HandleErr(w, 0, err)
+			return
+		}
+		res := tokensResponse{
+			AccessToken:           newToken.AccessToken(),
+			RefreshToken:          newToken.RefreshToken(),
+			AccessTokenExporesAt:  newToken.AccessTokenExpiresAt().UnixMilli(),
+			RefreshTokenExpiresAt: newToken.RefreshTokenExpiresAt().UnixMilli(),
+		}
+		err = models.Dbc.DeleteEntity(context.Background(), dbrt[0].RefString())
+		if err != nil {
+			HandleErr(w, 0, err)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+		err = json.NewEncoder(w).Encode(res)
+		if err != nil {
+			HandleErr(w, 0, err)
+			return
+		}
+		return
+
 	}
 	HandleErr(w, http.StatusUnauthorized, fmt.Errorf("refresh token is expired or invalid"))
 }

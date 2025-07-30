@@ -18,7 +18,7 @@ func Migrate(w http.ResponseWriter, r *http.Request) {
 
 	ctxMig := context.WithValue(context.Background(), "migration", true)
 
-	user, err := models.UserFromHttpRequest(r)
+	user, _, err := models.UserFromHttpRequest(r)
 	if err != nil {
 		HandleErr(w, 0, fmt.Errorf("unauthorized: %v", err))
 		return
@@ -42,6 +42,19 @@ func Migrate(w http.ResponseWriter, r *http.Request) {
 
 	// Users
 	////////
+
+	tokens, _, err := models.Dbc.TokenDef.SelectEntities(nil, nil, 0, 0)
+	if err != nil {
+		HandleErr(w, 0, fmt.Errorf("failed to fetch tokens for migration: %v", err))
+		return
+	}
+	for _, token := range tokens {
+		err := models.Dbc.DeleteEntity(ctxMig, token.RefString())
+		if err != nil {
+			HandleErr(w, 0, fmt.Errorf("failed to delete token %s: %v", token.RefString(), err))
+			return
+		}
+	}
 
 	users, _, err := models.Dbc.UserDef.SelectEntities(nil, nil, 0, 0)
 	if err != nil {
@@ -504,7 +517,6 @@ order by "ID"
 		}
 	}
 
-	models.TokensByAT = make(map[string]models.TokenItem)
 	imagesCache = expirable.NewLRU[string, *[]byte](1000, nil, time.Minute*60*24)
 	thumbsCache = expirable.NewLRU[string, *[]byte](1000, nil, time.Minute*60*24)
 

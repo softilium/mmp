@@ -41,7 +41,7 @@ func initRouterOrders(router *http.ServeMux) {
 	outbox.BeforeMiddleware = UserRequired
 	outbox.Context = models.HttpUserContext
 	outbox.AdditionalFilter = func(r *http.Request) ([]*elorm.Filter, error) {
-		user, err := models.UserFromHttpRequest(r)
+		user, _, err := models.UserFromHttpRequest(r)
 		if err != nil {
 			return nil, fmt.Errorf("error getting user from request: %w", err)
 		}
@@ -71,7 +71,7 @@ func initRouterOrders(router *http.ServeMux) {
 	inbox.BeforeMiddleware = UserRequired
 	inbox.Context = models.HttpUserContext
 	inbox.AdditionalFilter = func(r *http.Request) ([]*elorm.Filter, error) {
-		user, err := models.UserFromHttpRequest(r)
+		user, _, err := models.UserFromHttpRequest(r)
 		if err != nil {
 			return nil, fmt.Errorf("error getting user from request: %w", err)
 		}
@@ -142,7 +142,7 @@ func checkoutHandler(w http.ResponseWriter, r *http.Request) {
 	if !UserRequired(w, r) {
 		return
 	}
-	user, err := models.UserFromHttpRequest(r)
+	user, _, err := models.UserFromHttpRequest(r)
 	if err != nil {
 		HandleErr(w, http.StatusUnauthorized, fmt.Errorf("error getting user from request: %w", err))
 		return

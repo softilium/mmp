@@ -33,7 +33,7 @@ func AddUserContext(ctx context.Context, user *User) context.Context {
 }
 
 func HttpUserContext(r *http.Request) context.Context {
-	user, err := UserFromHttpRequest(r)
+	user, _, err := UserFromHttpRequest(r)
 	if err != nil {
 		return AddUserContext(r.Context(), user)
 	}

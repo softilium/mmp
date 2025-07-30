@@ -1,81 +1,66 @@
 package models
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/softilium/elorm"
 )
 
 type TelegramUserCtxKeyType string
 
 const TelegramUserCtxKey TelegramUserCtxKeyType = "tguser"
 
-type TokenItem struct {
-	AccessToken           string
-	RefreshToken          string
-	AccessTokenExpiresAt  time.Time
-	RefreshTokenExpiresAt time.Time
-}
-
-var TokensByAT = make(map[string]TokenItem)
-
-func UserFromHttpRequest(r *http.Request) (*User, error) {
-
+func UserFromHttpRequest(r *http.Request) (*User, *Token, error) {
 	tgUser := r.Context().Value(TelegramUserCtxKey)
 	if tgUser != nil {
 		if user, ok := tgUser.(*User); ok {
 			if user.IsActive() {
-				return user, nil
+				return user, nil, nil
 			}
-			return nil, fmt.Errorf("user isn't active")
+			return nil, nil, fmt.Errorf("user isn't active")
 		}
-		return nil, fmt.Errorf("invalid user context type for tg")
+		return nil, nil, fmt.Errorf("invalid user context type for tg")
 	}
-
 	raw := r.Header.Get("Authorization")
 	if raw == "" {
-		return nil, fmt.Errorf("no auth header")
+		return nil, nil, fmt.Errorf("no auth header")
 	}
 	if len(raw) < 7 || raw[:7] != "Bearer " {
-		return nil, fmt.Errorf("invalid auth header")
+		return nil, nil, fmt.Errorf("invalid auth header")
 	}
 	token := raw[7:]
-
-	var foundToken *TokenItem
-	var foundUserRef string
-	for k, item := range TokensByAT {
-		if item.AccessToken == token {
-			if !item.AccessTokenExpiresAt.After(time.Now()) {
-				return nil, fmt.Errorf("access token expired")
-			}
-			foundToken = &item
-			foundUserRef = k
-			break
-		}
+	dbtokens, _, err := Dbc.TokenDef.SelectEntities([]*elorm.Filter{elorm.AddFilterEQ(Dbc.TokenDef.AccessToken, token)}, nil, 1, 1)
+	if err != nil {
+		return nil, nil, fmt.Errorf("unable to load token from db: %v", err)
 	}
-
-	if foundToken != nil {
-		user, err := Dbc.LoadUser(foundUserRef)
-		if err != nil {
-			return nil, fmt.Errorf("unable to load user: %v", err)
+	if len(dbtokens) == 1 {
+		if dbtokens[0].AccessTokenExpiresAt().Before(time.Now()) {
+			return nil, nil, fmt.Errorf("access token expired")
 		}
-		if !user.IsActive() {
-			return nil, fmt.Errorf("user isn't active")
+		if !dbtokens[0].User().IsActive() {
+			return nil, nil, fmt.Errorf("user isn't active")
 		}
-		return user, nil
+		return dbtokens[0].User(), dbtokens[0], nil
 	}
-	return nil, fmt.Errorf("unregistered token")
+	return nil, nil, fmt.Errorf("unregistered token")
 }
 
-func GenerateToken(user *User) TokenItem {
-	newToken := TokenItem{
-		AccessToken:           uuid.NewString(),
-		RefreshToken:          uuid.NewString(),
-		AccessTokenExpiresAt:  time.Now().Add(20 * time.Second),
-		RefreshTokenExpiresAt: time.Now().Add(24 * time.Hour * 90),
+func GenerateToken(user *User) (*Token, error) {
+	newToken, err := Dbc.CreateToken()
+	if err != nil {
+		return nil, fmt.Errorf("unable to create token: %v", err)
 	}
-	TokensByAT[user.RefString()] = newToken
-	return newToken
+	newToken.SetAccessToken(elorm.NewRef())
+	newToken.SetRefreshToken(elorm.NewRef())
+	newToken.SetAccessTokenExpiresAt(time.Now().Add(20 * time.Second))
+	newToken.SetRefreshTokenExpiresAt(time.Now().Add(24 * time.Hour * 90))
+	newToken.SetUser(user)
+	err = newToken.Save(context.Background())
+	if err != nil {
+		return nil, fmt.Errorf("unable to save token: %v", err)
+	}
+	return newToken, nil
 }

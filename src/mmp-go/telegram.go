@@ -64,8 +64,6 @@ func TelegramMiddleware(next http.Handler) http.Handler {
 				next.ServeHTTP(w, r)
 				return
 			}
-		} else {
-			fmt.Printf("Telegram authorization header not found: %s\n", auth)
 		}
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
