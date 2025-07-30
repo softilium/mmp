@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"image"
 	"image/jpeg"
+	"io"
 	"net/http"
 	"os"
 	"time"
@@ -29,12 +30,12 @@ func handleImages(w http.ResponseWriter, r *http.Request, downScale bool) {
 
 	ref := r.URL.Query().Get("ref")
 	if ref == "" {
-		HandleErr(w, http.StatusBadRequest, fmt.Errorf("goodref is required"))
+		HandleErr(w, http.StatusBadRequest, fmt.Errorf("ref is required"))
 		return
 	}
 	n := r.URL.Query().Get("n")
 	if n == "" {
-		HandleErr(w, http.StatusBadRequest, fmt.Errorf("image number is required"))
+		HandleErr(w, http.StatusBadRequest, fmt.Errorf("n (image number) is required"))
 		return
 	}
 	fn := fmt.Sprintf("%s/goodImage-%s-%s", Cfg.ImagesFolder, ref, n)
@@ -91,6 +92,44 @@ func handleImages(w http.ResponseWriter, r *http.Request, downScale bool) {
 			HandleErr(w, http.StatusInternalServerError, fmt.Errorf("failed to write image data: %v", err))
 			return
 		}
+	}
+
+	if r.Method == http.MethodDelete {
+		if _, err = os.Stat(fn); os.IsNotExist(err) {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+		if err := os.Remove(fn); err != nil {
+			HandleErr(w, http.StatusInternalServerError, fmt.Errorf("failed to delete image: %v", err))
+			return
+		}
+		imagesCache.Remove(fn)
+		thumbsCache.Remove(fn)
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
+	if r.Method == http.MethodPost {
+
+		r.ParseMultipartForm(10 << 20) // Limit to 10MB
+		file, _, err := r.FormFile("image")
+		defer file.Close()
+		imageData, err := io.ReadAll(file)
+		if err != nil {
+			HandleErr(w, http.StatusInternalServerError, fmt.Errorf("failed to read image data: %v", err))
+			return
+		}
+		if len(imageData) == 0 {
+			HandleErr(w, http.StatusBadRequest, fmt.Errorf("image data cannot be empty"))
+			return
+		}
+		if err := os.WriteFile(fn, imageData, 0644); err != nil {
+			HandleErr(w, http.StatusInternalServerError, fmt.Errorf("failed to write image data: %v", err))
+			return
+		}
+		imagesCache.Remove(fn)
+		thumbsCache.Remove(fn)
+		w.WriteHeader(http.StatusCreated)
+		return
 	}
 }
 

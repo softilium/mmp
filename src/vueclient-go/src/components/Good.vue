@@ -204,13 +204,22 @@ const DeleteGood = async () => {
     <div class="col">{{ good.Description }}</div>
   </div>
 
-  <!-- <div class="row mb-3" v-if="imageSrc.length>1">
+  <div class="row mb-3" v-if="imageSrc.length > 1">
     <div class="col">
       <span v-for="(src, index) in imageSrc" :key="index">
-        <button :class="`${index==curImgIndex ? 'btn btn-secondary btn-sm' : 'btn btn-outline-secondary btn-sm'}`" @click="curImgIndex=index">{{index+1}}</button>&nbsp;
+        <button
+          :class="`${
+            index == curImgIndex
+              ? 'btn btn-secondary btn-sm'
+              : 'btn btn-outline-secondary btn-sm'
+          }`"
+          @click="curImgIndex = index"
+        >
+          {{ index + 1 }}</button
+        >&nbsp;
       </span>
     </div>
-  </div> -->
+  </div>
 
   <div v-if="!isImageLoading && imageSrc.length > 0" class="row mb-3">
     <div class="col">

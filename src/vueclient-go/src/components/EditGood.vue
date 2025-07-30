@@ -35,7 +35,7 @@ onMounted(async () => {
 const LoadImages = async () => {
   for (let i = 0; i < maxImagesCnt.value; i++) {
     let res = await fetch(
-      `${ctx.rbUrl()}/api/goods/images/${route.params.id}/${i}`,
+      `${ctx.rbUrl()}/api/goods/images?ref=${route.params.id}&n=${i}`,
       { method: "GET" }
     );
     if (res.status == 200) {
@@ -51,21 +51,27 @@ const LoadImages = async () => {
 const SaveImages = async (gid) => {
   for (let i = 0; i <= maxImagesCnt.value - 1; i++) {
     if (!imageSrc.value[i]) {
-      let res = await fetch(`${ctx.rbUrl()}/api/goods/images/${gid}/${i}`, {
-        method: "DELETE",
-        headers: await ctx.authHeaders(),
-      });
+      let res = await fetch(
+        `${ctx.rbUrl()}/api/goods/images?ref=${gid}&n=${i}`,
+        {
+          method: "DELETE",
+          headers: await ctx.authHeaders(),
+        }
+      );
       if (await ctx.CheckUnauth(res)) return;
       if (!res.ok) console.log(res);
     } else {
       let blob = await fetch(imageSrc.value[i]).then((r) => r.blob()); // load image from blob url
       let data = new FormData();
       data.append("image", blob);
-      let res = await fetch(`${ctx.rbUrl()}/api/goods/images/${gid}/${i}`, {
-        method: "POST",
-        headers: await ctx.authHeaders(),
-        body: data,
-      });
+      let res = await fetch(
+        `${ctx.rbUrl()}/api/goods/images?ref=${gid}&n=${i}`,
+        {
+          method: "POST",
+          headers: await ctx.authHeaders(),
+          body: data,
+        }
+      );
       if (await ctx.CheckUnauth(res)) return;
       if (!res.ok) console.log(res);
     }
