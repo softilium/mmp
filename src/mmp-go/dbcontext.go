@@ -1,5 +1,5 @@
 // THIS IS GENERATED CODE. DO NOT MODIFY IT
-package models
+package main
 
 import (
 	"github.com/softilium/elorm"
@@ -1192,7 +1192,7 @@ type UserDefStruct struct {
 
 	Email *elorm.FieldDef
 
-	Password *elorm.FieldDef
+	PasswordHash *elorm.FieldDef
 
 	IsActive *elorm.FieldDef
 
@@ -1237,7 +1237,7 @@ type User struct {
 
 	field_Username          *elorm.FieldValueString
 	field_Email             *elorm.FieldValueString
-	field_Password          *elorm.FieldValueString
+	field_PasswordHash      *elorm.FieldValueString
 	field_IsActive          *elorm.FieldValueBool
 	field_ShopManager       *elorm.FieldValueBool
 	field_Admin             *elorm.FieldValueBool
@@ -1276,18 +1276,18 @@ func (T *User) SetEmail(newValue string) {
 	T.field_Email.Set(newValue)
 }
 
-func (T *User) Password() string {
-	if T.field_Password == nil {
-		T.field_Password = T.Values["Password"].(*elorm.FieldValueString)
+func (T *User) PasswordHash() string {
+	if T.field_PasswordHash == nil {
+		T.field_PasswordHash = T.Values["PasswordHash"].(*elorm.FieldValueString)
 	}
-	return T.field_Password.Get()
+	return T.field_PasswordHash.Get()
 }
 
-func (T *User) SetPassword(newValue string) {
-	if T.field_Password == nil {
-		T.field_Password = T.Values["Password"].(*elorm.FieldValueString)
+func (T *User) SetPasswordHash(newValue string) {
+	if T.field_PasswordHash == nil {
+		T.field_PasswordHash = T.Values["PasswordHash"].(*elorm.FieldValueString)
 	}
-	T.field_Password.Set(newValue)
+	T.field_PasswordHash.Set(newValue)
 }
 
 func (T *User) IsActive() bool {
@@ -1650,7 +1650,7 @@ func CreateDbContext(dbDialect string, connectionString string) (*DbContext, err
 
 	r.UserDef.Username, _ = r.UserDef.AddStringFieldDef("Username", 100, "")
 	r.UserDef.Email, _ = r.UserDef.AddStringFieldDef("Email", 100, "")
-	r.UserDef.Password, _ = r.UserDef.AddStringFieldDef("Password", 50, "")
+	r.UserDef.PasswordHash, _ = r.UserDef.AddStringFieldDef("PasswordHash", 200, "")
 	r.UserDef.IsActive, _ = r.UserDef.AddBoolFieldDef("IsActive", false)
 	r.UserDef.ShopManager, _ = r.UserDef.AddBoolFieldDef("ShopManager", false)
 	r.UserDef.Admin, _ = r.UserDef.AddBoolFieldDef("Admin", false)

@@ -39,7 +39,7 @@ watch(
 );
 
 const SendMsg = async () => {
-  if (await ctx.SendMsg(-1, msgtext.value)) {
+  if (await ctx.SendMsg("", msgtext.value)) {
     msgtext.value = "";
     alert("Сообщение отослано");
   }

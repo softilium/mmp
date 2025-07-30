@@ -145,7 +145,7 @@ export const ctx = reactive({
   },
 
   async CheckLogged() {
-    if (this.accessToken != "") {
+    if (this.accessToken != "" || this.isTg()) {
       let res = await fetch(this.rbUrl() + "/identity/myprofile", {
         method: "GET",
         signal: AbortSignal.timeout(5000),
@@ -256,11 +256,14 @@ export const ctx = reactive({
   async SendMsg(userid, msgtext) {
     if (!msgtext) return false;
 
-    let res = await fetch(`${ctx.rbUrl()}/api/profiles/sendmsg/${userid}`, {
-      method: "POST",
-      headers: await ctx.authHeadersAppJson(),
-      body: msgtext,
-    });
+    let res = await fetch(
+      `${ctx.rbUrl()}/api/profiles/sendmsg?userref=${userid}`,
+      {
+        method: "POST",
+        headers: await ctx.authHeadersAppJson(),
+        body: msgtext,
+      }
+    );
 
     return res.ok;
   },

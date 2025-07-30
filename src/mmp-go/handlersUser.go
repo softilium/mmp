@@ -4,12 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"time"
 
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/softilium/elorm"
-	"github.com/softilium/mmp-go/models"
 )
 
 func initRouterAuth(router *http.ServeMux) {
@@ -19,6 +20,7 @@ func initRouterAuth(router *http.ServeMux) {
 	router.HandleFunc("/identity/myprofile", UserMyProfile)
 	router.HandleFunc("/identity/profiles", UserPublicProfile)
 	router.HandleFunc("/identity/refresh", RefreshToken)
+	router.HandleFunc("/api/profiles/sendmsg", SendMessageToUser)
 }
 
 type userPayLoad struct {
@@ -69,9 +71,9 @@ func UserRegister(w http.ResponseWriter, r *http.Request) {
 		HandleErr(w, 0, err)
 		return
 	}
-	exist, _, err := models.Dbc.UserDef.SelectEntities(
+	exist, _, err := DB.UserDef.SelectEntities(
 		[]*elorm.Filter{
-			elorm.AddFilterEQ(models.Dbc.UserDef.Email, payload.Email),
+			elorm.AddFilterEQ(DB.UserDef.Email, payload.Email),
 		}, nil, 0, 0)
 	if err != nil {
 		HandleErr(w, 0, err)
@@ -81,21 +83,27 @@ func UserRegister(w http.ResponseWriter, r *http.Request) {
 		HandleErr(w, http.StatusBadRequest, fmt.Errorf("user with this email already exists: %s", payload.Email))
 		return
 	}
-	newUser, err := models.Dbc.CreateUser()
+	newUser, err := DB.CreateUser()
 	if err != nil {
 		HandleErr(w, 0, err)
 		return
 	}
+
+	passwordHash, err := HashPassword(payload.Password)
+	if err != nil {
+		HandleErr(w, 0, err)
+	}
+
 	newUser.SetUsername(payload.Email)
 	newUser.SetEmail(payload.Email)
-	newUser.SetPassword(payload.Password)
+	newUser.SetPasswordHash(passwordHash)
 	err = newUser.Save(r.Context())
 	if err != nil {
 		HandleErr(w, 0, err)
 		return
 	}
 
-	newToken, err := models.GenerateToken(newUser)
+	newToken, err := GenerateToken(newUser)
 	if err != nil {
 		HandleErr(w, 0, err)
 		return
@@ -125,9 +133,9 @@ func UserLogin(w http.ResponseWriter, r *http.Request) {
 		HandleErr(w, http.StatusBadRequest, err)
 		return
 	}
-	users, _, err := models.Dbc.UserDef.SelectEntities(
+	users, _, err := DB.UserDef.SelectEntities(
 		[]*elorm.Filter{
-			elorm.AddFilterEQ(models.Dbc.UserDef.Email, payload.Email),
+			elorm.AddFilterEQ(DB.UserDef.Email, payload.Email),
 		}, nil, 1, 1)
 	if err != nil {
 		HandleErr(w, 0, err)
@@ -143,7 +151,12 @@ func UserLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	newToken, err := models.GenerateToken(users[0])
+	if !CheckPasswordHash(payload.Password, users[0].PasswordHash()) {
+		HandleErr(w, http.StatusUnauthorized, fmt.Errorf("invalid email or password"))
+		return
+	}
+
+	newToken, err := GenerateToken(users[0])
 	if err != nil {
 		HandleErr(w, 0, err)
 		return
@@ -168,18 +181,18 @@ func UserLogout(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, token, err := models.UserFromHttpRequest(r)
+	_, token, err := UserFromHttpRequest(r)
 	if err != nil {
 		HandleErr(w, http.StatusUnauthorized, fmt.Errorf("unauthorized: %v", err))
 		return
 	}
-	models.Dbc.DeleteEntity(r.Context(), token.RefString())
+	DB.DeleteEntity(r.Context(), token.RefString())
 	w.WriteHeader(http.StatusOK)
 }
 
 func UserMyProfile(w http.ResponseWriter, r *http.Request) {
 
-	user, _, err := models.UserFromHttpRequest(r)
+	user, _, err := UserFromHttpRequest(r)
 	if err != nil {
 		HandleErr(w, http.StatusUnauthorized, fmt.Errorf("unauthorized: %v", err))
 		return
@@ -249,9 +262,9 @@ func RefreshToken(w http.ResponseWriter, r *http.Request) {
 		HandleErr(w, http.StatusBadRequest, fmt.Errorf("refresh token is required"))
 		return
 	}
-	dbrt, _, err := models.Dbc.TokenDef.SelectEntities([]*elorm.Filter{
-		elorm.AddFilterEQ(models.Dbc.TokenDef.RefreshToken, payload.RefreshToken),
-		elorm.AddFilterGT(models.Dbc.TokenDef.RefreshTokenExpiresAt, time.Now()),
+	dbrt, _, err := DB.TokenDef.SelectEntities([]*elorm.Filter{
+		elorm.AddFilterEQ(DB.TokenDef.RefreshToken, payload.RefreshToken),
+		elorm.AddFilterGT(DB.TokenDef.RefreshTokenExpiresAt, time.Now()),
 	}, nil, 1, 1)
 	if err != nil {
 		HandleErr(w, 0, err)
@@ -263,7 +276,7 @@ func RefreshToken(w http.ResponseWriter, r *http.Request) {
 			HandleErr(w, http.StatusUnauthorized, fmt.Errorf("user isn't active"))
 			return
 		}
-		newToken, err := models.GenerateToken(user)
+		newToken, err := GenerateToken(user)
 		if err != nil {
 			HandleErr(w, 0, err)
 			return
@@ -274,7 +287,7 @@ func RefreshToken(w http.ResponseWriter, r *http.Request) {
 			AccessTokenExporesAt:  newToken.AccessTokenExpiresAt().UnixMilli(),
 			RefreshTokenExpiresAt: newToken.RefreshTokenExpiresAt().UnixMilli(),
 		}
-		err = models.Dbc.DeleteEntity(context.Background(), dbrt[0].RefString())
+		err = DB.DeleteEntity(context.Background(), dbrt[0].RefString())
 		if err != nil {
 			HandleErr(w, 0, err)
 			return
@@ -303,7 +316,7 @@ func UserPublicProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := models.Dbc.LoadUser(userref)
+	user, err := DB.LoadUser(userref)
 	if err != nil {
 		HandleErr(w, http.StatusNotFound, fmt.Errorf("user not found: %s", userref))
 		return
@@ -328,4 +341,53 @@ func UserPublicProfile(w http.ResponseWriter, r *http.Request) {
 		HandleErr(w, 0, err)
 		return
 	}
+}
+
+func SendMessageToUser(w http.ResponseWriter, r *http.Request) {
+	msg := ""
+	body, err := io.ReadAll(r.Body)
+	if err == nil {
+		msg = string(body)
+	}
+	if msg == "" {
+		HandleErr(w, http.StatusBadRequest, fmt.Errorf("message is required"))
+		return
+	}
+	if r.Method != http.MethodPost {
+		HandleErr(w, http.StatusMethodNotAllowed, nil)
+		return
+	}
+	sender, _, _ := UserFromHttpRequest(r)
+	if sender != nil {
+		msg = fmt.Sprintf("Сообщение от %s:\n\r\n\r%s", sender.Username(), msg)
+	}
+	uref := r.URL.Query().Get("userref")
+	if uref == "" {
+		admins, _, err := DB.UserDef.SelectEntities([]*elorm.Filter{
+			elorm.AddFilterEQ(DB.UserDef.Admin, true),
+			elorm.AddFilterEQ(DB.UserDef.IsDeleted, false),
+		}, nil, 0, 0)
+		if err != nil {
+			HandleErr(w, 0, err)
+			return
+		}
+		for _, admin := range admins {
+			if admin.TelegramVerified() {
+				Bot.Send(tgbotapi.NewMessage(admin.TelegramChatId(), msg))
+			}
+		}
+	} else {
+		user, err := DB.LoadUser(uref)
+		if err != nil {
+			HandleErr(w, http.StatusNotFound, fmt.Errorf("user not found: %s", uref))
+			return
+		}
+		if user.TelegramVerified() {
+			Bot.Send(tgbotapi.NewMessage(user.TelegramChatId(), msg))
+		} else {
+			HandleErr(w, http.StatusBadRequest, fmt.Errorf("user %s is not verified in Telegram", uref))
+			return
+		}
+	}
+
 }

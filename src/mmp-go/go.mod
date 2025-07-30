@@ -28,6 +28,7 @@ require (
 	github.com/lib/pq v1.10.9
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/telegram-mini-apps/init-data-golang v1.5.0
+	golang.org/x/crypto v0.40.0
 	modernc.org/sqlite v1.38.2
 )
 

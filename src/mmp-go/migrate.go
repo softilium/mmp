@@ -11,14 +11,13 @@ import (
 	"time"
 
 	"github.com/hashicorp/golang-lru/v2/expirable"
-	"github.com/softilium/mmp-go/models"
 )
 
 func Migrate(w http.ResponseWriter, r *http.Request) {
 
 	ctxMig := context.WithValue(context.Background(), "migration", true)
 
-	user, _, err := models.UserFromHttpRequest(r)
+	user, _, err := UserFromHttpRequest(r)
 	if err != nil {
 		HandleErr(w, 0, fmt.Errorf("unauthorized: %v", err))
 		return
@@ -35,28 +34,28 @@ func Migrate(w http.ResponseWriter, r *http.Request) {
 	}
 	defer mdb.Close()
 
-	usersMap := make(map[int64]*models.User)
-	shopsMap := make(map[int64]*models.Shop)
-	goodMap := make(map[int64]*models.Good)
-	ordersMap := make(map[int64]*models.CustomerOrder)
+	usersMap := make(map[int64]*User)
+	shopsMap := make(map[int64]*Shop)
+	goodMap := make(map[int64]*Good)
+	ordersMap := make(map[int64]*CustomerOrder)
 
 	// Users
 	////////
 
-	tokens, _, err := models.Dbc.TokenDef.SelectEntities(nil, nil, 0, 0)
+	tokens, _, err := DB.TokenDef.SelectEntities(nil, nil, 0, 0)
 	if err != nil {
 		HandleErr(w, 0, fmt.Errorf("failed to fetch tokens for migration: %v", err))
 		return
 	}
 	for _, token := range tokens {
-		err := models.Dbc.DeleteEntity(ctxMig, token.RefString())
+		err := DB.DeleteEntity(ctxMig, token.RefString())
 		if err != nil {
 			HandleErr(w, 0, fmt.Errorf("failed to delete token %s: %v", token.RefString(), err))
 			return
 		}
 	}
 
-	users, _, err := models.Dbc.UserDef.SelectEntities(nil, nil, 0, 0)
+	users, _, err := DB.UserDef.SelectEntities(nil, nil, 0, 0)
 	if err != nil {
 		HandleErr(w, 0, fmt.Errorf("failed to fetch users for migration: %v", err))
 		return
@@ -66,7 +65,7 @@ func Migrate(w http.ResponseWriter, r *http.Request) {
 		if user.Username() == Cfg.AdminEmail {
 			continue
 		}
-		err := models.Dbc.DeleteEntity(ctxMig, user.RefString())
+		err := DB.DeleteEntity(ctxMig, user.RefString())
 		if err != nil {
 			HandleErr(w, 0, fmt.Errorf("failed to delete user %s: %v", user.RefString(), err))
 			return
@@ -102,14 +101,15 @@ order by "Id"
 			return
 		}
 
-		newUser, err := models.Dbc.CreateUser()
+		newUser, err := DB.CreateUser()
 		if err != nil {
 			HandleErr(w, 0, fmt.Errorf("failed to create new user: %v", err))
 			return
 		}
 
+		passwordHash, _ := HashPassword(Cfg.AdminPassword)
 		newUser.SetUsername(userName)
-		newUser.SetPassword(Cfg.AdminPassword)
+		newUser.SetPasswordHash(passwordHash)
 		newUser.SetEmail(email)
 		newUser.SetAdmin(admin)
 		newUser.SetShopManager(shopManage)
@@ -134,13 +134,13 @@ order by "Id"
 	// shops
 	////////
 
-	shops, _, err := models.Dbc.ShopDef.SelectEntities(nil, nil, 0, 0)
+	shops, _, err := DB.ShopDef.SelectEntities(nil, nil, 0, 0)
 	if err != nil {
 		HandleErr(w, 0, fmt.Errorf("failed to fetch shops for migration: %v", err))
 		return
 	}
 	for _, shop := range shops {
-		err := models.Dbc.DeleteEntity(ctxMig, shop.RefString())
+		err := DB.DeleteEntity(ctxMig, shop.RefString())
 		if err != nil {
 			HandleErr(w, 0, fmt.Errorf("failed to delete shop %s: %v", shop.RefString(), err))
 			return
@@ -162,7 +162,7 @@ from "Shops" order by "ID"
 
 	for rows.Next() {
 
-		ns, err := models.Dbc.CreateShop()
+		ns, err := DB.CreateShop()
 		if err != nil {
 			HandleErr(w, 0, fmt.Errorf("failed to create new shop: %v", err))
 			return
@@ -210,13 +210,13 @@ from "Shops" order by "ID"
 
 	}
 
-	goods, _, err := models.Dbc.GoodDef.SelectEntities(nil, nil, 0, 0)
+	goods, _, err := DB.GoodDef.SelectEntities(nil, nil, 0, 0)
 	if err != nil {
 		HandleErr(w, 0, fmt.Errorf("failed to fetch goods for migration: %v", err))
 		return
 	}
 	for _, good := range goods {
-		err := models.Dbc.DeleteEntity(ctxMig, good.RefString())
+		err := DB.DeleteEntity(ctxMig, good.RefString())
 		if err != nil {
 			HandleErr(w, 0, fmt.Errorf("failed to delete good %s: %v", good.RefString(), err))
 			return
@@ -237,7 +237,7 @@ from "Goods" order by "ID"
 	defer rows.Close()
 
 	for rows.Next() {
-		ng, err := models.Dbc.CreateGood()
+		ng, err := DB.CreateGood()
 		if err != nil {
 			HandleErr(w, 0, fmt.Errorf("failed to create new good: %v", err))
 			return
@@ -340,13 +340,13 @@ from "Goods" order by "ID"
 	// orders
 	/////////
 
-	orders, _, err := models.Dbc.CustomerOrderDef.SelectEntities(nil, nil, 0, 0)
+	orders, _, err := DB.CustomerOrderDef.SelectEntities(nil, nil, 0, 0)
 	if err != nil {
 		HandleErr(w, 0, fmt.Errorf("failed to fetch orders for migration: %v", err))
 		return
 	}
 	for _, order := range orders {
-		err := models.Dbc.DeleteEntity(ctxMig, order.RefString())
+		err := DB.DeleteEntity(ctxMig, order.RefString())
 		if err != nil {
 			HandleErr(w, 0, fmt.Errorf("failed to delete order %s: %v", order.RefString(), err))
 			return
@@ -367,7 +367,7 @@ order by "ID"
 	}
 	defer rows.Close()
 	for rows.Next() {
-		no, err := models.Dbc.CreateCustomerOrder()
+		no, err := DB.CreateCustomerOrder()
 		if err != nil {
 			HandleErr(w, 0, fmt.Errorf("failed to create new order: %v", err))
 			return
@@ -429,13 +429,13 @@ order by "ID"
 	// order lines
 	///////////
 
-	orderLines, _, err := models.Dbc.OrderLineDef.SelectEntities(nil, nil, 0, 0)
+	orderLines, _, err := DB.OrderLineDef.SelectEntities(nil, nil, 0, 0)
 	if err != nil {
 		HandleErr(w, 0, fmt.Errorf("failed to fetch order lines for migration: %v", err))
 		return
 	}
 	for _, orderLine := range orderLines {
-		err := models.Dbc.DeleteEntity(ctxMig, orderLine.RefString())
+		err := DB.DeleteEntity(ctxMig, orderLine.RefString())
 		if err != nil {
 			HandleErr(w, 0, fmt.Errorf("failed to delete order line %s: %v", orderLine.RefString(), err))
 			return
@@ -456,7 +456,7 @@ order by "ID"
 	}
 	defer rows.Close()
 	for rows.Next() {
-		nol, err := models.Dbc.CreateOrderLine()
+		nol, err := DB.CreateOrderLine()
 		if err != nil {
 			HandleErr(w, 0, fmt.Errorf("failed to create new order line: %v", err))
 			return

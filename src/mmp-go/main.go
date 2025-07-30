@@ -12,7 +12,6 @@ import (
 	gh "github.com/gorilla/handlers"
 	_ "github.com/lib/pq"
 	"github.com/softilium/elorm"
-	"github.com/softilium/mmp-go/models"
 	_ "modernc.org/sqlite"
 )
 
@@ -69,54 +68,54 @@ func initServer() *http.Server {
 	// API routes
 
 	shopsRestApiConfig := elorm.CreateStdRestApiConfig(
-		*models.Dbc.ShopDef.EntityDef,
-		models.Dbc.LoadShop,
-		models.Dbc.ShopDef.SelectEntities,
-		models.Dbc.CreateShop)
+		*DB.ShopDef.EntityDef,
+		DB.LoadShop,
+		DB.ShopDef.SelectEntities,
+		DB.CreateShop)
 	shopsRestApiConfig.AdditionalFilter = func(r *http.Request) ([]*elorm.Filter, error) {
 		res := []*elorm.Filter{}
-		res = append(res, elorm.AddFilterEQ(models.Dbc.ShopDef.IsDeleted, false))
+		res = append(res, elorm.AddFilterEQ(DB.ShopDef.IsDeleted, false))
 		return res, nil
 	}
 	shopsRestApiConfig.DefaultSorts = func(r *http.Request) ([]*elorm.SortItem, error) {
-		return []*elorm.SortItem{{Field: models.Dbc.ShopDef.Caption, Asc: true}}, nil
+		return []*elorm.SortItem{{Field: DB.ShopDef.Caption, Asc: true}}, nil
 	}
-	shopsRestApiConfig.Context = models.HttpUserContext
+	shopsRestApiConfig.Context = LoadUserFromHttpToContext
 	shopsRestApiConfig.BeforeMiddleware = UserRequiredForEdit
 	router.HandleFunc("/api/shops", elorm.HandleRestApi(shopsRestApiConfig))
 
 	//// goods
 
 	goodsRestApiConfig := elorm.CreateStdRestApiConfig(
-		*models.Dbc.GoodDef.EntityDef,
-		models.Dbc.LoadGood,
-		models.Dbc.GoodDef.SelectEntities,
-		models.Dbc.CreateGood)
+		*DB.GoodDef.EntityDef,
+		DB.LoadGood,
+		DB.GoodDef.SelectEntities,
+		DB.CreateGood)
 	goodsRestApiConfig.AdditionalFilter = func(r *http.Request) ([]*elorm.Filter, error) {
 		res := []*elorm.Filter{}
-		res = append(res, elorm.AddFilterEQ(models.Dbc.GoodDef.IsDeleted, false))
+		res = append(res, elorm.AddFilterEQ(DB.GoodDef.IsDeleted, false))
 		shopref := r.URL.Query().Get("shopref")
 		if shopref != "" {
-			res = append(res, elorm.AddFilterEQ(models.Dbc.GoodDef.OwnerShop, shopref))
+			res = append(res, elorm.AddFilterEQ(DB.GoodDef.OwnerShop, shopref))
 		}
 		return res, nil
 	}
 	goodsRestApiConfig.DefaultSorts = func(r *http.Request) ([]*elorm.SortItem, error) {
-		return []*elorm.SortItem{{Field: models.Dbc.GoodDef.OrderInShop, Asc: true}}, nil
+		return []*elorm.SortItem{{Field: DB.GoodDef.OrderInShop, Asc: true}}, nil
 	}
-	goodsRestApiConfig.Context = models.HttpUserContext
+	goodsRestApiConfig.Context = LoadUserFromHttpToContext
 	router.HandleFunc("/api/goods", elorm.HandleRestApi(goodsRestApiConfig))
 
 	//// allusers
 
 	allusersRestApiConfig := elorm.CreateStdRestApiConfig(
-		*models.Dbc.UserDef.EntityDef,
-		models.Dbc.LoadUser,
-		models.Dbc.UserDef.SelectEntities,
-		models.Dbc.CreateUser)
+		*DB.UserDef.EntityDef,
+		DB.LoadUser,
+		DB.UserDef.SelectEntities,
+		DB.CreateUser)
 	allusersRestApiConfig.EnablePost = false
 	allusersRestApiConfig.BeforeMiddleware = UserAdminRequired
-	allusersRestApiConfig.Context = models.HttpUserContext
+	allusersRestApiConfig.Context = LoadUserFromHttpToContext
 	router.HandleFunc("/api/admin/allusers", elorm.HandleRestApi(allusersRestApiConfig))
 
 	router.HandleFunc("/api/admin/migrate", Migrate)
@@ -168,26 +167,26 @@ func main() {
 
 	}
 
-	models.Dbc, err = models.CreateDbContext(Cfg.dbDialect, Cfg.DbConnectionString)
+	DB, err = CreateDbContext(Cfg.dbDialect, Cfg.DbConnectionString)
 	logError(err)
 
-	models.Dbc.AggressiveReadingCache = true
+	DB.AggressiveReadingCache = true
 
-	err = models.Dbc.SetHandlers()
+	err = DB.SetHandlers()
 	logError(err)
 
-	err = models.Dbc.EnsureDBStructure()
+	err = DB.EnsureDBStructure()
 	logError(err)
 	fmt.Println("Database structure ensured successfully.")
 
-	tokensToDelete, _, err := models.Dbc.TokenDef.SelectEntities([]*elorm.Filter{
-		elorm.AddFilterLT(models.Dbc.TokenDef.RefreshTokenExpiresAt, time.Now()),
+	tokensToDelete, _, err := DB.TokenDef.SelectEntities([]*elorm.Filter{
+		elorm.AddFilterLT(DB.TokenDef.RefreshTokenExpiresAt, time.Now()),
 	}, nil, 0, 0)
 	if err != nil {
 		logError(err)
 	} else {
 		for _, token := range tokensToDelete {
-			err = models.Dbc.DeleteEntity(context.Background(), token.RefString())
+			err = DB.DeleteEntity(context.Background(), token.RefString())
 			if err != nil {
 				logError(err)
 			}
@@ -195,19 +194,20 @@ func main() {
 		fmt.Printf("Deleted %d expired tokens\n", len(tokensToDelete))
 	}
 
-	users, _, err := models.Dbc.UserDef.SelectEntities(nil, nil, 0, 0)
+	users, _, err := DB.UserDef.SelectEntities(nil, nil, 0, 0)
 	if err != nil {
 		logError(err)
 	}
 	if len(users) == 0 {
 		fmt.Println("No users found, creating default admin user...")
-		adminUser, err := models.Dbc.CreateUser()
+		adminUser, err := DB.CreateUser()
 		if err != nil {
 			logError(err)
 		}
+		admPwdHash, _ := HashPassword(Cfg.AdminPassword)
 		adminUser.SetEmail(Cfg.AdminEmail)
 		adminUser.SetUsername(Cfg.AdminEmail)
-		adminUser.SetPassword(Cfg.AdminPassword)
+		adminUser.SetPasswordHash(admPwdHash)
 		adminUser.SetAdmin(true)
 		adminUser.SetShopManager(true)
 		err = adminUser.Save(context.Background())
@@ -233,7 +233,7 @@ func main() {
 }
 
 func UserAdminRequired(w http.ResponseWriter, r *http.Request) bool {
-	user, _, err := models.UserFromHttpRequest(r)
+	user, _, err := UserFromHttpRequest(r)
 	if err != nil {
 		HandleErr(w, http.StatusUnauthorized, fmt.Errorf("unauthorized: %v", err))
 		return false
@@ -246,7 +246,7 @@ func UserAdminRequired(w http.ResponseWriter, r *http.Request) bool {
 }
 
 func UserRequired(w http.ResponseWriter, r *http.Request) bool {
-	_, _, err := models.UserFromHttpRequest(r)
+	_, _, err := UserFromHttpRequest(r)
 	if err != nil {
 		HandleErr(w, http.StatusUnauthorized, fmt.Errorf("unauthorized: %v", err))
 		return false
@@ -258,7 +258,7 @@ func UserRequiredForEdit(w http.ResponseWriter, r *http.Request) bool {
 	if r.Method == http.MethodGet {
 		return true
 	}
-	_, _, err := models.UserFromHttpRequest(r)
+	_, _, err := UserFromHttpRequest(r)
 	if err != nil {
 		HandleErr(w, http.StatusUnauthorized, fmt.Errorf("unauthorized: %v", err))
 		return false
@@ -266,6 +266,6 @@ func UserRequiredForEdit(w http.ResponseWriter, r *http.Request) bool {
 	return true
 }
 
-//TODO password salt+hash
-//TODO messages on telegram (via api, updates)
 //TODO locks for elorm public methods (for def, factory, entity)
+//TODO double check images handling (re-upload, delete, etc.)
+//TODO localization

@@ -6,19 +6,18 @@ import (
 	"net/http"
 
 	"github.com/softilium/elorm"
-	"github.com/softilium/mmp-go/models"
 )
 
 func initRouterBasket(router *http.ServeMux) {
 
 	basketRestApiConfig := elorm.CreateStdRestApiConfig(
-		*models.Dbc.OrderLineDef.EntityDef,
-		models.Dbc.LoadOrderLine,
-		models.Dbc.OrderLineDef.SelectEntities,
-		models.Dbc.CreateOrderLine)
+		*DB.OrderLineDef.EntityDef,
+		DB.LoadOrderLine,
+		DB.OrderLineDef.SelectEntities,
+		DB.CreateOrderLine)
 	basketRestApiConfig.EnablePost = false
 	basketRestApiConfig.BeforeMiddleware = func(w http.ResponseWriter, r *http.Request) bool {
-		_, _, err := models.UserFromHttpRequest(r)
+		_, _, err := UserFromHttpRequest(r)
 		if err != nil {
 			HandleErr(w, http.StatusUnauthorized, fmt.Errorf("unauthorized: %v", err))
 			return false
@@ -26,20 +25,20 @@ func initRouterBasket(router *http.ServeMux) {
 		return true
 	}
 	basketRestApiConfig.AdditionalFilter = func(r *http.Request) ([]*elorm.Filter, error) {
-		user, _, err := models.UserFromHttpRequest(r)
+		user, _, err := UserFromHttpRequest(r)
 		if err != nil {
 			return nil, err
 		}
 		res := []*elorm.Filter{}
-		res = append(res, elorm.AddFilterEQ(models.Dbc.OrderLineDef.IsDeleted, false))
-		res = append(res, elorm.AddFilterEQ(models.Dbc.OrderLineDef.CustomerOrder, "")) // only active basket lines (order is empty)
-		res = append(res, elorm.AddFilterEQ(models.Dbc.OrderLineDef.CreatedBy, user.RefString()))
+		res = append(res, elorm.AddFilterEQ(DB.OrderLineDef.IsDeleted, false))
+		res = append(res, elorm.AddFilterEQ(DB.OrderLineDef.CustomerOrder, "")) // only active basket lines (order is empty)
+		res = append(res, elorm.AddFilterEQ(DB.OrderLineDef.CreatedBy, user.RefString()))
 		return res, nil
 	}
 	basketRestApiConfig.DefaultSorts = func(r *http.Request) ([]*elorm.SortItem, error) {
-		return []*elorm.SortItem{{Field: models.Dbc.OrderLineDef.Ref, Asc: true}}, nil
+		return []*elorm.SortItem{{Field: DB.OrderLineDef.Ref, Asc: true}}, nil
 	}
-	basketRestApiConfig.Context = models.HttpUserContext
+	basketRestApiConfig.Context = LoadUserFromHttpToContext
 	router.HandleFunc("/api/basket", elorm.HandleRestApi(basketRestApiConfig))
 
 	router.HandleFunc("/api/basket/increase", increaseBasket)
@@ -53,7 +52,7 @@ func increaseBasket(w http.ResponseWriter, r *http.Request) {
 		HandleErr(w, http.StatusMethodNotAllowed, nil)
 		return
 	}
-	user, _, err := models.UserFromHttpRequest(r)
+	user, _, err := UserFromHttpRequest(r)
 	if err != nil {
 		HandleErr(w, http.StatusUnauthorized, fmt.Errorf("unauthorized: %v", err))
 		return
@@ -63,17 +62,17 @@ func increaseBasket(w http.ResponseWriter, r *http.Request) {
 		HandleErr(w, http.StatusBadRequest, fmt.Errorf("goodref is required"))
 		return
 	}
-	good, err := models.Dbc.LoadGood(gref)
+	good, err := DB.LoadGood(gref)
 	if err != nil {
 		HandleErr(w, http.StatusNotFound, fmt.Errorf("good not found: %v", err))
 		return
 	}
-	exists, _, err := models.Dbc.OrderLineDef.SelectEntities(
+	exists, _, err := DB.OrderLineDef.SelectEntities(
 		[]*elorm.Filter{
-			elorm.AddFilterEQ(models.Dbc.OrderLineDef.IsDeleted, false),
-			elorm.AddFilterEQ(models.Dbc.OrderLineDef.CustomerOrder, ""), // only active basket lines (order is empty)
-			elorm.AddFilterEQ(models.Dbc.OrderLineDef.CreatedBy, user.RefString()),
-			elorm.AddFilterEQ(models.Dbc.OrderLineDef.Good, gref),
+			elorm.AddFilterEQ(DB.OrderLineDef.IsDeleted, false),
+			elorm.AddFilterEQ(DB.OrderLineDef.CustomerOrder, ""), // only active basket lines (order is empty)
+			elorm.AddFilterEQ(DB.OrderLineDef.CreatedBy, user.RefString()),
+			elorm.AddFilterEQ(DB.OrderLineDef.Good, gref),
 		}, nil, 0, 0)
 	if err != nil {
 		HandleErr(w, http.StatusNotFound, err)
@@ -94,7 +93,7 @@ func increaseBasket(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		return
 	}
-	newLine, err := models.Dbc.CreateOrderLine()
+	newLine, err := DB.CreateOrderLine()
 	if err != nil {
 		HandleErr(w, 0, err)
 		return
@@ -117,7 +116,7 @@ func decreaseBasket(w http.ResponseWriter, r *http.Request) {
 		HandleErr(w, http.StatusMethodNotAllowed, nil)
 		return
 	}
-	user, _, err := models.UserFromHttpRequest(r)
+	user, _, err := UserFromHttpRequest(r)
 	if err != nil {
 		HandleErr(w, http.StatusUnauthorized, fmt.Errorf("unauthorized: %v", err))
 		return
@@ -127,17 +126,17 @@ func decreaseBasket(w http.ResponseWriter, r *http.Request) {
 		HandleErr(w, http.StatusBadRequest, fmt.Errorf("goodref is required"))
 		return
 	}
-	good, err := models.Dbc.LoadGood(gref)
+	good, err := DB.LoadGood(gref)
 	if err != nil {
 		HandleErr(w, http.StatusNotFound, fmt.Errorf("good not found: %v", err))
 		return
 	}
-	exists, _, err := models.Dbc.OrderLineDef.SelectEntities(
+	exists, _, err := DB.OrderLineDef.SelectEntities(
 		[]*elorm.Filter{
-			elorm.AddFilterEQ(models.Dbc.OrderLineDef.IsDeleted, false),
-			elorm.AddFilterEQ(models.Dbc.OrderLineDef.CustomerOrder, ""), // only active basket lines (order is empty)
-			elorm.AddFilterEQ(models.Dbc.OrderLineDef.CreatedBy, user.RefString()),
-			elorm.AddFilterEQ(models.Dbc.OrderLineDef.Good, gref),
+			elorm.AddFilterEQ(DB.OrderLineDef.IsDeleted, false),
+			elorm.AddFilterEQ(DB.OrderLineDef.CustomerOrder, ""), // only active basket lines (order is empty)
+			elorm.AddFilterEQ(DB.OrderLineDef.CreatedBy, user.RefString()),
+			elorm.AddFilterEQ(DB.OrderLineDef.Good, gref),
 		}, nil, 0, 0)
 	if err != nil {
 		HandleErr(w, 0, err)
@@ -151,7 +150,7 @@ func decreaseBasket(w http.ResponseWriter, r *http.Request) {
 		exists[0].SetQty(exists[0].Qty() - 1)
 		exists[0].SetSum(exists[0].Qty() * good.Price())
 		if exists[0].Qty() < 1 {
-			err = models.Dbc.DeleteEntity(r.Context(), exists[0].RefString())
+			err = DB.DeleteEntity(r.Context(), exists[0].RefString())
 			if err != nil {
 				HandleErr(w, 0, err)
 				return
@@ -176,13 +175,13 @@ type MergeBasketItem struct {
 
 func mergeBasket(w http.ResponseWriter, r *http.Request) {
 
-	user, _, err := models.UserFromHttpRequest(r)
+	user, _, err := UserFromHttpRequest(r)
 	if err != nil {
 		HandleErr(w, http.StatusUnauthorized, fmt.Errorf("unauthorized: %v", err))
 		return
 	}
 
-	dbCtx := models.AddUserContext(r.Context(), user)
+	dbCtx := AddUserContext(r.Context(), user)
 
 	var newItems []MergeBasketItem
 	err = json.NewDecoder(r.Body).Decode(&newItems)
@@ -191,11 +190,11 @@ func mergeBasket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	existItems, _, err := models.Dbc.OrderLineDef.SelectEntities(
+	existItems, _, err := DB.OrderLineDef.SelectEntities(
 		[]*elorm.Filter{
-			elorm.AddFilterEQ(models.Dbc.OrderLineDef.IsDeleted, false),
-			elorm.AddFilterEQ(models.Dbc.OrderLineDef.CustomerOrder, ""), // only active basket lines (order is empty)
-			elorm.AddFilterEQ(models.Dbc.OrderLineDef.CreatedBy, user.RefString()),
+			elorm.AddFilterEQ(DB.OrderLineDef.IsDeleted, false),
+			elorm.AddFilterEQ(DB.OrderLineDef.CustomerOrder, ""), // only active basket lines (order is empty)
+			elorm.AddFilterEQ(DB.OrderLineDef.CreatedBy, user.RefString()),
 		}, nil, 0, 0)
 	if err != nil {
 		HandleErr(w, 0, fmt.Errorf("error selecting basket lines: %w", err))
@@ -220,12 +219,12 @@ func mergeBasket(w http.ResponseWriter, r *http.Request) {
 		}
 		if !updated {
 			// Create new item
-			good, err := models.Dbc.LoadGood(newItem.GoodId)
+			good, err := DB.LoadGood(newItem.GoodId)
 			if err != nil {
 				HandleErr(w, http.StatusNotFound, fmt.Errorf("good not found: %v", err))
 				return
 			}
-			newLine, err := models.Dbc.CreateOrderLine()
+			newLine, err := DB.CreateOrderLine()
 			if err != nil {
 				HandleErr(w, 0, fmt.Errorf("error creating new order line: %w", err))
 				return

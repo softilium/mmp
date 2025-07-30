@@ -1,5 +1,5 @@
 {
-    "PackageName": "models",
+    "PackageName": "main",
     "Fragments": [
         {
             "FragmentName": "BusinessObjects",
@@ -61,9 +61,9 @@
                     "Len": 100
                 },
                 {
-                    "Name": "Password",
+                    "Name": "PasswordHash",
                     "ColumnType": "string",
-                    "Len": 50
+                    "Len": 200
                 },
                 {
                     "Name": "IsActive",
