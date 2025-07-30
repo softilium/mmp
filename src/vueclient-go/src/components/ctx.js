@@ -145,16 +145,6 @@ export const ctx = reactive({
   },
 
   async CheckLogged() {
-    if (this.isTg()) {
-      let res = await fetch(`${this.rbUrl()}/api/profiles/public?email=0`, {
-        headers: await this.authHeaders(),
-      });
-      if (res.ok) {
-        res = await res.json();
-        this.userInfo = res;
-      }
-      return;
-    }
     if (this.accessToken != "") {
       let res = await fetch(this.rbUrl() + "/identity/myprofile", {
         method: "GET",

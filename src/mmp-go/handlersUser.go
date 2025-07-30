@@ -186,7 +186,7 @@ func UserMyProfile(w http.ResponseWriter, r *http.Request) {
 			Id:                user.RefString(),
 			Description:       user.Description(),
 			TelegramUsername:  user.TelegramUsername(),
-			BotChatId:         user.BotChatId(),
+			BotChatId:         user.TelegramChatId(),
 			TelegramVerified:  user.TelegramVerified(),
 			TelegramCheckCode: user.TelegramCheckCode(),
 		}
@@ -211,7 +211,6 @@ func UserMyProfile(w http.ResponseWriter, r *http.Request) {
 		user.SetAdmin(payload.Admin)
 		user.SetDescription(payload.Description)
 		user.SetTelegramUsername(payload.TelegramUsername)
-		//user.SetBotChatId(payload.BotChatId)
 		//user.SetTelegramVerified(payload.TelegramVerified)
 		//user.SetTelegramCheckCode(payload.TelegramCheckCode)
 

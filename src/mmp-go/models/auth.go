@@ -8,6 +8,10 @@ import (
 	"github.com/google/uuid"
 )
 
+type TelegramUserCtxKeyType string
+
+const TelegramUserCtxKey TelegramUserCtxKeyType = "tguser"
+
 type TokenItem struct {
 	AccessToken           string
 	RefreshToken          string
@@ -18,6 +22,18 @@ type TokenItem struct {
 var TokensByAT = make(map[string]TokenItem)
 
 func UserFromHttpRequest(r *http.Request) (*User, error) {
+
+	tgUser := r.Context().Value(TelegramUserCtxKey)
+	if tgUser != nil {
+		if user, ok := tgUser.(*User); ok {
+			if user.IsActive() {
+				return user, nil
+			}
+			return nil, fmt.Errorf("user isn't active")
+		}
+		return nil, fmt.Errorf("invalid user context type for tg")
+	}
+
 	raw := r.Header.Get("Authorization")
 	if raw == "" {
 		return nil, fmt.Errorf("no auth header")

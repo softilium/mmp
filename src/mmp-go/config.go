@@ -13,11 +13,13 @@ type ConfigData struct {
 	ListenAddr                     string
 	Debug                          bool
 	FrontEndFolder                 string
-	AdminEmail                     string
-	AdminPassword                  string
-	DbConnectionStringForMigration string
+	AdminEmail                     string // Admin email for the default admin user (only for empty database)
+	AdminPassword                  string // Admin password for the default admin user (only for empty database)
+	DbConnectionStringForMigration string // Connection string for database migration
 	ImagesFolder                   string
 	ImagesFolderForMigration       string
+	TgbotApiKey                    string
+	CORSAlloweedHosts              []string // Allowed CORS hosts
 }
 
 var Cfg ConfigData
@@ -41,5 +43,9 @@ func init() {
 
 	Cfg.ImagesFolder = os.Getenv("IMAGES_FOLDER")
 	Cfg.ImagesFolderForMigration = os.Getenv("IMAGES_FOLDER_FOR_MIGRATION")
+	Cfg.TgbotApiKey = os.Getenv("TGBOT_APIKEY")
+
+	cah := os.Getenv("CORS_ALLOWED_HOSTS")
+	Cfg.CORSAlloweedHosts = strings.Split(cah, ",")
 
 }

@@ -143,8 +143,10 @@ func initServer() *http.Server {
 	}
 	server.Handler = gh.LoggingHandler(os.Stdout, server.Handler)
 
+	server.Handler = TelegramMiddleware(server.Handler)
+
 	if Cfg.Debug {
-		c1 := gh.AllowedOrigins([]string{"http://localhost:56056"}) //vita dev server addr
+		c1 := gh.AllowedOrigins(Cfg.CORSAlloweedHosts)
 		c2 := gh.AllowCredentials()
 		c3 := gh.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"})
 		c4 := gh.AllowedHeaders([]string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token", "Set-Cookie"})
@@ -249,6 +251,7 @@ func UserRequiredForEdit(w http.ResponseWriter, r *http.Request) bool {
 	return true
 }
 
-//TODO telegram middleware
 //TODO store tokens
-//TODO Cfg to CORS hosts
+//TODO password salt+hash
+//TODO messages on telegram (via api, updates)
+//TODO locks for elorm public methods (for def, factory, entity)

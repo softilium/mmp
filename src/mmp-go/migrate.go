@@ -106,7 +106,7 @@ order by "Id"
 		newUser.SetDescription(description)
 
 		if chatId.Valid {
-			newUser.SetBotChatId(chatId.Int64)
+			newUser.SetTelegramChatId(chatId.Int64)
 		}
 
 		err = newUser.Save(ctxMig)

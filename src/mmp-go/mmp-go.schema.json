@@ -93,17 +93,12 @@
                 },
                 {
                     "Name": "TelegramChatId",
-                    "ColumnType": "string",
-                    "Len": 100
+                    "ColumnType": "int"
                 },
                 {
                     "Name": "Description",
                     "ColumnType": "string",
                     "Len": 300
-                },
-                {
-                    "Name": "BotChatId",
-                    "ColumnType": "int"
                 }
             ]
         },
