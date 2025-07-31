@@ -268,3 +268,4 @@ func UserRequiredForEdit(w http.ResponseWriter, r *http.Request) bool {
 
 //TODO locks for elorm public methods (for def, factory, entity)
 //TODO localization
+//TODO vueclient-go ->> authFetch()
