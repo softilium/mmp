@@ -126,8 +126,8 @@ const Save = async () => {
 
   <div class="row mb-3">
     <div class="form-group form-group-sm row">
-      <label class="col-3 form-label">Статус</label>
-      <div class="col-9">
+      <label class="col-4 form-label">Статус</label>
+      <div class="col-8">
         <select
           :disabled="!isSender"
           class="form-select form-control-sm"
@@ -142,8 +142,8 @@ const Save = async () => {
   </div>
   <div class="row mb-3">
     <div class="form-group form-group-sm row">
-      <label class="col-3 form-label">Примечание покупателя</label>
-      <div class="col-9">
+      <label class="col-4 form-label">Примечание покупателя</label>
+      <div class="col-8">
         <textarea
           :disabled="!isCustomer"
           class="form-control"
@@ -155,8 +155,8 @@ const Save = async () => {
   </div>
   <div class="row mb-3">
     <div class="form-group form-group-sm row">
-      <label class="col-3 form-label">Примечание продавца</label>
-      <div class="col-9">
+      <label class="col-4 form-label">Примечание продавца</label>
+      <div class="col-8">
         <textarea
           :disabled="!isSender"
           class="form-control"
@@ -168,8 +168,8 @@ const Save = async () => {
   </div>
   <div class="row mb-3">
     <div class="form-group form-group-sm row">
-      <label class="col-3 form-label">Ожидаемая дата доставки</label>
-      <div class="col-9">
+      <label class="col-4 form-label">Ожидаемая дата доставки</label>
+      <div class="col-8">
         <input
           :disabled="!isSender"
           type="date"
