@@ -26,6 +26,7 @@ func initRouterOrders(router *http.ServeMux) {
 		DB.LoadCustomerOrder,
 		DB.CustomerOrderDef.SelectEntities,
 		DB.CreateCustomerOrder)
+	outbox.DefaultPageSize = 0
 	outbox.EnablePost = false
 	outbox.EnablePut = false
 	outbox.EnableDelete = false
@@ -56,6 +57,7 @@ func initRouterOrders(router *http.ServeMux) {
 		DB.LoadCustomerOrder,
 		DB.CustomerOrderDef.SelectEntities,
 		DB.CreateCustomerOrder)
+	inbox.DefaultPageSize = 0
 	inbox.EnablePost = false
 	inbox.EnablePut = false
 	inbox.EnableDelete = false
@@ -86,6 +88,7 @@ func initRouterOrders(router *http.ServeMux) {
 		DB.LoadCustomerOrder,
 		DB.CustomerOrderDef.SelectEntities,
 		DB.CreateCustomerOrder)
+	ordersGetterEditor.DefaultPageSize = 0
 	ordersGetterEditor.EnablePost = false
 	ordersGetterEditor.EnablePut = true
 	ordersGetterEditor.EnableDelete = false
@@ -104,6 +107,7 @@ func initRouterOrders(router *http.ServeMux) {
 		DB.LoadOrderLine,
 		DB.OrderLineDef.SelectEntities,
 		DB.CreateOrderLine)
+	lines.DefaultPageSize = 0
 	lines.EnablePost = false
 	lines.EnablePut = false
 	lines.EnableDelete = false

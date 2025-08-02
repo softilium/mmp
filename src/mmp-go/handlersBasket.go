@@ -15,6 +15,7 @@ func initRouterBasket(router *http.ServeMux) {
 		DB.LoadOrderLine,
 		DB.OrderLineDef.SelectEntities,
 		DB.CreateOrderLine)
+	basketRestApiConfig.DefaultPageSize = 0
 	basketRestApiConfig.EnablePost = false
 	basketRestApiConfig.BeforeMiddleware = func(w http.ResponseWriter, r *http.Request) bool {
 		_, _, err := UserFromHttpRequest(r)

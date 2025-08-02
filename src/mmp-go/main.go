@@ -72,6 +72,7 @@ func initServer() *http.Server {
 		DB.LoadShop,
 		DB.ShopDef.SelectEntities,
 		DB.CreateShop)
+	shopsRestApiConfig.DefaultPageSize = 0
 	shopsRestApiConfig.AdditionalFilter = func(r *http.Request) ([]*elorm.Filter, error) {
 		res := []*elorm.Filter{}
 		res = append(res, elorm.AddFilterEQ(DB.ShopDef.IsDeleted, false))
@@ -91,6 +92,7 @@ func initServer() *http.Server {
 		DB.LoadGood,
 		DB.GoodDef.SelectEntities,
 		DB.CreateGood)
+	goodsRestApiConfig.DefaultPageSize = 0
 	goodsRestApiConfig.AdditionalFilter = func(r *http.Request) ([]*elorm.Filter, error) {
 		res := []*elorm.Filter{}
 		res = append(res, elorm.AddFilterEQ(DB.GoodDef.IsDeleted, false))
@@ -113,6 +115,7 @@ func initServer() *http.Server {
 		DB.LoadUser,
 		DB.UserDef.SelectEntities,
 		DB.CreateUser)
+	allusersRestApiConfig.DefaultPageSize = 0
 	allusersRestApiConfig.EnablePost = false
 	allusersRestApiConfig.BeforeMiddleware = UserAdminRequired
 	allusersRestApiConfig.Context = LoadUserFromHttpToContext
