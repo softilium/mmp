@@ -1,13 +1,13 @@
 # MMP
 
-This repo represents marketplace for telegram bot. This marketplace is accessible on this address on Telegram: @RiverStoresBot. 
+This repo represents marketplace (or e-shop) for telegram bot. This marketplace is accessible on this address on [@RiverStoresBot](https://t.me/RiverStoresBot). 
 Application allows users to deploy their own showcases, add goods with images and descriptions and invite other users to make orders.
 Order can has traditional minimal flow. Bot notify both showcase owners and users about all the changes.
 
-This repo contains two implementations for marketplace: 
+Repo contains two implementations for marketplace: 
 
 * using standard ASP.NET + EF.Core approach
-* using my old Golang library https://githut.com/softilium/elorm
+* using my old Golang library https://github.com/softilium/elorm
 
 Currently bot works on Golang + elorm.
 
