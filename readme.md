@@ -7,7 +7,7 @@ Order can has traditional minimal flow. Bot notify both showcase owners and user
 This repo contains two implementations for marketplace: 
 
 * using standard ASP.NET + EF.Core approach
-* using my old Golang library https://githut.com/softilium/elorm
+* using my old Golang library https://github.com/softilium/elorm
 
 Currently bot works on Golang + elorm.
 
