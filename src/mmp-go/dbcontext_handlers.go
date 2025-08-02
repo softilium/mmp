@@ -144,19 +144,19 @@ func (dbc *DbContext) SetHandlers() error {
 
 		if order.IsNew() {
 			if order.Sender().TelegramVerified() {
-				Bot.Send(
+				_, _ = Bot.Send(
 					tgbotapi.NewMessage(order.Sender().TelegramChatId(),
 						fmt.Sprintf("Новый заказ для вашей обработки. Заказчик [%s, Заказ [%s].", order.CreatedBy().Username(), orderID)))
 			}
 			if order.CreatedBy().TelegramVerified() {
-				Bot.Send(
+				_, _ = Bot.Send(
 					tgbotapi.NewMessage(order.CreatedBy().TelegramChatId(),
 						fmt.Sprintf("Заказ [%s] отправлен вледельцу витрины. Бот будет уведомлять вас о всех будущих изменениях.", orderID)))
 			}
 		} else {
 			if order.Status() != order.field_Status.GetOld() {
 				if order.CreatedBy().TelegramVerified() {
-					Bot.Send(
+					_, _ = Bot.Send(
 						tgbotapi.NewMessage(order.CreatedBy().TelegramChatId(),
 							fmt.Sprintf("Статус заказа [%s] изменен владельцем [%s] с [%s] на [%s].",
 								orderID,
@@ -168,21 +168,21 @@ func (dbc *DbContext) SetHandlers() error {
 			}
 			if order.CustomerComment() != order.field_CustomerComment.GetOld() {
 				if order.Sender().TelegramVerified() {
-					Bot.Send(
+					_, _ = Bot.Send(
 						tgbotapi.NewMessage(order.Sender().TelegramChatId(),
 							fmt.Sprintf("Заказчик указал примечание к заказу [%s]\n\r\n\r%s", orderID, order.CustomerComment())))
 				}
 			}
 			if order.SenderComment() != order.field_SenderComment.GetOld() {
 				if order.CreatedBy().TelegramVerified() {
-					Bot.Send(
+					_, _ = Bot.Send(
 						tgbotapi.NewMessage(order.CreatedBy().TelegramChatId(),
 							fmt.Sprintf("Владелец витрины указал примечание к заказу [%s]\n\r\n\r%s", orderID, order.SenderComment())))
 				}
 			}
 			if order.ExpectedDeliveryDate() != order.field_ExpectedDeliveryDate.GetOld() {
 				if order.CreatedBy().TelegramVerified() {
-					Bot.Send(
+					_, _ = Bot.Send(
 						tgbotapi.NewMessage(order.CreatedBy().TelegramChatId(),
 							fmt.Sprintf("Владелец витрины указал дату доставки к заказу [%s]\n\r\n\r%s", orderID, order.ExpectedDeliveryDate().Format(time.DateTime))))
 				}

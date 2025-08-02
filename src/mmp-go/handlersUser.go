@@ -186,7 +186,11 @@ func UserLogout(w http.ResponseWriter, r *http.Request) {
 		HandleErr(w, http.StatusUnauthorized, fmt.Errorf("unauthorized: %v", err))
 		return
 	}
-	DB.DeleteEntity(r.Context(), token.RefString())
+	err = DB.DeleteEntity(r.Context(), token.RefString())
+	if err != nil {
+		HandleErr(w, 0, err)
+		return
+	}
 	w.WriteHeader(http.StatusOK)
 }
 
@@ -373,7 +377,7 @@ func SendMessageToUser(w http.ResponseWriter, r *http.Request) {
 		}
 		for _, admin := range admins {
 			if admin.TelegramVerified() {
-				Bot.Send(tgbotapi.NewMessage(admin.TelegramChatId(), msg))
+				_, _ = Bot.Send(tgbotapi.NewMessage(admin.TelegramChatId(), msg))
 			}
 		}
 	} else {
@@ -383,7 +387,7 @@ func SendMessageToUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if user.TelegramVerified() {
-			Bot.Send(tgbotapi.NewMessage(user.TelegramChatId(), msg))
+			_, _ = Bot.Send(tgbotapi.NewMessage(user.TelegramChatId(), msg))
 		} else {
 			HandleErr(w, http.StatusBadRequest, fmt.Errorf("user %s is not verified in Telegram", uref))
 			return

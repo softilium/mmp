@@ -110,9 +110,19 @@ func handleImages(w http.ResponseWriter, r *http.Request, downScale bool) {
 	}
 	if r.Method == http.MethodPost {
 
-		r.ParseMultipartForm(10 << 20) // Limit to 10MB
+		err = r.ParseMultipartForm(10 << 20) // Limit to 10MB
+		if err != nil {
+			HandleErr(w, http.StatusBadRequest, fmt.Errorf("failed to parse form: %v", err))
+			return
+		}
 		file, _, err := r.FormFile("image")
-		defer file.Close()
+		if err != nil {
+			HandleErr(w, http.StatusBadRequest, fmt.Errorf("failed to get image from form: %v", err))
+			return
+		}
+		defer func() {
+			_ = file.Close()
+		}()
 		imageData, err := io.ReadAll(file)
 		if err != nil {
 			HandleErr(w, http.StatusInternalServerError, fmt.Errorf("failed to read image data: %v", err))

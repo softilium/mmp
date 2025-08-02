@@ -186,7 +186,9 @@ func checkoutHandler(w http.ResponseWriter, r *http.Request) {
 		HandleErr(w, 0, fmt.Errorf("error starting transaction: %w", err))
 		return
 	}
-	defer DB.RollbackTran(tx)
+	defer func() {
+		_ = DB.RollbackTran(tx)
+	}()
 
 	for _, line := range newLines {
 		if line.Good().CreatedBy().RefString() == senderObj.RefString() {

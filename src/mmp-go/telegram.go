@@ -147,7 +147,7 @@ func init() {
 					continue
 				}
 
-				Bot.Send(tgbotapi.NewMessage(
+				_, _ = Bot.Send(tgbotapi.NewMessage(
 					update.Message.Chat.ID,
 					fmt.Sprintf(`
 
