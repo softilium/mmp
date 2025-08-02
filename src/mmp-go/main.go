@@ -57,7 +57,7 @@ func initServer() *http.Server {
 	// SPA routes
 	SPAroutes := []string{
 		"/login", "/edit-shop", "/shop/", "/edit-good", "/checkout",
-		"/orders", "/myprofile", "/profile", "/set-roles", "/inc-orders", "/good/",
+		"/orders", "/myprofile", "/profile/", "/set-roles", "/inc-orders", "/good/",
 	}
 	for _, route := range SPAroutes {
 		router.HandleFunc(route, SpaHandler())
