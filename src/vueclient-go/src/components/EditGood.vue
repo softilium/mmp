@@ -99,8 +99,8 @@ const Save = async () => {
     });
     if (await ctx.CheckUnauth(res)) return;
     if (res.ok) {
-      res = await res.json();
-      await SaveImages(res.Ref);
+      let rj = await res.json();
+      await SaveImages(rj.Ref);
       router.push("/shop/" + route.params.shopid);
     }
   }

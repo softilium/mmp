@@ -59,11 +59,9 @@ const SendMsg = async () => {
             height="24px"
           />&nbsp;Витрины</RouterLink
         >&nbsp;&nbsp;
-        <span v-if="!ctx.userInfo.id && !ctx.isTg()">
-          <RouterLink class="btn btn-outline-secondary btn-sm" to="/login"
-            >Войти</RouterLink
-          >&nbsp;
-        </span>
+        <RouterLink class="btn btn-outline-secondary btn-sm" to="/search"
+          >Поиск</RouterLink
+        >
         <span v-if="!ctx.userInfo.id && ctx.isTg()" class="text-danger">
           Напишите в чат бота любое сообщение для авто-регистрации&nbsp;
         </span>
@@ -76,6 +74,11 @@ const SendMsg = async () => {
               ctx.basket.sum
             }}</RouterLink
           >&nbsp;&nbsp;
+        </span>
+        <span v-if="!ctx.userInfo.id && !ctx.isTg()">
+          <RouterLink class="btn btn-outline-secondary btn-sm" to="/login"
+            >Войти</RouterLink
+          >&nbsp;
         </span>
         <span v-if="ctx.userInfo.id">
           <RouterLink

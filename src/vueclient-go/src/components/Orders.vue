@@ -15,8 +15,8 @@ const Load = async () => {
   });
   if (await ctx.CheckUnauth(res)) return;
   if (res.ok) {
-    res = await res.json();
-    orders.value = res.Data;
+    let rj = await res.json();
+    orders.value = rj.Data;
   }
 };
 

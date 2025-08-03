@@ -27,8 +27,8 @@ onMounted(async () => {
         method: "GET",
       });
       if (res.ok) {
-        res = await res.json();
-        shop.value = res;
+        let rj = await res.json();
+        shop.value = rj;
       }
     } catch (err) {
       console.log(err);
@@ -47,8 +47,8 @@ const Save = async () => {
       });
       if (await ctx.CheckUnauth(res)) return;
       if (res.ok) {
-        res = await res.json();
-        shop.value.Ref = res.Ref;
+        let rj = await res.json();
+        shop.value.Ref = rj.Ref;
         router.push(`/shop/${shop.value.Ref}`);
       }
     } catch (err) {

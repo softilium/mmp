@@ -56,7 +56,7 @@ func initServer() *http.Server {
 
 	// SPA routes
 	SPAroutes := []string{
-		"/login", "/edit-shop", "/shop/", "/edit-good", "/checkout",
+		"/login", "/edit-shop", "/shop/", "/edit-good", "/checkout", "/search",
 		"/orders", "/myprofile", "/profile/", "/set-roles", "/inc-orders", "/good/",
 	}
 	for _, route := range SPAroutes {
@@ -127,6 +127,7 @@ func initServer() *http.Server {
 	initRouterAuth(router)
 	initRouterBasket(router)
 	initRouterOrders(router)
+	initRouterSearchGoods(router)
 
 	// CORE
 

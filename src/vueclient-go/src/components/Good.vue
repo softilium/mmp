@@ -75,8 +75,8 @@ const LoadBasket = async () => {
     );
     if (await ctx.CheckUnauth(res)) return;
     if (res.ok) {
-      res = await res.json();
-      res.Data.forEach((l) => {
+      let rj = await res.json();
+      rj.Data.forEach((l) => {
         if (l.Good.Ref == good.value.Ref) {
           good.value.Basked = l.Qty;
           basketQty.value = l.Qty;

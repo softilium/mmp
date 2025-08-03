@@ -2,6 +2,7 @@ import { createApp } from "vue";
 import { createWebHistory, createRouter } from "vue-router";
 import Home from "./components/Home.vue";
 import Login from "./components/Login.vue";
+import Search from "./components/Search.vue";
 import EditShop from "./components/EditShop.vue";
 import EditGood from "./components/EditGood.vue";
 import Shop from "./components/Shop.vue";
@@ -18,6 +19,7 @@ import App from "./App.vue";
 const routes = [
   { path: "/", component: Home },
   { path: "/login", component: Login },
+  { path: "/search", component: Search },
   { path: "/edit-shop/", component: EditShop },
   { path: "/edit-shop/:id", component: EditShop },
   { path: "/shop/:id", component: Shop },

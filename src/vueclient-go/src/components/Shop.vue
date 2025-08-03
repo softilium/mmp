@@ -75,15 +75,15 @@ const LoadBasket = async () => {
       );
       if (await ctx.CheckUnauth(res)) return;
       if (res.ok) {
-        res = await res.json();
+        let rj = await res.json();
 
-        if (res.Data.length > 0) {
+        if (rj.Data.length > 0) {
           let goodmap = new Map();
           goods.value.Data.forEach((_) => {
             goodmap.set(_.Ref, _);
           });
 
-          res.Data.forEach((_) => {
+          rj.Data.forEach((_) => {
             let goodId = _.Good.Ref;
             let gObj = goodmap.get(goodId);
             if (gObj != null) {

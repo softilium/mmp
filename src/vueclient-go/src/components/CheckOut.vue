@@ -23,10 +23,10 @@ const Load = async () => {
     });
     if (await ctx.CheckUnauth(res)) return;
     if (res.ok) {
-      res = await res.json();
-      res = res.Data;
+      let rj = await res.json();
+      let rj2 = rj.Data;
       const senderMap = new Map();
-      res.forEach((_) => {
+      rj2.forEach((_) => {
         senderMap.set(_.Good.CreatedBy.Ref, 1);
       });
       basket.value = [];
@@ -40,7 +40,7 @@ const Load = async () => {
           senderInfo: {},
         };
         basket.value.push(senderRec);
-        res.forEach((r) => {
+        rj2.forEach((r) => {
           r.good = {
             id: r.Good.Ref,
             caption: r.Good.Caption,
@@ -108,8 +108,8 @@ const Checkout = async (senderRec) => {
   if (await ctx.CheckUnauth(res)) return;
   if (res.ok) {
     await ctx.loadBasket();
-    res = await res.json();
-    router.push(`/order/${res.Ref}`);
+    let rj = await res.json();
+    router.push(`/order/${rj.Ref}`);
   }
 };
 
