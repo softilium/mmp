@@ -28,6 +28,8 @@ github.com/softilium/elorm v0.8.0 h1:LEgtGpoZPPXttDatCrRN3RyWGLayvpA0JBliQn1WEgY
 github.com/softilium/elorm v0.8.0/go.mod h1:+eNMRMd52APu2CM1Jeu903+TO/rNoqJECYqXDx6kxSQ=
 github.com/softilium/elorm v0.8.1 h1:iIlYl02Nf2sHWfvIwPhsjtVY21nBOZfGUnB8+ox5+k0=
 github.com/softilium/elorm v0.8.1/go.mod h1:+eNMRMd52APu2CM1Jeu903+TO/rNoqJECYqXDx6kxSQ=
+github.com/softilium/elorm v0.8.2 h1:rFLNHAgkNHbEcYfaS9YU0CAo8IkzUilhydogREG4jW4=
+github.com/softilium/elorm v0.8.2/go.mod h1:+eNMRMd52APu2CM1Jeu903+TO/rNoqJECYqXDx6kxSQ=
 github.com/telegram-mini-apps/init-data-golang v1.5.0 h1:rtpsmQ/nihkicPvnrdRXmHHtTnPvG1FmxMRZJwMKPz0=
 github.com/telegram-mini-apps/init-data-golang v1.5.0/go.mod h1:GG4HnRx9ocjD4MjjzOw7gf9Ptm0NvFbDr5xqnfFOYuY=
 golang.org/x/crypto v0.40.0 h1:r4x+VvoG5Fm+eJcxMaY8CQM7Lb0l1lsmjGBQ6s8BfKM=

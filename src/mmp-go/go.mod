@@ -5,7 +5,7 @@ go 1.24.5
 require (
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/joho/godotenv v1.5.1
-	github.com/softilium/elorm v0.8.1
+	github.com/softilium/elorm v0.8.2
 )
 
 require (
@@ -31,3 +31,5 @@ require (
 	golang.org/x/crypto v0.40.0
 	modernc.org/sqlite v1.38.2
 )
+
+replace github.com/softilium/elorm v0.8.1 => ../../../elorm
