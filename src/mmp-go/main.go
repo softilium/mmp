@@ -103,7 +103,10 @@ func initServer() *http.Server {
 		return res, nil
 	}
 	goodsRestApiConfig.DefaultSorts = func(r *http.Request) ([]*elorm.SortItem, error) {
-		return []*elorm.SortItem{{Field: DB.GoodDef.OrderInShop, Asc: true}}, nil
+		return []*elorm.SortItem{
+			{Field: DB.GoodDef.OrderInShop, Asc: true},
+			{Field: DB.GoodDef.Caption, Asc: true},
+		}, nil
 	}
 	goodsRestApiConfig.Context = LoadUserFromHttpToContext
 	router.HandleFunc("/api/goods", elorm.HandleRestApi(goodsRestApiConfig))
