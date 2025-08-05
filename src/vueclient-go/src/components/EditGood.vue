@@ -192,7 +192,7 @@ const removeItem = (index) => {
   </div>
 
   <div class="row mb-3">
-    <div class="col-1">
+    <div class="col">
       <span v-for="(src, index) in imageSrc" :key="index">
         <button
           :class="`${
@@ -205,7 +205,16 @@ const removeItem = (index) => {
           {{ index + 1 }}</button
         >&nbsp;
       </span>
+      <button
+        v-if="!isImageLoading && imageSrc.length > 0"
+        class="btn btn-secondary btn-sm"
+        @click="removeItem(curImgIndex)"
+      >
+        Удалить
+      </button>
     </div>
+  </div>
+  <div class="row">
     <div class="col">
       <input
         v-if="imageSrc.length < maxImagesCnt"
@@ -217,11 +226,6 @@ const removeItem = (index) => {
   </div>
 
   <div v-if="!isImageLoading && imageSrc.length > 0" class="row mb-3">
-    <div class="col-1">
-      <button class="btn btn-secondary btn-sm" @click="removeItem(curImgIndex)">
-        Удалить
-      </button>
-    </div>
     <div class="col-11">
       <img :src="imageSrc[curImgIndex]" class="d-block w-100" />
     </div>
