@@ -302,6 +302,36 @@
                     "Scale": 2
                 }
             ]
+        },
+        {
+            "ObjectName": "Tag",
+            "TableName": "Tags",
+            "Columns": [
+                {
+                    "Name": "Name",
+                    "ColumnType": "string",
+                    "Len": 20
+                },
+                {
+                    "Name": "Color",
+                    "ColumnType": "string",
+                    "Len": 20
+                }
+            ]
+        },
+        {
+            "ObjectName": "GoodTag",
+            "TableName": "GoodTags",
+            "Columns": [
+                {
+                    "Name": "Good",
+                    "ColumnType": "ref.Good"
+                },
+                {
+                    "Name": "Tag",
+                    "ColumnType": "ref.Tag"
+                }
+            ]
         }
     ]
 }

@@ -15,9 +15,8 @@ const shop = ref({
   CreatedBy: { Ref: "", Username: "" },
 });
 const shopDescription = ref("");
-
+const tags = ref([{ tagRef: "", tagName: "", tagged: false, tagColor: "" }]);
 const goods = ref({ Data: [], PagesCount: 0 });
-
 const isOwner = ref(false);
 
 onMounted(async () => {
@@ -28,6 +27,13 @@ onMounted(async () => {
       isOwner.value =
         shop.value.CreatedBy.Ref == ctx.userInfo.id && ctx.userInfo.shopManage;
       shopDescription.value = ctx.linkify(shop.value.Description);
+
+      let r2 = await fetch(
+        ctx.rbUrl() + "/api/tags-by-shop?ref=" + shop.value.Ref
+      );
+      if (r2.ok) {
+        tags.value = await r2.json();
+      }
     } else router.push("/");
   } catch (err) {
     console.log(err);
@@ -213,6 +219,20 @@ const DeleteShop = async () => {
     <div class="col"><span v-html="shopDescription"></span></div>
     <div class="col">&nbsp;</div>
   </div>
+
+  <div class="row">
+    <div class="col">
+      <span v-for="tag in tags" v-bind:key="tag.tagRef">
+        <RouterLink :to="`/goods-by-tag/${tag.tagRef}`"
+          ><span :class="['badge', tag.tagColor]">
+            {{ tag.tagName }}
+          </span></RouterLink
+        >
+        &nbsp;
+      </span>
+    </div>
+  </div>
+
   <div class="row">
     <table class="table">
       <tbody>

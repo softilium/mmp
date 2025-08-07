@@ -124,13 +124,22 @@ func initServer() *http.Server {
 	allusersRestApiConfig.Context = LoadUserFromHttpToContext
 	router.HandleFunc("/api/admin/allusers", elorm.HandleRestApi(allusersRestApiConfig))
 
-	router.HandleFunc("/api/admin/migrate", Migrate)
+	tagsRestApiConfig := elorm.CreateStdRestApiConfig(
+		*DB.TagDef.EntityDef,
+		DB.LoadTag,
+		DB.TagDef.SelectEntities,
+		DB.CreateTag)
+	tagsRestApiConfig.BeforeMiddleware = AdminRequiredForEdit
+	tagsRestApiConfig.DefaultPageSize = 0
+	tagsRestApiConfig.EnableSoftDelete = false
+	router.HandleFunc("/api/tags", elorm.HandleRestApi(tagsRestApiConfig))
 
 	initRouterImages(router)
 	initRouterAuth(router)
 	initRouterBasket(router)
 	initRouterOrders(router)
 	initRouterSearchGoods(router)
+	initRouterGoodTags(router)
 
 	// CORE
 
@@ -270,5 +279,21 @@ func UserRequiredForEdit(w http.ResponseWriter, r *http.Request) bool {
 		HandleErr(w, http.StatusUnauthorized, fmt.Errorf("unauthorized: %v", err))
 		return false
 	}
+	return true
+}
+
+func AdminRequiredForEdit(w http.ResponseWriter, r *http.Request) bool {
+	if r.Method == http.MethodGet {
+		return true
+	}
+	u, _, err := UserFromHttpRequest(r)
+	if err != nil {
+		HandleErr(w, http.StatusUnauthorized, fmt.Errorf("unauthorized: %v", err))
+		return false
+	}
+	if !u.Admin() {
+		HandleErr(w, http.StatusForbidden, fmt.Errorf("user isn't admin"))
+	}
+
 	return true
 }

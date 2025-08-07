@@ -17,6 +17,8 @@ const good = ref({
 });
 const isImageLoading = ref(true);
 
+const tags = ref([{ tagRef: "", tagName: "", tagged: false, tagColor: "" }]);
+
 onMounted(async () => {
   if (route.params.id) {
     try {
@@ -28,6 +30,12 @@ onMounted(async () => {
     } catch (err) {
       console.log(err);
       router.push("/shop/" + route.params.shopid);
+    }
+    let rt = await fetch(ctx.rbUrl() + "/api/good-tags?ref=" + route.params.id);
+    if (rt.ok) {
+      tags.value = await rt.json();
+    } else {
+      console.log("Error loading tags for good", route.params.id);
     }
   } else isImageLoading.value = false;
 });
@@ -88,6 +96,7 @@ const Save = async () => {
     if (await ctx.CheckUnauth(res)) return;
     if (res.ok) {
       await SaveImages(route.params.id);
+      await SaveTags(route.params.id);
       router.push("/shop/" + route.params.shopid);
     }
   } else {
@@ -101,6 +110,7 @@ const Save = async () => {
     if (res.ok) {
       let rj = await res.json();
       await SaveImages(rj.Ref);
+      await SaveTags(rj.Ref);
       router.push("/shop/" + route.params.shopid);
     }
   }
@@ -111,6 +121,19 @@ const Save = async () => {
 const maxImagesCnt = ref(3);
 const imageSrc = ref([]);
 let curImgIndex = ref(0);
+
+const SaveTags = async (gref) => {
+  let res = await fetch(ctx.rbUrl() + "/api/good-tags?ref=" + gref, {
+    method: "POST",
+    headers: await ctx.authHeadersAppJson(),
+    body: JSON.stringify(tags.value),
+  });
+  if (!res.ok) {
+    console.error("Error saving tags:", res.statusText);
+  } else {
+    console.log("Tags saved successfully");
+  }
+};
 
 const handelFileUpload = (e) => {
   curImgIndex.value = 0;
@@ -190,6 +213,20 @@ const removeItem = (index) => {
       </div>
     </div>
   </div>
+
+  <h3>Теги</h3>
+  <table>
+    <tr v-for="tagLine in tags" :key="tagLine.tagRef">
+      <td>
+        <span :class="['badge', tagLine.tagColor]">
+          {{ tagLine.tagName }}
+        </span>
+      </td>
+      <td><input v-model="tagLine.tagged" type="checkbox" /></td>
+    </tr>
+  </table>
+
+  <br />
 
   <div class="row mb-3">
     <div class="col">

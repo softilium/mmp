@@ -576,6 +576,90 @@ func (T *Good) SetDeletedAt(newValue time.Time) {
 	T.field_DeletedAt.Set(newValue)
 }
 
+// GoodTag class
+//////
+
+type GoodTagDefStruct struct {
+	*elorm.EntityDef
+	Ref         *elorm.FieldDef
+	IsDeleted   *elorm.FieldDef
+	DataVersion *elorm.FieldDef
+
+	Good *elorm.FieldDef
+
+	Tag *elorm.FieldDef
+}
+
+func (T *GoodTagDefStruct) SelectEntities(filters []*elorm.Filter, sorts []*elorm.SortItem, pageNo int, pageSize int) (result []*GoodTag, pages int, err error) {
+
+	res, total, err := T.EntityDef.SelectEntities(filters, sorts, pageNo, pageSize)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	res2 := make([]*GoodTag, 0, len(res))
+
+	for _, r := range res {
+		if r == nil {
+			continue
+		}
+		rt := T.Wrap(r)
+		res2 = append(res2, rt.(*GoodTag))
+	}
+
+	return res2, total, nil
+
+}
+
+type GoodTag struct {
+	*elorm.Entity
+
+	field_Good *elorm.FieldValueRef
+	field_Tag  *elorm.FieldValueRef
+}
+
+func (T *GoodTag) Good() *Good {
+	if T.field_Good == nil {
+		T.field_Good = T.Values["Good"].(*elorm.FieldValueRef)
+	}
+	r, err := T.field_Good.Get()
+	if err != nil {
+		panic(err)
+	}
+	return r.(*Good)
+}
+
+func (T *GoodTag) SetGood(newValue *Good) {
+	if T.field_Good == nil {
+		T.field_Good = T.Values["Good"].(*elorm.FieldValueRef)
+	}
+	err := T.field_Good.Set(newValue)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (T *GoodTag) Tag() *Tag {
+	if T.field_Tag == nil {
+		T.field_Tag = T.Values["Tag"].(*elorm.FieldValueRef)
+	}
+	r, err := T.field_Tag.Get()
+	if err != nil {
+		panic(err)
+	}
+	return r.(*Tag)
+}
+
+func (T *GoodTag) SetTag(newValue *Tag) {
+	if T.field_Tag == nil {
+		T.field_Tag = T.Values["Tag"].(*elorm.FieldValueRef)
+	}
+	err := T.field_Tag.Set(newValue)
+	if err != nil {
+		panic(err)
+	}
+}
+
 // OrderLine class
 //////
 
@@ -1051,6 +1135,76 @@ func (T *Shop) SetDeletedAt(newValue time.Time) {
 	T.field_DeletedAt.Set(newValue)
 }
 
+// Tag class
+//////
+
+type TagDefStruct struct {
+	*elorm.EntityDef
+	Ref         *elorm.FieldDef
+	IsDeleted   *elorm.FieldDef
+	DataVersion *elorm.FieldDef
+
+	Name *elorm.FieldDef
+
+	Color *elorm.FieldDef
+}
+
+func (T *TagDefStruct) SelectEntities(filters []*elorm.Filter, sorts []*elorm.SortItem, pageNo int, pageSize int) (result []*Tag, pages int, err error) {
+
+	res, total, err := T.EntityDef.SelectEntities(filters, sorts, pageNo, pageSize)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	res2 := make([]*Tag, 0, len(res))
+
+	for _, r := range res {
+		if r == nil {
+			continue
+		}
+		rt := T.Wrap(r)
+		res2 = append(res2, rt.(*Tag))
+	}
+
+	return res2, total, nil
+
+}
+
+type Tag struct {
+	*elorm.Entity
+
+	field_Name  *elorm.FieldValueString
+	field_Color *elorm.FieldValueString
+}
+
+func (T *Tag) Name() string {
+	if T.field_Name == nil {
+		T.field_Name = T.Values["Name"].(*elorm.FieldValueString)
+	}
+	return T.field_Name.Get()
+}
+
+func (T *Tag) SetName(newValue string) {
+	if T.field_Name == nil {
+		T.field_Name = T.Values["Name"].(*elorm.FieldValueString)
+	}
+	T.field_Name.Set(newValue)
+}
+
+func (T *Tag) Color() string {
+	if T.field_Color == nil {
+		T.field_Color = T.Values["Color"].(*elorm.FieldValueString)
+	}
+	return T.field_Color.Get()
+}
+
+func (T *Tag) SetColor(newValue string) {
+	if T.field_Color == nil {
+		T.field_Color = T.Values["Color"].(*elorm.FieldValueString)
+	}
+	T.field_Color.Set(newValue)
+}
+
 // Token class
 //////
 
@@ -1436,8 +1590,10 @@ type DbContext struct {
 	*elorm.Factory
 	CustomerOrderDef CustomerOrderDefStruct
 	GoodDef          GoodDefStruct
+	GoodTagDef       GoodTagDefStruct
 	OrderLineDef     OrderLineDefStruct
 	ShopDef          ShopDefStruct
+	TagDef           TagDefStruct
 	TokenDef         TokenDefStruct
 	UserDef          UserDefStruct
 }
@@ -1478,6 +1634,11 @@ func CreateDbContext(dbDialect string, connectionString string) (*DbContext, err
 
 	r.GoodDef.Fragments = frg
 
+	r.GoodTagDef.EntityDef, err = r.CreateEntityDef("GoodTag", "GoodTags")
+	if err != nil {
+		return nil, err
+	}
+
 	r.OrderLineDef.EntityDef, err = r.CreateEntityDef("OrderLine", "OrderLines")
 	if err != nil {
 		return nil, err
@@ -1501,6 +1662,11 @@ func CreateDbContext(dbDialect string, connectionString string) (*DbContext, err
 	frg = append(frg, "BusinessObjects")
 
 	r.ShopDef.Fragments = frg
+
+	r.TagDef.EntityDef, err = r.CreateEntityDef("Tag", "Tags")
+	if err != nil {
+		return nil, err
+	}
 
 	r.TokenDef.EntityDef, err = r.CreateEntityDef("Token", "Tokens")
 	if err != nil {
@@ -1565,6 +1731,18 @@ func CreateDbContext(dbDialect string, connectionString string) (*DbContext, err
 		return nil, err
 	}
 
+	// GoodTag
+	//////
+
+	r.GoodTagDef.Ref = r.GoodTagDef.FieldDefByName("Ref")
+	r.GoodTagDef.IsDeleted = r.GoodTagDef.FieldDefByName("IsDeleted")
+	r.GoodTagDef.DataVersion = r.GoodTagDef.FieldDefByName("DataVersion")
+
+	r.GoodTagDef.Good, _ = r.GoodTagDef.AddRefFieldDef("Good", r.GoodDef.EntityDef)
+	r.GoodTagDef.Tag, _ = r.GoodTagDef.AddRefFieldDef("Tag", r.TagDef.EntityDef)
+
+	r.GoodTagDef.Wrap = func(source *elorm.Entity) any { return &GoodTag{Entity: source} }
+
 	// OrderLine
 	//////
 
@@ -1604,6 +1782,18 @@ func CreateDbContext(dbDialect string, connectionString string) (*DbContext, err
 	r.ShopDef.DeletedAt, _ = r.ShopDef.AddDateTimeFieldDef("DeletedAt")
 
 	r.ShopDef.Wrap = func(source *elorm.Entity) any { return &Shop{Entity: source} }
+
+	// Tag
+	//////
+
+	r.TagDef.Ref = r.TagDef.FieldDefByName("Ref")
+	r.TagDef.IsDeleted = r.TagDef.FieldDefByName("IsDeleted")
+	r.TagDef.DataVersion = r.TagDef.FieldDefByName("DataVersion")
+
+	r.TagDef.Name, _ = r.TagDef.AddStringFieldDef("Name", 20, "")
+	r.TagDef.Color, _ = r.TagDef.AddStringFieldDef("Color", 20, "")
+
+	r.TagDef.Wrap = func(source *elorm.Entity) any { return &Tag{Entity: source} }
 
 	// Token
 	//////
@@ -1715,6 +1905,24 @@ func (T *DbContext) LoadGood(Ref string) (*Good, error) {
 	return rt, nil
 }
 
+func (T *DbContext) CreateGoodTag() (*GoodTag, error) {
+	r, err := T.CreateEntityWrapped(T.GoodTagDef.EntityDef)
+	if err != nil {
+		return nil, err
+	}
+	rt := r.(*GoodTag)
+	return rt, nil
+}
+
+func (T *DbContext) LoadGoodTag(Ref string) (*GoodTag, error) {
+	r, err := T.LoadEntityWrapped(Ref)
+	if err != nil {
+		return nil, err
+	}
+	rt := r.(*GoodTag)
+	return rt, nil
+}
+
 func (T *DbContext) CreateOrderLine() (*OrderLine, error) {
 	r, err := T.CreateEntityWrapped(T.OrderLineDef.EntityDef)
 	if err != nil {
@@ -1748,6 +1956,24 @@ func (T *DbContext) LoadShop(Ref string) (*Shop, error) {
 		return nil, err
 	}
 	rt := r.(*Shop)
+	return rt, nil
+}
+
+func (T *DbContext) CreateTag() (*Tag, error) {
+	r, err := T.CreateEntityWrapped(T.TagDef.EntityDef)
+	if err != nil {
+		return nil, err
+	}
+	rt := r.(*Tag)
+	return rt, nil
+}
+
+func (T *DbContext) LoadTag(Ref string) (*Tag, error) {
+	r, err := T.LoadEntityWrapped(Ref)
+	if err != nil {
+		return nil, err
+	}
+	rt := r.(*Tag)
 	return rt, nil
 }
 

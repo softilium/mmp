@@ -70,6 +70,12 @@ func (dbc *DbContext) SetHandlers() error {
 		dbc.GoodDef.CreatedBy: true,
 	}
 
+	dbc.TagDef.AutoExpandFieldsForJSON = map[*elorm.FieldDef]bool{
+		dbc.TagDef.Ref:   true,
+		dbc.TagDef.Name:  true,
+		dbc.TagDef.Color: true,
+	}
+
 	// BusinessObjects fragment
 	///////////////////////////
 
@@ -112,6 +118,28 @@ func (dbc *DbContext) SetHandlers() error {
 
 		return nil
 
+	})
+	if err != nil {
+		return err
+	}
+
+	//Tags
+	//////
+
+	err = dbc.AddBeforeDeleteHandler(dbc.TagDef.EntityDef, func(ctx context.Context, entity any) error {
+		tg := entity.(*elorm.Entity)
+		usages, _, err := dbc.GoodTagDef.SelectEntities([]*elorm.Filter{
+			elorm.AddFilterEQ(dbc.GoodTagDef.Tag, tg)}, nil, 0, 0)
+		if err != nil {
+			return fmt.Errorf("error selecting good tags for tag: %v", err)
+		}
+		for _, usage := range usages {
+			err = dbc.DeleteEntity(ctx, usage.RefString())
+			if err != nil {
+				return fmt.Errorf("error deleting good tag %s: %v", usage.RefString(), err)
+			}
+		}
+		return nil
 	})
 	if err != nil {
 		return err

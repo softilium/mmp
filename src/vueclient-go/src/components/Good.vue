@@ -21,6 +21,7 @@ const good = ref({
 });
 const basketQty = ref(0);
 const isOwner = ref(false);
+const tags = ref([{ tagRef: "", tagName: "", tagged: false, tagColor: "" }]);
 
 onMounted(async () => {
   if (route.params.id) {
@@ -33,6 +34,15 @@ onMounted(async () => {
         basketQty.value = null;
         LoadBasket();
         LoadImages();
+
+        let rt = await fetch(
+          ctx.rbUrl() + "/api/good-tags?ref=" + route.params.id
+        );
+        if (rt.ok) {
+          tags.value = await rt.json();
+        } else {
+          console.log("Error loading tags for good", route.params.id);
+        }
       } else router.push("/shop/" + route.params.shopid);
     } catch (err) {
       console.log(err);
@@ -199,6 +209,21 @@ const DeleteGood = async () => {
       <a :href="good.Url" target="_blank">{{ good.Url }}</a>
     </div>
   </div>
+
+  <div class="row-mb3">
+    <div class="col">
+      <span v-for="tag in tags" v-bind:key="tag.tagRef">
+        <RouterLink v-if="tag.tagged" :to="`/goods-by-tag/${tag.tagRef}`"
+          ><span :class="['badge', tag.tagColor]">
+            {{ tag.tagName }}
+          </span></RouterLink
+        >
+        &nbsp;
+      </span>
+    </div>
+  </div>
+
+  &nbsp;
 
   <div class="row-mb3">
     <div class="col">{{ good.Description }}</div>

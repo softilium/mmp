@@ -5,6 +5,7 @@ import { ctx } from "./ctx.js";
 import ProfileLink from "./ProfileLink.vue";
 
 let shops = ref({ Data: [], PagesCount: 0 });
+const tags = ref([{ tagRef: "", tagName: "", tagged: false, tagColor: "" }]);
 
 onMounted(async () => {
   try {
@@ -13,6 +14,11 @@ onMounted(async () => {
     });
     if (res.ok) {
       shops.value = await res.json();
+    }
+
+    let r2 = await fetch(ctx.rbUrl() + "/api/tags-by-all");
+    if (r2.ok) {
+      tags.value = await r2.json();
     }
   } catch (err) {
     console.log(err);
@@ -33,6 +39,19 @@ onMounted(async () => {
 
   <h1>Витрины</h1>
 
+  <div class="row">
+    <div class="col">
+      <span v-for="tag in tags" v-bind:key="tag.tagRef">
+        <RouterLink :to="`/goods-by-tag/${tag.tagRef}`"
+          ><span :class="['badge', tag.tagColor]">
+            {{ tag.tagName }}
+          </span></RouterLink
+        >
+        &nbsp;
+      </span>
+    </div>
+  </div>
+  &nbsp;
   <div class="row">
     <table class="table table-sm">
       <thead class="table-primary">

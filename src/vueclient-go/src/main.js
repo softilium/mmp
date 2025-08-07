@@ -12,6 +12,7 @@ import Order from "./components/Order.vue";
 import Profile from "./components/Profile.vue";
 import SetRoles from "./components/SetRoles.vue";
 import IncOrders from "./components/IncOrders.vue";
+import GoodsByTag from "./components/GoodsByTag.vue";
 import Good from "./components/Good.vue";
 
 import App from "./App.vue";
@@ -27,6 +28,7 @@ const routes = [
   { path: "/edit-good/:shopid/:id", component: EditGood },
   { path: "/checkout", component: CheckOut },
   { path: "/orders", component: Orders },
+  { path: "/goods-by-tag/:id", component: GoodsByTag },
   { path: "/order/:id", component: Order },
   { path: "/myprofile", component: Profile },
   { path: "/profile/:id", component: Profile },
