@@ -218,11 +218,11 @@ const removeItem = (index) => {
   <table>
     <tr v-for="tagLine in tags" :key="tagLine.tagRef">
       <td>
-        <span :class="['badge', tagLine.tagColor]">
+        &nbsp;<span :class="['badge', tagLine.tagColor]">
           {{ tagLine.tagName }}
         </span>
       </td>
-      <td><input v-model="tagLine.tagged" type="checkbox" /></td>
+      <td>&nbsp;<input v-model="tagLine.tagged" type="checkbox" /></td>
     </tr>
   </table>
 

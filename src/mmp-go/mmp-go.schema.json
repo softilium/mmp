@@ -306,6 +306,14 @@
         {
             "ObjectName": "Tag",
             "TableName": "Tags",
+            "Indexes": [
+                {
+                    "Columns": [
+                        "Name"
+                    ],
+                    "Unique": true
+                }
+            ],
             "Columns": [
                 {
                     "Name": "Name",

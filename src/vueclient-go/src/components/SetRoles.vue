@@ -137,9 +137,8 @@ const DeleteTag = async (tag) => {
     <thead>
       <th>Tag</th>
       <th>Color</th>
-      <th>Preview</th>
-      >
       <th></th>
+      <th>Preview</th>
     </thead>
     <tbody v-for="tag in tags" v-bind:key="tag.Ref">
       <td><input v-model="tag.Name" /></td>
@@ -147,7 +146,7 @@ const DeleteTag = async (tag) => {
         <select class="form-select form-control-sm" v-model="tag.Color">
           <option value="text-bg-primary">primary</option>
           <option value="text-bg-secondary">secondary</option>
-          <option value="text-bg-succcess">success</option>
+          <option value="text-bg-success">success</option>
           <option value="text-bg-danger">danger</option>
           <option value="text-bg-warning">warning</option>
           <option value="text-bg-info">info</option>
@@ -156,12 +155,20 @@ const DeleteTag = async (tag) => {
         </select>
       </td>
       <td>
-        <span :class="['badge', tag.Color]"> {{ tag.Name }} </span>
+        <button class="btn btn-primary btn-sm" @click="SaveTag(tag)">
+          Save</button
+        >&nbsp;
+        <button class="btn btn-primary btn-sm" @click="DeleteTag(tag)">
+          Delete
+        </button>
       </td>
       <td>
-        <button class="btn btn-primary" @click="SaveTag(tag)">Save</button
-        >&nbsp;
-        <button class="btn btn-primary" @click="DeleteTag(tag)">Delete</button>
+        &nbsp;
+        <RouterLink :to="`/goods-by-tag/${tag.Ref}`"
+          ><span :class="['badge', tag.Color]">
+            {{ tag.Name }}
+          </span>
+        </RouterLink>
       </td>
     </tbody>
   </table>

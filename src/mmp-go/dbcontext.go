@@ -1795,6 +1795,13 @@ func CreateDbContext(dbDialect string, connectionString string) (*DbContext, err
 
 	r.TagDef.Wrap = func(source *elorm.Entity) any { return &Tag{Entity: source} }
 
+	err = r.TagDef.AddIndex(true,
+		*r.TagDef.Name,
+	)
+	if err != nil {
+		return nil, err
+	}
+
 	// Token
 	//////
 
