@@ -9,6 +9,24 @@ import (
 )
 
 func initRouterGoodTags(router *http.ServeMux) {
+
+	//// tags
+
+	tagsRestApiConfig := elorm.CreateStdRestApiConfig(
+		*DB.TagDef.EntityDef,
+		DB.LoadTag,
+		DB.TagDef.SelectEntities,
+		DB.CreateTag)
+	tagsRestApiConfig.BeforeMiddleware = AdminRequiredForEdit
+	tagsRestApiConfig.DefaultPageSize = 0
+	tagsRestApiConfig.DefaultSorts = func(r *http.Request) ([]*elorm.SortItem, error) {
+		return []*elorm.SortItem{
+			{Field: DB.TagDef.Color, Asc: true},
+			{Field: DB.TagDef.Name, Asc: true},
+		}, nil
+	}
+	router.HandleFunc("/api/tags", elorm.HandleRestApi(tagsRestApiConfig))
+
 	router.HandleFunc("/api/good-tags", handleGoodTags)
 	router.HandleFunc("/api/tags-by-shop", handleTagsByShop)
 	router.HandleFunc("/api/tags-by-all", handleTagsByAll)

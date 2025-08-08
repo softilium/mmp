@@ -118,15 +118,6 @@ func initServer() *http.Server {
 	allusersRestApiConfig.Context = LoadUserFromHttpToContext
 	router.HandleFunc("/api/admin/allusers", elorm.HandleRestApi(allusersRestApiConfig))
 
-	tagsRestApiConfig := elorm.CreateStdRestApiConfig(
-		*DB.TagDef.EntityDef,
-		DB.LoadTag,
-		DB.TagDef.SelectEntities,
-		DB.CreateTag)
-	tagsRestApiConfig.BeforeMiddleware = AdminRequiredForEdit
-	tagsRestApiConfig.DefaultPageSize = 0
-	router.HandleFunc("/api/tags", elorm.HandleRestApi(tagsRestApiConfig))
-
 	initRouterImages(router)
 	initRouterAuth(router)
 	initRouterBasket(router)
