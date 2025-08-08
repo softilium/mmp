@@ -367,10 +367,7 @@ func SendMessageToUser(w http.ResponseWriter, r *http.Request) {
 	}
 	uref := r.URL.Query().Get("userref")
 	if uref == "" {
-		admins, _, err := DB.UserDef.SelectEntities([]*elorm.Filter{
-			elorm.AddFilterEQ(DB.UserDef.Admin, true),
-			elorm.AddFilterEQ(DB.UserDef.IsDeleted, false),
-		}, nil, 0, 0)
+		admins, _, err := DB.UserDef.SelectEntities([]*elorm.Filter{elorm.AddFilterEQ(DB.UserDef.Admin, true)}, nil, 0, 0)
 		if err != nil {
 			HandleErr(w, 0, err)
 			return

@@ -73,11 +73,6 @@ func initServer() *http.Server {
 		DB.ShopDef.SelectEntities,
 		DB.CreateShop)
 	shopsRestApiConfig.DefaultPageSize = 0
-	shopsRestApiConfig.AdditionalFilter = func(r *http.Request) ([]*elorm.Filter, error) {
-		res := []*elorm.Filter{}
-		res = append(res, elorm.AddFilterEQ(DB.ShopDef.IsDeleted, false))
-		return res, nil
-	}
 	shopsRestApiConfig.DefaultSorts = func(r *http.Request) ([]*elorm.SortItem, error) {
 		return []*elorm.SortItem{{Field: DB.ShopDef.Caption, Asc: true}}, nil
 	}
@@ -95,7 +90,6 @@ func initServer() *http.Server {
 	goodsRestApiConfig.DefaultPageSize = 0
 	goodsRestApiConfig.AdditionalFilter = func(r *http.Request) ([]*elorm.Filter, error) {
 		res := []*elorm.Filter{}
-		res = append(res, elorm.AddFilterEQ(DB.GoodDef.IsDeleted, false))
 		shopref := r.URL.Query().Get("shopref")
 		if shopref != "" {
 			res = append(res, elorm.AddFilterEQ(DB.GoodDef.OwnerShop, shopref))
@@ -131,7 +125,6 @@ func initServer() *http.Server {
 		DB.CreateTag)
 	tagsRestApiConfig.BeforeMiddleware = AdminRequiredForEdit
 	tagsRestApiConfig.DefaultPageSize = 0
-	tagsRestApiConfig.EnableSoftDelete = false
 	router.HandleFunc("/api/tags", elorm.HandleRestApi(tagsRestApiConfig))
 
 	initRouterImages(router)

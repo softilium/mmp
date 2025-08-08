@@ -29,9 +29,7 @@ func GoodsSearch(w http.ResponseWriter, r *http.Request) {
 
 	flds := []*elorm.FieldDef{gd.Caption, gd.Description}
 
-	flts := []*elorm.Filter{
-		elorm.AddFilterEQ(gd.IsDeleted, false),
-	}
+	flts := []*elorm.Filter{}
 	orGr := elorm.AddOrGroup()
 	flts = append(flts, orGr)
 	for _, fld := range flds {

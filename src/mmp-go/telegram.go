@@ -101,7 +101,6 @@ func init() {
 			exUsers, _, _err := DB.UserDef.SelectEntities([]*elorm.Filter{
 				elorm.AddFilterEQ(DB.UserDef.TelegramUsername, TelegramUserName(tgUserId, tgUserName)),
 				elorm.AddFilterEQ(DB.UserDef.TelegramVerified, true),
-				elorm.AddFilterEQ(DB.UserDef.IsDeleted, false),
 			}, nil, 1, 1)
 
 			if _err != nil {
@@ -167,7 +166,6 @@ func init() {
 				elorm.AddFilterEQ(DB.UserDef.TelegramVerified, true),
 				elorm.AddFilterNOEQ(DB.UserDef.TelegramUsername, ""),
 				elorm.AddFilterEQ(DB.UserDef.IsActive, true),
-				elorm.AddFilterEQ(DB.UserDef.IsDeleted, false),
 				elorm.AddFilterEQ(DB.UserDef.Admin, true),
 			}, nil, 0, 0)
 			if err != nil {

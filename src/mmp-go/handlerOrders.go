@@ -42,7 +42,6 @@ func initRouterOrders(router *http.ServeMux) {
 		if showAll != "1" {
 			res = append(res, elorm.AddFilterNOTIN(DB.CustomerOrderDef.Status, OrderStatusCanceled, OrderStatusDone))
 		}
-		res = append(res, elorm.AddFilterEQ(DB.CustomerOrderDef.IsDeleted, false))
 		res = append(res, elorm.AddFilterEQ(DB.CustomerOrderDef.CreatedBy, user.RefString()))
 		return res, nil
 	}
@@ -73,7 +72,6 @@ func initRouterOrders(router *http.ServeMux) {
 		if showAll != "1" {
 			res = append(res, elorm.AddFilterNOTIN(DB.CustomerOrderDef.Status, OrderStatusCanceled, OrderStatusDone))
 		}
-		res = append(res, elorm.AddFilterEQ(DB.CustomerOrderDef.IsDeleted, false))
 		res = append(res, elorm.AddFilterEQ(DB.CustomerOrderDef.Sender, user.RefString()))
 		return res, nil
 	}
@@ -120,10 +118,7 @@ func initRouterOrders(router *http.ServeMux) {
 		if orderref == "" {
 			return nil, fmt.Errorf("orderref is required")
 		}
-		res := []*elorm.Filter{
-			elorm.AddFilterEQ(DB.OrderLineDef.CustomerOrder, orderref),
-			elorm.AddFilterEQ(DB.OrderLineDef.IsDeleted, false),
-		}
+		res := []*elorm.Filter{elorm.AddFilterEQ(DB.OrderLineDef.CustomerOrder, orderref)}
 		return res, nil
 	}
 	lines.DefaultSorts = func(r *http.Request) ([]*elorm.SortItem, error) {
@@ -162,7 +157,6 @@ func checkoutHandler(w http.ResponseWriter, r *http.Request) {
 
 	newLines, _, err := DB.OrderLineDef.SelectEntities(
 		[]*elorm.Filter{
-			elorm.AddFilterEQ(DB.OrderLineDef.IsDeleted, false),
 			elorm.AddFilterEQ(DB.OrderLineDef.CustomerOrder, ""),
 			elorm.AddFilterEQ(DB.OrderLineDef.CreatedBy, user.RefString()),
 		}, nil, 0, 0)

@@ -1615,6 +1615,8 @@ func CreateDbContext(dbDialect string, connectionString string) (*DbContext, err
 		return nil, err
 	}
 
+	r.CustomerOrderDef.EntityDef.UseSoftDelete = false
+
 	r.CustomerOrderDef.Fragments = make([]string, 0)
 	frg = []string{}
 
@@ -1626,6 +1628,8 @@ func CreateDbContext(dbDialect string, connectionString string) (*DbContext, err
 	if err != nil {
 		return nil, err
 	}
+
+	r.GoodDef.EntityDef.UseSoftDelete = true
 
 	r.GoodDef.Fragments = make([]string, 0)
 	frg = []string{}
@@ -1639,10 +1643,14 @@ func CreateDbContext(dbDialect string, connectionString string) (*DbContext, err
 		return nil, err
 	}
 
+	r.GoodTagDef.EntityDef.UseSoftDelete = false
+
 	r.OrderLineDef.EntityDef, err = r.CreateEntityDef("OrderLine", "OrderLines")
 	if err != nil {
 		return nil, err
 	}
+
+	r.OrderLineDef.EntityDef.UseSoftDelete = false
 
 	r.OrderLineDef.Fragments = make([]string, 0)
 	frg = []string{}
@@ -1656,6 +1664,8 @@ func CreateDbContext(dbDialect string, connectionString string) (*DbContext, err
 		return nil, err
 	}
 
+	r.ShopDef.EntityDef.UseSoftDelete = true
+
 	r.ShopDef.Fragments = make([]string, 0)
 	frg = []string{}
 
@@ -1668,15 +1678,21 @@ func CreateDbContext(dbDialect string, connectionString string) (*DbContext, err
 		return nil, err
 	}
 
+	r.TagDef.EntityDef.UseSoftDelete = false
+
 	r.TokenDef.EntityDef, err = r.CreateEntityDef("Token", "Tokens")
 	if err != nil {
 		return nil, err
 	}
 
+	r.TokenDef.EntityDef.UseSoftDelete = false
+
 	r.UserDef.EntityDef, err = r.CreateEntityDef("User", "Users")
 	if err != nil {
 		return nil, err
 	}
+
+	r.UserDef.EntityDef.UseSoftDelete = false
 
 	// CustomerOrder
 	//////

@@ -31,7 +31,6 @@ func initRouterBasket(router *http.ServeMux) {
 			return nil, err
 		}
 		res := []*elorm.Filter{}
-		res = append(res, elorm.AddFilterEQ(DB.OrderLineDef.IsDeleted, false))
 		res = append(res, elorm.AddFilterEQ(DB.OrderLineDef.CustomerOrder, "")) // only active basket lines (order is empty)
 		res = append(res, elorm.AddFilterEQ(DB.OrderLineDef.CreatedBy, user.RefString()))
 		return res, nil
@@ -70,7 +69,6 @@ func increaseBasket(w http.ResponseWriter, r *http.Request) {
 	}
 	exists, _, err := DB.OrderLineDef.SelectEntities(
 		[]*elorm.Filter{
-			elorm.AddFilterEQ(DB.OrderLineDef.IsDeleted, false),
 			elorm.AddFilterEQ(DB.OrderLineDef.CustomerOrder, ""), // only active basket lines (order is empty)
 			elorm.AddFilterEQ(DB.OrderLineDef.CreatedBy, user.RefString()),
 			elorm.AddFilterEQ(DB.OrderLineDef.Good, gref),
@@ -134,7 +132,6 @@ func decreaseBasket(w http.ResponseWriter, r *http.Request) {
 	}
 	exists, _, err := DB.OrderLineDef.SelectEntities(
 		[]*elorm.Filter{
-			elorm.AddFilterEQ(DB.OrderLineDef.IsDeleted, false),
 			elorm.AddFilterEQ(DB.OrderLineDef.CustomerOrder, ""), // only active basket lines (order is empty)
 			elorm.AddFilterEQ(DB.OrderLineDef.CreatedBy, user.RefString()),
 			elorm.AddFilterEQ(DB.OrderLineDef.Good, gref),
@@ -193,7 +190,6 @@ func mergeBasket(w http.ResponseWriter, r *http.Request) {
 
 	existItems, _, err := DB.OrderLineDef.SelectEntities(
 		[]*elorm.Filter{
-			elorm.AddFilterEQ(DB.OrderLineDef.IsDeleted, false),
 			elorm.AddFilterEQ(DB.OrderLineDef.CustomerOrder, ""), // only active basket lines (order is empty)
 			elorm.AddFilterEQ(DB.OrderLineDef.CreatedBy, user.RefString()),
 		}, nil, 0, 0)
