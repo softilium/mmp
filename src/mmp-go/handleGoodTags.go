@@ -40,6 +40,7 @@ func handleGoodTags(w http.ResponseWriter, r *http.Request) {
 				t.ref as tag, t.name as tagname, case when gt.good is null then '0' else '1' end as Tagged, t.color
 			from tags t
 			left join goodtags gt on (t.ref=gt.tag and gt.good='%s')
+			order by t.color, t.name
 			`,
 			gref))
 		if err != nil {
