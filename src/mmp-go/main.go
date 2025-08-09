@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"time"
 
 	gh "github.com/gorilla/handlers"
@@ -156,44 +157,7 @@ func initServer() *http.Server {
 
 }
 
-func main() {
-
-	if Cfg.Debug {
-		fmt.Printf("Debug mode is ON\n")
-		fmt.Printf("Cfg.Dialect            = %s\n", Cfg.dbDialect)
-		fmt.Printf("Cfg.DbConnectionString = %s\n", Cfg.DbConnectionString)
-		fmt.Printf("Cfg.ListenAddr         = %s\n", Cfg.ListenAddr)
-		fmt.Printf("Cfg.FrontEndFolder     = %s\n", Cfg.FrontEndFolder)
-
-	}
-
-	DB, err = CreateDbContext(Cfg.dbDialect, Cfg.DbConnectionString)
-	logError(err)
-
-	DB.AggressiveReadingCache = true
-
-	err = DB.SetHandlers()
-	logError(err)
-
-	err = DB.EnsureDBStructure()
-	logError(err)
-	fmt.Println("Database structure ensured successfully.")
-
-	tokensToDelete, _, err := DB.TokenDef.SelectEntities([]*elorm.Filter{
-		elorm.AddFilterLT(DB.TokenDef.RefreshTokenExpiresAt, time.Now()),
-	}, nil, 0, 0)
-	if err != nil {
-		logError(err)
-	} else {
-		for _, token := range tokensToDelete {
-			err = DB.DeleteEntity(context.Background(), token.RefString())
-			if err != nil {
-				logError(err)
-			}
-		}
-		fmt.Printf("Deleted %d expired tokens\n", len(tokensToDelete))
-	}
-
+func createDefaultUser() {
 	users, _, err := DB.UserDef.SelectEntities(nil, nil, 0, 0)
 	if err != nil {
 		logError(err)
@@ -215,21 +179,65 @@ func main() {
 			logError(err)
 		}
 	}
+}
 
-	done := make(chan bool, 1)
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, os.Interrupt)
-
-	server := initServer()
-	go gracefullShutdown(server, quit, done)
-
-	fmt.Printf("Listening on http://%s\n", Cfg.ListenAddr)
-	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		log.Fatalf("could not listen on %s: %v\n", Cfg.ListenAddr, err.Error())
+func removeOrphanedImages() {
+	rows, err := DB.Query("select ref from goods")
+	if err != nil {
+		logError(err)
 	}
+	defer func() { _ = rows.Close() }()
 
-	<-done
+	goodRefs := make(map[string]bool)
+	for rows.Next() {
+		var ref string
+		err = rows.Scan(&ref)
+		if err != nil {
+			logError(err)
+		}
+		goodRefs[ref] = true
+	}
+	ifiles, err := os.ReadDir(Cfg.ImagesFolder)
+	if err != nil {
+		logError(err)
+	}
+	deletedImages := 0
+	for _, file := range ifiles {
 
+		fn := file.Name()
+		if file.IsDir() {
+			continue
+		}
+		tokens := strings.Split(fn, "-")
+		if len(tokens) != 3 || tokens[0] != "goodImage" {
+			continue
+		}
+		if _, ok := goodRefs[tokens[1]]; !ok {
+			err = os.Remove(Cfg.ImagesFolder + "/" + file.Name())
+			if err != nil {
+				logError(err)
+			}
+			deletedImages++
+		}
+	}
+	fmt.Printf("Deleted %d images for goods that don't exist\n", deletedImages)
+}
+
+func removeOldTokens() {
+	tokensToDelete, _, err := DB.TokenDef.SelectEntities([]*elorm.Filter{
+		elorm.AddFilterLT(DB.TokenDef.RefreshTokenExpiresAt, time.Now()),
+	}, nil, 0, 0)
+	if err != nil {
+		logError(err)
+	} else {
+		for _, token := range tokensToDelete {
+			err = DB.DeleteEntity(context.Background(), token.RefString())
+			if err != nil {
+				logError(err)
+			}
+		}
+		fmt.Printf("Deleted %d expired tokens\n", len(tokensToDelete))
+	}
 }
 
 func UserAdminRequired(w http.ResponseWriter, r *http.Request) bool {
@@ -280,4 +288,46 @@ func AdminRequiredForEdit(w http.ResponseWriter, r *http.Request) bool {
 	}
 
 	return true
+}
+
+func main() {
+
+	if Cfg.Debug {
+		fmt.Printf("Debug mode is ON\n")
+		fmt.Printf("Cfg.Dialect            = %s\n", Cfg.dbDialect)
+		fmt.Printf("Cfg.DbConnectionString = %s\n", Cfg.DbConnectionString)
+		fmt.Printf("Cfg.ListenAddr         = %s\n", Cfg.ListenAddr)
+		fmt.Printf("Cfg.FrontEndFolder     = %s\n", Cfg.FrontEndFolder)
+	}
+
+	DB, err = CreateDbContext(Cfg.dbDialect, Cfg.DbConnectionString)
+	logError(err)
+
+	DB.AggressiveReadingCache = true
+
+	err = DB.SetHandlers()
+	logError(err)
+
+	err = DB.EnsureDBStructure()
+	logError(err)
+	fmt.Println("Database structure ensured successfully.")
+
+	removeOldTokens()
+	removeOrphanedImages()
+	createDefaultUser()
+
+	done := make(chan bool, 1)
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt)
+
+	server := initServer()
+	go gracefullShutdown(server, quit, done)
+
+	fmt.Printf("Listening on http://%s\n", Cfg.ListenAddr)
+	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		log.Fatalf("could not listen on %s: %v\n", Cfg.ListenAddr, err.Error())
+	}
+
+	<-done
+
 }
