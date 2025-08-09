@@ -221,17 +221,20 @@ const DeleteShop = async () => {
   </div>
 
   <div class="row">
-    <div class="col">
-      <span v-for="tag in tags" v-bind:key="tag.tagRef">
-        <RouterLink :to="`/goods-by-tag/${tag.tagRef}`"
-          ><span :class="['badge', tag.tagColor]">
-            {{ tag.tagName }}
-          </span></RouterLink
-        >
-        &nbsp;
+    <div class="col text-center">
+      <span v-for="(tag, idx) in tags" v-bind:key="tag.tagRef">
+        <span :style="`padding: 3px; font-size: ${1.4 / (idx * 0.02 + 1)}em`">
+          <RouterLink :to="`/goods-by-tag/${tag.tagRef}`"
+            ><span :class="['badge', tag.tagColor]">
+              {{ tag.tagName }}
+            </span></RouterLink
+          >
+        </span>
       </span>
     </div>
   </div>
+
+  <div class="col">&nbsp;</div>
 
   <div class="row">
     <table class="table">

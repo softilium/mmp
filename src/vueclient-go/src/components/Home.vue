@@ -40,26 +40,23 @@ onMounted(async () => {
   <h1>Витрины</h1>
 
   <div class="row">
-    <div class="col">
-      <span v-for="tag in tags" v-bind:key="tag.tagRef">
-        <RouterLink :to="`/goods-by-tag/${tag.tagRef}`"
-          ><span :class="['badge', tag.tagColor]">
-            {{ tag.tagName }}
-          </span></RouterLink
-        >
-        &nbsp;
+    <div class="col text-center">
+      <span v-for="(tag, idx) in tags" v-bind:key="tag.tagRef">
+        <span :style="`padding: 3px; font-size: ${1.5 / (idx * 0.015 + 1)}em`">
+          <RouterLink :to="`/goods-by-tag/${tag.tagRef}`"
+            ><span :class="['badge', tag.tagColor]">
+              {{ tag.tagName }}
+            </span></RouterLink
+          >
+        </span>
       </span>
     </div>
   </div>
-  &nbsp;
+
+  <div class="col">&nbsp;</div>
+
   <div class="row">
     <table class="table table-sm">
-      <thead class="table-primary">
-        <tr>
-          <th>Заголовок</th>
-          <th>Владелец</th>
-        </tr>
-      </thead>
       <tbody>
         <tr v-for="item in shops.Data" v-bind:key="item.Ref">
           <td class="col-9">
