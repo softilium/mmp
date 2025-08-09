@@ -212,13 +212,17 @@ const DeleteGood = async () => {
 
   <div class="row-mb3">
     <div class="col">
-      <span v-for="tag in tags" v-bind:key="tag.tagRef">
-        <RouterLink v-if="tag.tagged" :to="`/goods-by-tag/${tag.tagRef}`"
-          ><span :class="['badge', tag.tagColor]">
-            {{ tag.tagName }}
-          </span></RouterLink
-        >
-        &nbsp;
+      <span>
+        <span v-for="tag in tags" v-bind:key="tag.tagRef">
+          <RouterLink
+            v-if="tag.tagged"
+            :to="`/goods-by-tag/${tag.tagRef}`"
+            :style="`padding: 3px`"
+            ><span :class="['badge', tag.tagColor]">
+              {{ tag.tagName }}
+            </span></RouterLink
+          >
+        </span>
       </span>
     </div>
   </div>
