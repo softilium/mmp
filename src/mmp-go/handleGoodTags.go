@@ -203,8 +203,8 @@ func getTags(sref string) ([]TagResultLine, error) {
 		select t.ref, t.name, t.color, count(*) as cnt
 		from goodtags gt
 		left join tags t on gt.tag=t.ref
-		inner join goods g on gt.good=g.ref and (g.ownershop='%s' or %s)
-		group by t.ref
+		inner join goods g on gt.good=g.ref and (g.ownershop='%s' or %s) and g.isdeleted=false
+		group by t.name
 		having count(*) > 0
 		order by cnt DESC
 
