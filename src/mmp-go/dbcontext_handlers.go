@@ -109,7 +109,7 @@ func (dbc *DbContext) SetHandlers() error {
 		}
 
 		fld := ent.GetValues()[elorm.IsDeletedFieldName].(*elorm.FieldValueBool)
-		if !fld.Get() && fld.GetOld() {
+		if !fld.Get() && fld.Old() {
 			et.SetDeletedAt(time.Now())
 			if user != nil {
 				et.SetDeletedBy(user)
@@ -182,33 +182,33 @@ func (dbc *DbContext) SetHandlers() error {
 						fmt.Sprintf("Заказ [%s] отправлен вледельцу витрины. Бот будет уведомлять вас о всех будущих изменениях.", orderID)))
 			}
 		} else {
-			if order.Status() != order.field_Status.GetOld() {
+			if order.Status() != order.field_Status.Old() {
 				if order.CreatedBy().TelegramVerified() {
 					_, _ = Bot.Send(
 						tgbotapi.NewMessage(order.CreatedBy().TelegramChatId(),
 							fmt.Sprintf("Статус заказа [%s] изменен владельцем [%s] с [%s] на [%s].",
 								orderID,
 								order.Sender().Username(),
-								OrderStatusCaptions[order.field_Status.GetOld()],
+								OrderStatusCaptions[order.field_Status.Old()],
 								OrderStatusCaptions[order.Status()],
 							)))
 				}
 			}
-			if order.CustomerComment() != order.field_CustomerComment.GetOld() {
+			if order.CustomerComment() != order.field_CustomerComment.Old() {
 				if order.Sender().TelegramVerified() {
 					_, _ = Bot.Send(
 						tgbotapi.NewMessage(order.Sender().TelegramChatId(),
 							fmt.Sprintf("Заказчик указал примечание к заказу [%s]\n\r\n\r%s", orderID, order.CustomerComment())))
 				}
 			}
-			if order.SenderComment() != order.field_SenderComment.GetOld() {
+			if order.SenderComment() != order.field_SenderComment.Old() {
 				if order.CreatedBy().TelegramVerified() {
 					_, _ = Bot.Send(
 						tgbotapi.NewMessage(order.CreatedBy().TelegramChatId(),
 							fmt.Sprintf("Владелец витрины указал примечание к заказу [%s]\n\r\n\r%s", orderID, order.SenderComment())))
 				}
 			}
-			if order.ExpectedDeliveryDate() != order.field_ExpectedDeliveryDate.GetOld() {
+			if order.ExpectedDeliveryDate() != order.field_ExpectedDeliveryDate.Old() {
 				if order.CreatedBy().TelegramVerified() {
 					_, _ = Bot.Send(
 						tgbotapi.NewMessage(order.CreatedBy().TelegramChatId(),

@@ -24,8 +24,8 @@ github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 h1:zYyBkD/k9seD2A7fsi6
 github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646/go.mod h1:jpp1/29i3P1S/RLdc7JQKbRpFeM1dOBd8T9ki5s+AY8=
 github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec h1:W09IVJc94icq4NjY3clb7Lk8O1qJ8BdBEF8z0ibU0rE=
 github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec/go.mod h1:qqbHyh8v60DhA7CoWK5oRCqLrMHRGoxYCSS9EjAz6Eo=
-github.com/softilium/elorm v0.9.2 h1:Oerb+2H45uizRoX3qoylh9zIeR+uRULy9oohpAiOc2Q=
-github.com/softilium/elorm v0.9.2/go.mod h1:+eNMRMd52APu2CM1Jeu903+TO/rNoqJECYqXDx6kxSQ=
+github.com/softilium/elorm v0.10.0 h1:2869iGQg4iZjuFSGDyq8x2+Oly7FxD/cw6F8pmdtMmY=
+github.com/softilium/elorm v0.10.0/go.mod h1:+eNMRMd52APu2CM1Jeu903+TO/rNoqJECYqXDx6kxSQ=
 github.com/telegram-mini-apps/init-data-golang v1.5.0 h1:rtpsmQ/nihkicPvnrdRXmHHtTnPvG1FmxMRZJwMKPz0=
 github.com/telegram-mini-apps/init-data-golang v1.5.0/go.mod h1:GG4HnRx9ocjD4MjjzOw7gf9Ptm0NvFbDr5xqnfFOYuY=
 golang.org/x/crypto v0.41.0 h1:WKYxWedPGCTVVl5+WHSSrOBT0O8lx32+zxmHxijgXp4=
