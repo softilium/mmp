@@ -11,7 +11,7 @@ import (
 func initRouterBasket(router *http.ServeMux) {
 
 	basketRestApiConfig := elorm.CreateStdRestApiConfig(
-		*DB.OrderLineDef.EntityDef,
+		DB.OrderLineDef.EntityDef,
 		DB.LoadOrderLine,
 		DB.OrderLineDef.SelectEntities,
 		DB.CreateOrderLine)

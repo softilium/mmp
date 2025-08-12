@@ -13,7 +13,7 @@ func initRouterGoodTags(router *http.ServeMux) {
 	//// tags
 
 	tagsRestApiConfig := elorm.CreateStdRestApiConfig(
-		*DB.TagDef.EntityDef,
+		DB.TagDef.EntityDef,
 		DB.LoadTag,
 		DB.TagDef.SelectEntities,
 		DB.CreateTag)

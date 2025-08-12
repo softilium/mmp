@@ -69,7 +69,7 @@ func initServer() *http.Server {
 	// API routes
 
 	shopsRestApiConfig := elorm.CreateStdRestApiConfig(
-		*DB.ShopDef.EntityDef,
+		DB.ShopDef.EntityDef,
 		DB.LoadShop,
 		DB.ShopDef.SelectEntities,
 		DB.CreateShop)
@@ -84,7 +84,7 @@ func initServer() *http.Server {
 	//// goods
 
 	goodsRestApiConfig := elorm.CreateStdRestApiConfig(
-		*DB.GoodDef.EntityDef,
+		DB.GoodDef.EntityDef,
 		DB.LoadGood,
 		DB.GoodDef.SelectEntities,
 		DB.CreateGood)
@@ -109,7 +109,7 @@ func initServer() *http.Server {
 	//// allusers
 
 	allusersRestApiConfig := elorm.CreateStdRestApiConfig(
-		*DB.UserDef.EntityDef,
+		DB.UserDef.EntityDef,
 		DB.LoadUser,
 		DB.UserDef.SelectEntities,
 		DB.CreateUser)

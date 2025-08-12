@@ -22,7 +22,7 @@ func initRouterOrders(router *http.ServeMux) {
 		}
 	})
 	outbox := elorm.CreateStdRestApiConfig(
-		*DB.CustomerOrderDef.EntityDef,
+		DB.CustomerOrderDef.EntityDef,
 		DB.LoadCustomerOrder,
 		DB.CustomerOrderDef.SelectEntities,
 		DB.CreateCustomerOrder)
@@ -52,7 +52,7 @@ func initRouterOrders(router *http.ServeMux) {
 	router.HandleFunc("/api/orders/outbox", elorm.HandleRestApi(outbox))
 
 	inbox := elorm.CreateStdRestApiConfig(
-		*DB.CustomerOrderDef.EntityDef,
+		DB.CustomerOrderDef.EntityDef,
 		DB.LoadCustomerOrder,
 		DB.CustomerOrderDef.SelectEntities,
 		DB.CreateCustomerOrder)
@@ -82,7 +82,7 @@ func initRouterOrders(router *http.ServeMux) {
 	router.HandleFunc("/api/orders/inbox", elorm.HandleRestApi(inbox))
 
 	ordersGetterEditor := elorm.CreateStdRestApiConfig(
-		*DB.CustomerOrderDef.EntityDef,
+		DB.CustomerOrderDef.EntityDef,
 		DB.LoadCustomerOrder,
 		DB.CustomerOrderDef.SelectEntities,
 		DB.CreateCustomerOrder)
@@ -101,7 +101,7 @@ func initRouterOrders(router *http.ServeMux) {
 	router.HandleFunc("/api/orders", elorm.HandleRestApi(ordersGetterEditor))
 
 	lines := elorm.CreateStdRestApiConfig(
-		*DB.OrderLineDef.EntityDef,
+		DB.OrderLineDef.EntityDef,
 		DB.LoadOrderLine,
 		DB.OrderLineDef.SelectEntities,
 		DB.CreateOrderLine)
