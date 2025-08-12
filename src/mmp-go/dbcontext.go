@@ -1741,7 +1741,7 @@ func CreateDbContext(dbDialect string, connectionString string) (*DbContext, err
 	r.GoodDef.Wrap = func(source *elorm.Entity) any { return &Good{Entity: source} }
 
 	err = r.GoodDef.AddIndex(false,
-		*r.GoodDef.OwnerShop,
+		r.GoodDef.OwnerShop,
 	)
 	if err != nil {
 		return nil, err
@@ -1812,7 +1812,7 @@ func CreateDbContext(dbDialect string, connectionString string) (*DbContext, err
 	r.TagDef.Wrap = func(source *elorm.Entity) any { return &Tag{Entity: source} }
 
 	err = r.TagDef.AddIndex(true,
-		*r.TagDef.Name,
+		r.TagDef.Name,
 	)
 	if err != nil {
 		return nil, err
@@ -1834,21 +1834,21 @@ func CreateDbContext(dbDialect string, connectionString string) (*DbContext, err
 	r.TokenDef.Wrap = func(source *elorm.Entity) any { return &Token{Entity: source} }
 
 	err = r.TokenDef.AddIndex(false,
-		*r.TokenDef.User,
+		r.TokenDef.User,
 	)
 	if err != nil {
 		return nil, err
 	}
 
 	err = r.TokenDef.AddIndex(true,
-		*r.TokenDef.AccessToken, *r.TokenDef.AccessTokenExpiresAt,
+		r.TokenDef.AccessToken, r.TokenDef.AccessTokenExpiresAt,
 	)
 	if err != nil {
 		return nil, err
 	}
 
 	err = r.TokenDef.AddIndex(true,
-		*r.TokenDef.RefreshToken, *r.TokenDef.RefreshTokenExpiresAt,
+		r.TokenDef.RefreshToken, r.TokenDef.RefreshTokenExpiresAt,
 	)
 	if err != nil {
 		return nil, err
@@ -1876,14 +1876,14 @@ func CreateDbContext(dbDialect string, connectionString string) (*DbContext, err
 	r.UserDef.Wrap = func(source *elorm.Entity) any { return &User{Entity: source} }
 
 	err = r.UserDef.AddIndex(true,
-		*r.UserDef.Username,
+		r.UserDef.Username,
 	)
 	if err != nil {
 		return nil, err
 	}
 
 	err = r.UserDef.AddIndex(true,
-		*r.UserDef.Email,
+		r.UserDef.Email,
 	)
 	if err != nil {
 		return nil, err
