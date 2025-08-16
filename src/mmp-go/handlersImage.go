@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"fmt"
 	"image"
+	_ "image/gif"
 	"image/jpeg"
+	_ "image/png"
 	"io"
 	"net/http"
 	"os"
@@ -19,14 +21,20 @@ var thumbsCache *expirable.LRU[string, *[]byte]
 
 func initRouterImages(router *http.ServeMux) {
 	router.HandleFunc("/api/goods/images", func(w http.ResponseWriter, r *http.Request) {
-		handleImages(w, r, false)
+		handleImages(w, r, false, "good")
 	})
 	router.HandleFunc("/api/goods/thumbs", func(w http.ResponseWriter, r *http.Request) {
-		handleImages(w, r, true)
+		handleImages(w, r, true, "good")
+	})
+	router.HandleFunc("/api/shops/images", func(w http.ResponseWriter, r *http.Request) {
+		handleImages(w, r, false, "shop")
+	})
+	router.HandleFunc("/api/shops/thumbs", func(w http.ResponseWriter, r *http.Request) {
+		handleImages(w, r, true, "shop")
 	})
 }
 
-func handleImages(w http.ResponseWriter, r *http.Request, downScale bool) {
+func handleImages(w http.ResponseWriter, r *http.Request, downScale bool, prefix string) {
 
 	ref := r.URL.Query().Get("ref")
 	if ref == "" {
@@ -38,7 +46,7 @@ func handleImages(w http.ResponseWriter, r *http.Request, downScale bool) {
 		HandleErr(w, http.StatusBadRequest, fmt.Errorf("n (image number) is required"))
 		return
 	}
-	fn := fmt.Sprintf("%s/goodImage-%s-%s", Cfg.ImagesFolder, ref, n)
+	fn := fmt.Sprintf("%s/%sImage-%s-%s", Cfg.ImagesFolder, prefix, ref, n)
 
 	cache := imagesCache
 	if downScale {
