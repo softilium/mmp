@@ -18,6 +18,9 @@ let shop = ref({
 });
 
 let shopId = null;
+let imageSrc = ref("");
+
+const isImageLoading = ref(true);
 
 onMounted(async () => {
   shopId = route.params.id;
@@ -33,7 +36,18 @@ onMounted(async () => {
     } catch (err) {
       console.log(err);
     }
+    let res = await fetch(
+      `${ctx.rbUrl()}/api/shops/images?ref=${route.params.id}&n=0`,
+      { method: "GET" }
+    );
+    if (res.status == 200) {
+      // status 204 also ok but it means no image
+      let b = await res.blob();
+      const src = URL.createObjectURL(b);
+      imageSrc.value = src;
+    }
   }
+  isImageLoading.value = false;
 });
 
 const Save = async () => {
@@ -66,6 +80,40 @@ const Save = async () => {
     } catch (err) {
       console.log(err);
     }
+
+  if (!imageSrc.value) {
+    let res = await fetch(`${ctx.rbUrl()}/api/shops/images?ref=${shopId}&n=0`, {
+      method: "DELETE",
+      headers: await ctx.authHeaders(),
+    });
+    if (await ctx.CheckUnauth(res)) return;
+    if (!res.ok) console.log(res);
+  } else {
+    let blob = await fetch(imageSrc.value).then((r) => r.blob()); // load image from blob url
+    let data = new FormData();
+    data.append("image", blob);
+    let res = await fetch(`${ctx.rbUrl()}/api/shops/images?ref=${shopId}&n=0`, {
+      method: "POST",
+      headers: await ctx.authHeaders(),
+      body: data,
+    });
+    if (await ctx.CheckUnauth(res)) return;
+    if (!res.ok) console.log(res);
+  }
+};
+
+const handelFileUpload = (e) => {
+  var files = e.target.files || e.dataTransfer.files;
+  if (!files.length) return;
+
+  for (let i = 0; i < files.length; i++) {
+    const src = URL.createObjectURL(files[i]);
+    imageSrc.value = src;
+  }
+};
+
+const removeImage = () => {
+  imageSrc.value = "";
 };
 </script>
 
@@ -112,6 +160,29 @@ const Save = async () => {
           placeholder="Этот текст с условиями, сроками доставки, условиями возврата и другой важной информацией будет показан на странице перед заказом"
         />
       </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <input
+        type="file"
+        accept="image/*"
+        @change="(event) => handelFileUpload(event)"
+      />
+      <button
+        v-if="imageSrc"
+        @click="removeImage()"
+        class="btn btn-secondary btn-sm"
+      >
+        Удалить картинку
+      </button>
+    </div>
+  </div>
+
+  <div v-if="!isImageLoading" class="row mb-3">
+    <div class="col-11">
+      <img :src="imageSrc" class="d-block w-100" />
     </div>
   </div>
 </template>

@@ -3,7 +3,7 @@
 import { onMounted, ref } from "vue";
 import { ctx } from "./ctx.js";
 
-let shops = ref({ Data: [], PagesCount: 0 });
+let shops = ref({ Data: [], PagesCount: 0, thumb: "" });
 const tags = ref([{ tagRef: "", tagName: "", tagged: false, tagColor: "" }]);
 
 onMounted(async () => {
@@ -13,6 +13,19 @@ onMounted(async () => {
     });
     if (res.ok) {
       shops.value = await res.json();
+
+      shops.value.Data.forEach(async (shop) => {
+        let res = await fetch(
+          `${ctx.rbUrl()}/api/shops/thumbs?ref=${shop.Ref}&n=0`,
+          { method: "GET" }
+        );
+        if (res.status == 200) {
+          // status 204 means no image
+          let b = await res.blob();
+          const src = URL.createObjectURL(b);
+          shop.thumb = src;
+        }
+      });
     }
 
     let r2 = await fetch(ctx.rbUrl() + "/api/tags-by-all");
@@ -57,6 +70,16 @@ onMounted(async () => {
     <table class="table table-sm">
       <tbody>
         <tr v-for="item in shops.Data" v-bind:key="item.Ref">
+          <td>
+            <RouterLink v-if="item.thumb" :to="`/shop/${item.Ref}`">
+              <img
+                :src="item.thumb"
+                class="img-fluid img-thumbnail"
+                height="60"
+                width="60"
+              />
+            </RouterLink>
+          </td>
           <td class="col-9">
             <RouterLink v-bind:to="`/shop/${item.Ref}`">{{
               item.Caption
