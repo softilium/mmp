@@ -69,13 +69,22 @@ func handleImages(w http.ResponseWriter, r *http.Request, downScale bool, prefix
 				// Decoding gives you an Image.
 				// If you have an io.Reader already, you can give that to Decode
 				// without reading it into a []byte.
-				image, _, err := image.Decode(bytes.NewReader(*imageData))
+				img, _, err := image.Decode(bytes.NewReader(*imageData))
 				if err != nil {
 					HandleErr(w, http.StatusInternalServerError, fmt.Errorf("failed to decode image: %v", err))
 					return
 				}
 
-				newImage := resize.Resize(60, 60, image, resize.Lanczos3)
+				var newImage image.Image
+
+				img_bnd := img.Bounds()
+				img_w := img_bnd.Max.X - img_bnd.Min.X
+				img_h := img_bnd.Max.Y - img_bnd.Min.Y
+				if img_w > img_h {
+					newImage = resize.Resize(60, 0, img, resize.Lanczos3)
+				} else {
+					newImage = resize.Resize(0, 60, img, resize.Lanczos3)
+				}
 
 				var buf bytes.Buffer
 				err = jpeg.Encode(&buf, newImage, nil)
