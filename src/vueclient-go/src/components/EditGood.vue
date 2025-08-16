@@ -37,7 +37,25 @@ onMounted(async () => {
     } else {
       console.log("Error loading tags for good", route.params.id);
     }
-  } else isImageLoading.value = false;
+  } else {
+    let rt = await fetch(ctx.rbUrl() + "/api/tags");
+    if (rt.ok) {
+      tags.value = [];
+      let lj = await rt.json();
+      let lt = lj.Data;
+      for (let i = 0; i < lt.length; i++) {
+        tags.value.push({
+          tagRef: lt[i].Ref,
+          tagName: lt[i].Name,
+          tagged: false,
+          tagColor: lt[i].Color,
+        });
+      }
+    } else {
+      console.log("Error loading tags for good", route.params.id);
+    }
+  }
+  isImageLoading.value = false;
 });
 
 const LoadImages = async () => {
