@@ -115,5 +115,5 @@ const DeleteShop = async () => {
   </div>
 
   <div class="col">&nbsp;</div>
-  <GoodList :goods="goods.Data" :shopRef="shop.Ref" />
+  <GoodList :goods="goods.Data" />
 </template>

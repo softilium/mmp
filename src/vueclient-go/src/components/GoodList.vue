@@ -16,24 +16,16 @@ const props = defineProps({
     type: Array<Good>,
     required: true,
   },
-  shopRef: {
-    type: String,
-    required: true,
-  },
 });
 
 watch(
   () => props.goods,
   async (newValue) => {
     if (newValue.length > 0) {
-      console.log("someProp received data:", newValue);
-
       props.goods.forEach(async (g) => {
         let res = await fetch(
           `${ctx.rbUrl()}/api/goods/thumbs?ref=${g.Ref}&n=0`,
-          {
-            method: "GET",
-          }
+          { method: "GET" }
         );
         if (res.status == 200) {
           // status 204 means no image

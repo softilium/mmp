@@ -2,7 +2,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { ctx } from "./ctx.js";
-import ProfileLink from "./ProfileLink.vue";
 
 let shops = ref({ Data: [], PagesCount: 0 });
 const tags = ref([{ tagRef: "", tagName: "", tagged: false, tagColor: "" }]);
@@ -27,18 +26,6 @@ onMounted(async () => {
 </script>
 
 <template>
-  <nav>
-    <button
-      class="btn btn-info btn-sm"
-      v-if="ctx.userInfo.id && ctx.userInfo.shopManage"
-      @click="$router.push('/edit-shop')"
-    >
-      Добавить витрину
-    </button>
-  </nav>
-
-  <h1>Витрины</h1>
-
   <div class="row">
     <div class="col text-center">
       <span v-for="(tag, idx) in tags" v-bind:key="tag.tagRef">
@@ -55,6 +42,17 @@ onMounted(async () => {
 
   <div class="col">&nbsp;</div>
 
+  <nav>
+    <button
+      class="btn btn-info btn-sm"
+      v-if="ctx.userInfo.id && ctx.userInfo.shopManage"
+      @click="$router.push('/edit-shop')"
+    >
+      Добавить витрину
+    </button>
+  </nav>
+  <h1>Витрины</h1>
+
   <div class="row">
     <table class="table table-sm">
       <tbody>
@@ -63,9 +61,6 @@ onMounted(async () => {
             <RouterLink v-bind:to="`/shop/${item.Ref}`">{{
               item.Caption
             }}</RouterLink>
-          </td>
-          <td class="col-2">
-            <ProfileLink :userInfo="item.CreatedBy"></ProfileLink>
           </td>
         </tr>
       </tbody>

@@ -2,6 +2,7 @@
 import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import { ctx } from "./ctx.js";
+import GoodList from "./GoodList.vue";
 
 const route = useRoute();
 
@@ -26,18 +27,5 @@ onMounted(async () => {
 
 <template>
   <h1>{{ tagName }}</h1>
-
-  <div class="row">
-    <table class="table">
-      <tbody>
-        <tr v-for="good in goods" v-bind:key="good.Ref">
-          <td class="col">
-            &nbsp;<RouterLink v-bind:to="`/good/${good.Ref}`">{{
-              good.Caption
-            }}</RouterLink>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+  <GoodList :goods="goods" />
 </template>

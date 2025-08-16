@@ -2,6 +2,7 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
 import { ctx } from "./ctx.js";
+import GoodList from "./GoodList.vue";
 
 const q = ref("");
 const goods = ref([]);
@@ -33,13 +34,6 @@ watch(
       <input type="text" class="form-control" v-model="q" />
     </div>
   </div>
-  <table class="table table-striped">
-    <tbody>
-      <tr v-for="good in goods" :key="good.Ref">
-        <td>
-          <RouterLink :to="'/good/' + good.Ref">{{ good.Caption }}</RouterLink>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+
+  <GoodList :goods="goods" />
 </template>
