@@ -1,11 +1,18 @@
 const LOCAL_BASKET_KEY = "anonymous_basket";
 
-export const localBasket = {
-  getItems() {
+interface BasketItem {
+  goodId: string;
+  quantity: number;
+  price: number;
+}
+
+export class localBasket {
+  public static getItems(): BasketItem[] {
     const items = localStorage.getItem(LOCAL_BASKET_KEY);
-    return items ? JSON.parse(items) : [];
-  },
-  addItem(item) {
+    return items ? (JSON.parse(items) as BasketItem[]) : ([] as BasketItem[]);
+  }
+
+  public static addItem(item: BasketItem) {
     const items = this.getItems();
     const existing = items.find((i) => i.goodId === item.goodId);
     if (existing) {
@@ -15,15 +22,16 @@ export const localBasket = {
         goodId: item.goodId,
         quantity: item.quantity,
         price: item.price,
-        title: item.title,
-        shopTitle: item.shopTitle,
-        senderId: item.senderId,
-        shopId: item.shopId,
+        //title: item.title,
+        //shopTitle: item.shopTitle,
+        //senderId: item.senderId,
+        //shopId: item.shopId,
       });
     }
     localStorage.setItem(LOCAL_BASKET_KEY, JSON.stringify(items));
-  },
-  decItem(goodId) {
+  }
+
+  public static decItem(goodId: string) {
     let items = this.getItems();
     const idx = items.findIndex((i) => i.goodId === goodId);
     if (idx !== -1) {
@@ -34,8 +42,8 @@ export const localBasket = {
       }
       localStorage.setItem(LOCAL_BASKET_KEY, JSON.stringify(items));
     }
-  },
-  clear() {
+  }
+  public static clear() {
     localStorage.removeItem(LOCAL_BASKET_KEY);
-  },
-};
+  }
+}

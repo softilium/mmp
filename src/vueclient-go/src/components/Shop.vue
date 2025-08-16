@@ -125,10 +125,6 @@ const Inc = async (good) => {
       goodId: good.Ref,
       quantity: 1,
       price: good.Price,
-      title: good.Caption,
-      shopTitle: shop.value.Caption,
-      senderId: shop.value.CreatedBy.Ref,
-      shopId: shop.value.Ref,
     });
     await ctx.loadBasket();
     LoadBasket();

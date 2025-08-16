@@ -26,11 +26,12 @@ const Load = async () => {
       let rj = await res.json();
       let rj2 = rj.Data;
       const senderMap = new Map();
+
       rj2.forEach((_) => {
         senderMap.set(_.Good.CreatedBy.Ref, 1);
       });
       basket.value = [];
-      for (let [k] of senderMap.entries()) {
+      senderMap.forEach((_, k) => {
         let senderRec = {
           senderID: k,
           lines: [],
@@ -53,7 +54,7 @@ const Load = async () => {
             senderRec.senderInfo = r.Good.CreatedBy;
           }
         });
-      }
+      });
     }
   } else {
     // Load basket for anonymous users from localBasket
