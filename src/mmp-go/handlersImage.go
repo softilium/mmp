@@ -21,20 +21,20 @@ var thumbsCache *expirable.LRU[string, *[]byte]
 
 func initRouterImages(router *http.ServeMux) {
 	router.HandleFunc("/api/goods/images", func(w http.ResponseWriter, r *http.Request) {
-		handleImages(w, r, false, "good")
+		handleImages(w, r, "good", 0)
 	})
 	router.HandleFunc("/api/goods/thumbs", func(w http.ResponseWriter, r *http.Request) {
-		handleImages(w, r, true, "good")
+		handleImages(w, r, "good", 60)
 	})
 	router.HandleFunc("/api/shops/images", func(w http.ResponseWriter, r *http.Request) {
-		handleImages(w, r, false, "shop")
+		handleImages(w, r, "shop", 0)
 	})
 	router.HandleFunc("/api/shops/thumbs", func(w http.ResponseWriter, r *http.Request) {
-		handleImages(w, r, true, "shop")
+		handleImages(w, r, "shop", 90)
 	})
 }
 
-func handleImages(w http.ResponseWriter, r *http.Request, downScale bool, prefix string) {
+func handleImages(w http.ResponseWriter, r *http.Request, prefix string, maxdim uint) {
 
 	ref := r.URL.Query().Get("ref")
 	if ref == "" {
@@ -49,7 +49,7 @@ func handleImages(w http.ResponseWriter, r *http.Request, downScale bool, prefix
 	fn := fmt.Sprintf("%s/%sImage-%s-%s", Cfg.ImagesFolder, prefix, ref, n)
 
 	cache := imagesCache
-	if downScale {
+	if maxdim > 0 {
 		cache = thumbsCache
 	}
 
@@ -65,7 +65,7 @@ func handleImages(w http.ResponseWriter, r *http.Request, downScale bool, prefix
 			}
 			imageData = &i
 
-			if downScale {
+			if maxdim > 0 {
 				// Decoding gives you an Image.
 				// If you have an io.Reader already, you can give that to Decode
 				// without reading it into a []byte.
@@ -81,9 +81,9 @@ func handleImages(w http.ResponseWriter, r *http.Request, downScale bool, prefix
 				img_w := img_bnd.Max.X - img_bnd.Min.X
 				img_h := img_bnd.Max.Y - img_bnd.Min.Y
 				if img_w > img_h {
-					newImage = resize.Resize(60, 0, img, resize.Lanczos3)
+					newImage = resize.Resize(maxdim, 0, img, resize.Lanczos3)
 				} else {
-					newImage = resize.Resize(0, 60, img, resize.Lanczos3)
+					newImage = resize.Resize(0, maxdim, img, resize.Lanczos3)
 				}
 
 				var buf bytes.Buffer

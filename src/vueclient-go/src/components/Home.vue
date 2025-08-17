@@ -40,9 +40,9 @@ onMounted(async () => {
 
 <template>
   <div class="row">
-    <div class="col text-center">
-      <span v-for="(tag, idx) in tags" v-bind:key="tag.tagRef">
-        <span :style="`padding: 3px; font-size: ${1.5 / (idx * 0.015 + 1)}em`">
+    <div class="col text-center" style="opacity: 0.8">
+      <span v-for="tag in tags" v-bind:key="tag.tagRef">
+        <span :style="`padding: 3px; font-size: ${1}em`">
           <RouterLink :to="`/goods-by-tag/${tag.tagRef}`"
             ><span :class="['badge', tag.tagColor]">
               {{ tag.tagName }}
@@ -75,15 +75,17 @@ onMounted(async () => {
               <img
                 :src="item.thumb"
                 class="img-fluid img-thumbnail"
-                height="60"
-                width="60"
+                height="90"
+                width="90"
               />
             </RouterLink>
           </td>
           <td class="col-9">
-            <RouterLink v-bind:to="`/shop/${item.Ref}`">{{
-              item.Caption
-            }}</RouterLink>
+            <h5>
+              <RouterLink v-bind:to="`/shop/${item.Ref}`">{{
+                item.Caption
+              }}</RouterLink>
+            </h5>
           </td>
         </tr>
       </tbody>

@@ -151,10 +151,6 @@ const SendMsg = async () => {
         >
           <i class="bi bi-chat-quote"></i>&nbsp;Вопросы, проблемы, предложения?
         </button>
-        <div v-if="ctx.isTg() && ctx.userInfo.shopManage">
-          Адрес страницы для браузера:
-          <input class="form-control sm" v-model="myurl" />
-        </div>
       </div>
     </div>
   </div>
