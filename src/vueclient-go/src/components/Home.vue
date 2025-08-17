@@ -64,7 +64,7 @@ onMounted(async () => {
       Добавить витрину
     </button>
   </nav>
-  <h1>Витрины</h1>
+  <h1>&nbsp;</h1>
 
   <div class="row">
     <table class="table table-sm">
