@@ -93,6 +93,11 @@ func initServer() *http.Server {
 		res := []*elorm.Filter{}
 		shopref := r.URL.Query().Get("shopref")
 		if shopref != "" {
+			showall := r.URL.Query().Get("showall")
+			if showall == "1" {
+				res = append(res, elorm.AddFilterIN(DB.GoodDef.IsDeleted, true, false))
+				fmt.Println("User is owner of the shop, showing deleted goods")
+			}
 			res = append(res, elorm.AddFilterEQ(DB.GoodDef.OwnerShop, shopref))
 		}
 		return res, nil

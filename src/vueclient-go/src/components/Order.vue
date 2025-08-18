@@ -106,9 +106,7 @@ const Save = async () => {
       <tbody>
         <tr v-for="line in order.lines" v-bind:key="line.Ref">
           <td>
-            <RouterLink :to="`/good/${line.Good.Ref}`">{{
-              line.Good.Caption
-            }}</RouterLink>
+            {{ line.Good.Caption }}
           </td>
           <td>{{ line.Qty }}</td>
           <td>{{ line.Sum }}</td>

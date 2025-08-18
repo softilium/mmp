@@ -17,13 +17,14 @@ const good = ref({
   Price: 0,
   Article: "",
   Url: "",
+  IsDeleted: false,
   CreatedBy: { Ref: "", Username: "" },
 });
 const basketQty = ref(0);
 const isOwner = ref(false);
 const tags = ref([{ tagRef: "", tagName: "", tagged: false, tagColor: "" }]);
 
-onMounted(async () => {
+const load = async () => {
   if (route.params.id) {
     try {
       let res = await fetch(ctx.rbUrl() + "/api/goods?ref=" + route.params.id);
@@ -49,6 +50,10 @@ onMounted(async () => {
       router.push("/shop/" + route.params.shopid);
     }
   }
+};
+
+onMounted(async () => {
+  await load();
 });
 
 const isImageLoading = ref(true);
@@ -162,7 +167,27 @@ const DeleteGood = async () => {
   });
   if (await ctx.CheckUnauth(res)) return;
   if (res.ok) {
-    router.push("/shop/" + route.params.shopid);
+    await load();
+  }
+};
+
+const RecoverGood = async () => {
+  if (!confirm("Восстановить товар, вы уверены?")) return;
+
+  let newgood = good.value;
+  newgood.IsDeleted = false;
+
+  let res = await fetch(`${ctx.rbUrl()}/api/goods?ref=${good.value.Ref}`, {
+    method: "PUT",
+    headers: await ctx.authHeadersAppJson(),
+    body: JSON.stringify(newgood),
+  });
+  if (await ctx.CheckUnauth(res)) return;
+  if (res.ok) {
+    await load();
+  } else {
+    var err = await res.text();
+    alert(err);
   }
 };
 </script>
@@ -176,8 +201,19 @@ const DeleteGood = async () => {
       <span class="btn btn-info btn-sm">Редактировать товар</span>
     </RouterLink>
     &nbsp;
-    <button class="btn btn-info btn-sm" v-if="isOwner" @click="DeleteGood()">
+    <button
+      class="btn btn-info btn-sm"
+      v-if="isOwner && !good.IsDeleted"
+      @click="DeleteGood()"
+    >
       Удалить товар
+    </button>
+    <button
+      class="btn btn-info btn-sm"
+      v-if="isOwner && good.IsDeleted"
+      @click="RecoverGood()"
+    >
+      Восстановить товар
     </button>
   </nav>
   <RouterLink :to="`/shop/${good.OwnerShop.Ref}`"
@@ -186,7 +222,7 @@ const DeleteGood = async () => {
   <div>&nbsp;</div>
   <h1>{{ good.Caption }}</h1>
 
-  <div class="row">
+  <div class="row" v-if="!good.IsDeleted">
     <div class="col-6 col-md-3">Положить в корзину</div>
     <div class="col-6 col-md-9">
       <button class="btn btn-primary btn-sm" @click="Inc()">+</button>&nbsp;
@@ -194,6 +230,11 @@ const DeleteGood = async () => {
         <button class="btn btn-primary btn-sm" @click="Dec()">-</button>&nbsp;
         {{ basketQty }}
       </span>
+    </div>
+  </div>
+  <div class="row" v-if="good.IsDeleted">
+    <div class="col">
+      <span class="text-danger">Товар удален</span>
     </div>
   </div>
   <div class="row">

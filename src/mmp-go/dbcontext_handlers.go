@@ -68,6 +68,7 @@ func (dbc *DbContext) SetHandlers() error {
 		dbc.GoodDef.Ref:       true,
 		dbc.GoodDef.Caption:   true,
 		dbc.GoodDef.CreatedBy: true,
+		dbc.GoodDef.IsDeleted: true,
 	}
 
 	dbc.TagDef.AutoExpandFieldsForJSON = map[*elorm.FieldDef]bool{

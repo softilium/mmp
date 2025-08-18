@@ -40,11 +40,13 @@ onMounted(async () => {
     router.push("/");
   }
 
+  let gurl = `${ctx.rbUrl()}/api/goods?shopref=${route.params.id}`;
+  if (shop.value.CreatedBy.Ref == ctx.userInfo.id) {
+    gurl += "&showall=1";
+  }
+
   try {
-    let res = await fetch(
-      ctx.rbUrl() + "/api/goods?shopref=" + route.params.id,
-      { signal: AbortSignal.timeout(5000) }
-    );
+    let res = await fetch(gurl);
     if (res.ok) {
       goods.value = await res.json();
     }

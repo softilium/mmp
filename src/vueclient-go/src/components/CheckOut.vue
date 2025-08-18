@@ -188,9 +188,14 @@ const Dec = async (good) => {
       <tbody>
         <tr v-for="line in sender.lines" v-bind:key="line.id">
           <td class="col-8">
-            <RouterLink :to="`/good/${line.good.id}`">{{
-              line.good.caption
-            }}</RouterLink>
+            <span v-if="!line.good.IsDeleted">
+              <RouterLink :to="`/good/${line.good.id}`">{{
+                line.good.caption
+              }}</RouterLink>
+            </span>
+            <span v-if="line.good.IsDeleted">
+              {{ line.good.caption }} [Удален]
+            </span>
           </td>
           <td>
             &nbsp;<button

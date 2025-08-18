@@ -7,6 +7,7 @@ interface Good {
   Ref: string;
   Caption: string;
   Price: number;
+  IsDeleted: boolean;
   thumb: string;
   basked?: number | null;
 }
@@ -164,13 +165,17 @@ const Dec = async (good) => {
             </div>
           </td>
           <td class="col-3">
-            {{ good.Price }}<br />
-            <button class="btn btn-primary btn-sm" @click="Inc(good)">+</button
-            >&nbsp;
-            <span v-if="good.basked">
-              <button class="btn btn-primary btn-sm" @click="Dec(good)">
-                -</button
-              >&nbsp;{{ good.basked }}
+            <span v-if="good.IsDeleted" class="text-danger">(Удален)</span>
+            <span v-if="!good.IsDeleted">
+              {{ good.Price }}<br />
+              <button class="btn btn-primary btn-sm" @click="Inc(good)">
+                +</button
+              >&nbsp;
+              <span v-if="good.basked">
+                <button class="btn btn-primary btn-sm" @click="Dec(good)">
+                  -</button
+                >&nbsp;{{ good.basked }}
+              </span>
             </span>
           </td>
         </tr>
