@@ -120,16 +120,16 @@ const Inc = async (good) => {
       goodId: good.id,
       quantity: 1,
       price: good.price,
-      title: good.caption,
-      shopTitle:
-        good.createdByInfo && good.createdByInfo.userName
-          ? good.createdByInfo.userName
-          : "",
+      //title: good.caption,
+      // shopTitle:
+      //   good.createdByInfo && good.createdByInfo.userName
+      //     ? good.createdByInfo.userName
+      //     : "",
       senderId:
         good.createdByInfo && good.createdByInfo.id
           ? good.createdByInfo.id
           : null,
-      shopId: good.shopId || null,
+      // shopId: good.shopId || null,
     });
     await Load();
     await ctx.loadBasket();

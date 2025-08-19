@@ -4,6 +4,7 @@ interface BasketItem {
   goodId: string;
   quantity: number;
   price: number;
+  senderId: string;
 }
 
 export class localBasket {
@@ -24,7 +25,7 @@ export class localBasket {
         price: item.price,
         //title: item.title,
         //shopTitle: item.shopTitle,
-        //senderId: item.senderId,
+        senderId: item.senderId,
         //shopId: item.shopId,
       });
     }

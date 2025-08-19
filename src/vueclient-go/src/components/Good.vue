@@ -115,10 +115,10 @@ const Inc = async () => {
       goodId: good.value.Ref,
       quantity: 1,
       price: good.value.Price,
-      title: good.value.Caption,
-      shopTitle: good.value.OwnerShop ? good.value.OwnerShop.Caption : "",
+      //title: good.value.Caption,
+      //shopTitle: good.value.OwnerShop ? good.value.OwnerShop.Caption : "",
       senderId: good.value.CreatedBy.Ref,
-      shopId: good.value.OwnerShop ? good.value.OwnerShop.Ref : null,
+      //shopId: good.value.OwnerShop ? good.value.OwnerShop.Ref : null,
     });
     await LoadBasket();
     await ctx.loadBasket();
