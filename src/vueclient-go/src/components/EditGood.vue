@@ -19,6 +19,8 @@ const isImageLoading = ref(true);
 
 const tags = ref([{ tagRef: "", tagName: "", tagged: false, tagColor: "" }]);
 
+const myOtherShops = ref([]);
+
 onMounted(async () => {
   if (route.params.id) {
     try {
@@ -55,6 +57,20 @@ onMounted(async () => {
       console.log("Error loading tags for good", route.params.id);
     }
   }
+
+  let req = await fetch(
+    `${ctx.rbUrl()}/api/shops?CreatedBy=${ctx.userInfo.id}`,
+    {
+      headers: await ctx.authHeaders(),
+    }
+  );
+  if (req.ok) {
+    let rj = await req.json();
+    myOtherShops.value = rj.Data;
+  } else {
+    console.log("Error loading my shops");
+  }
+
   isImageLoading.value = false;
 });
 
@@ -243,6 +259,26 @@ const removeItem = (index) => {
       <td>&nbsp;<input v-model="tagLine.tagged" type="checkbox" /></td>
     </tr>
   </table>
+
+  <div class="row mb-3">
+    <div class="form-group form-group-sm row">
+      <br />
+      <br />
+      <label class="col-3 form-label">Перенести в витрину</label>
+      <div class="col-7">
+        <select class="form-select form-control-sm" v-model="good.OwnerShop">
+          <option
+            v-for="value in myOtherShops"
+            :key="value.Ref"
+            :value="value.Ref"
+            :selected="good.OwnerShop.Ref === value.Ref"
+          >
+            {{ value.Caption }}
+          </option>
+        </select>
+      </div>
+    </div>
+  </div>
 
   <div>&nbsp;</div>
   <button class="btn btn-primary btn-sm" @click="Save">Сохранить</button>
