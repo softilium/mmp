@@ -13,6 +13,7 @@ import Profile from "./components/Profile.vue";
 import SetRoles from "./components/SetRoles.vue";
 import IncOrders from "./components/IncOrders.vue";
 import GoodsByTag from "./components/GoodsByTag.vue";
+import ResetPwd from "./components/ResetPwd.vue";
 import Good from "./components/Good.vue";
 
 import App from "./App.vue";
@@ -35,6 +36,7 @@ const routes = [
   { path: "/set-roles", component: SetRoles },
   { path: "/inc-orders", component: IncOrders },
   { path: "/good/:id", component: Good },
+  { path: "/resetpwd", component: ResetPwd },
 ];
 
 const router = createRouter({
