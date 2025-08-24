@@ -1363,6 +1363,10 @@ type UserDefStruct struct {
 	TelegramChatId *elorm.FieldDef
 
 	Description *elorm.FieldDef
+
+	RecoverCodeEmail *elorm.FieldDef
+
+	RecoverCodeDeadline *elorm.FieldDef
 }
 
 func (T *UserDefStruct) SelectEntities(filters []*elorm.Filter, sorts []*elorm.SortItem, pageNo int, pageSize int) (result []*User, pages int, err error) {
@@ -1389,17 +1393,19 @@ func (T *UserDefStruct) SelectEntities(filters []*elorm.Filter, sorts []*elorm.S
 type User struct {
 	*elorm.Entity
 
-	field_Username          *elorm.FieldValueString
-	field_Email             *elorm.FieldValueString
-	field_PasswordHash      *elorm.FieldValueString
-	field_IsActive          *elorm.FieldValueBool
-	field_ShopManager       *elorm.FieldValueBool
-	field_Admin             *elorm.FieldValueBool
-	field_TelegramUsername  *elorm.FieldValueString
-	field_TelegramCheckCode *elorm.FieldValueString
-	field_TelegramVerified  *elorm.FieldValueBool
-	field_TelegramChatId    *elorm.FieldValueInt
-	field_Description       *elorm.FieldValueString
+	field_Username            *elorm.FieldValueString
+	field_Email               *elorm.FieldValueString
+	field_PasswordHash        *elorm.FieldValueString
+	field_IsActive            *elorm.FieldValueBool
+	field_ShopManager         *elorm.FieldValueBool
+	field_Admin               *elorm.FieldValueBool
+	field_TelegramUsername    *elorm.FieldValueString
+	field_TelegramCheckCode   *elorm.FieldValueString
+	field_TelegramVerified    *elorm.FieldValueBool
+	field_TelegramChatId      *elorm.FieldValueInt
+	field_Description         *elorm.FieldValueString
+	field_RecoverCodeEmail    *elorm.FieldValueString
+	field_RecoverCodeDeadline *elorm.FieldValueDateTime
 }
 
 func (T *User) Username() string {
@@ -1554,6 +1560,34 @@ func (T *User) SetDescription(newValue string) {
 		T.field_Description = T.Values["Description"].(*elorm.FieldValueString)
 	}
 	T.field_Description.Set(newValue)
+}
+
+func (T *User) RecoverCodeEmail() string {
+	if T.field_RecoverCodeEmail == nil {
+		T.field_RecoverCodeEmail = T.Values["RecoverCodeEmail"].(*elorm.FieldValueString)
+	}
+	return T.field_RecoverCodeEmail.Get()
+}
+
+func (T *User) SetRecoverCodeEmail(newValue string) {
+	if T.field_RecoverCodeEmail == nil {
+		T.field_RecoverCodeEmail = T.Values["RecoverCodeEmail"].(*elorm.FieldValueString)
+	}
+	T.field_RecoverCodeEmail.Set(newValue)
+}
+
+func (T *User) RecoverCodeDeadline() time.Time {
+	if T.field_RecoverCodeDeadline == nil {
+		T.field_RecoverCodeDeadline = T.Values["RecoverCodeDeadline"].(*elorm.FieldValueDateTime)
+	}
+	return T.field_RecoverCodeDeadline.Get()
+}
+
+func (T *User) SetRecoverCodeDeadline(newValue time.Time) {
+	if T.field_RecoverCodeDeadline == nil {
+		T.field_RecoverCodeDeadline = T.Values["RecoverCodeDeadline"].(*elorm.FieldValueDateTime)
+	}
+	T.field_RecoverCodeDeadline.Set(newValue)
 }
 
 // BusinessObjects fragment
@@ -1872,6 +1906,8 @@ func CreateDbContext(dbDialect string, connectionString string) (*DbContext, err
 	r.UserDef.TelegramVerified, _ = r.UserDef.AddBoolFieldDef("TelegramVerified")
 	r.UserDef.TelegramChatId, _ = r.UserDef.AddIntFieldDef("TelegramChatId")
 	r.UserDef.Description, _ = r.UserDef.AddStringFieldDef("Description", 300)
+	r.UserDef.RecoverCodeEmail, _ = r.UserDef.AddStringFieldDef("RecoverCodeEmail", 30)
+	r.UserDef.RecoverCodeDeadline, _ = r.UserDef.AddDateTimeFieldDef("RecoverCodeDeadline")
 
 	r.UserDef.Wrap = func(source *elorm.Entity) any { return &User{Entity: source} }
 

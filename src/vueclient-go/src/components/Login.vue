@@ -24,6 +24,23 @@ const doRegister = async () => {
   registerError.value = q;
   if (registerError.value == "") router.push("/");
 };
+
+const sendReset = async () => {
+  if (emailString.value == "") {
+    return;
+  }
+  let q = await fetch(
+    ctx.rbUrl() + "/api/users/sendreset?email=" + emailString.value,
+    {
+      method: "POST",
+    }
+  );
+  if (q.ok) {
+    alert("Перейдите по ссылке, полученной в email для сброса пароля");
+  } else {
+    alert("Ошибка при отправке письма");
+  }
+};
 </script>
 
 <template>
@@ -49,7 +66,12 @@ const doRegister = async () => {
       </div>
       <button class="btn btn-secondary" @click="doLogin()">Вход</button>
       <div v-if="loginError" class="alert alert-danger" role="alert">
-        {{ loginError }}
+        <p>
+          {{ loginError }}
+        </p>
+        <button class="btn btn-primary" @click="sendReset">
+          Отослать код сброса пароля на почту
+        </button>
       </div>
     </div>
   </div>

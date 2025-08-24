@@ -99,6 +99,15 @@
                     "Name": "Description",
                     "ColumnType": "string",
                     "Len": 300
+                },
+                {
+                    "Name": "RecoverCodeEmail",
+                    "ColumnType": "string",
+                    "Len": 30
+                },
+                {
+                    "Name": "RecoverCodeDeadline",
+                    "ColumnType": "datetime"
                 }
             ]
         },

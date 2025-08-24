@@ -21,6 +21,8 @@ func initRouterAuth(router *http.ServeMux) {
 	router.HandleFunc("/identity/profiles", UserPublicProfile)
 	router.HandleFunc("/identity/refresh", RefreshToken)
 	router.HandleFunc("/api/profiles/sendmsg", SendMessageToUser)
+	router.HandleFunc("/api/users/sendreset", SendReset)
+	router.HandleFunc("/api/users/resetpwd", ResetPwd)
 }
 
 type userPayLoad struct {
@@ -390,5 +392,97 @@ func SendMessageToUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+}
 
+func SendReset(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method != http.MethodPost {
+		HandleErr(w, http.StatusMethodNotAllowed, nil)
+		return
+	}
+
+	email := r.URL.Query().Get("email")
+	if email == "" {
+		HandleErr(w, http.StatusBadRequest, fmt.Errorf("email is required"))
+		return
+	}
+
+	users, _, err := DB.UserDef.SelectEntities(
+		[]*elorm.Filter{
+			elorm.AddFilterEQ(DB.UserDef.Email, email),
+		}, nil, 1, 1)
+
+	if err != nil {
+		HandleErr(w, 0, err)
+		return
+	}
+	if len(users) != 1 {
+		HandleErr(w, http.StatusNotFound, fmt.Errorf("user with this email not found"))
+		return
+	}
+	user := users[0]
+	user.SetRecoverCodeEmail(elorm.NewRef())
+	user.SetRecoverCodeDeadline(time.Now().Add(1 * time.Hour))
+	err = user.Save(r.Context())
+	if err != nil {
+		HandleErr(w, 0, err)
+		return
+	}
+
+	err = SendEmail(
+		user.Email(),
+		"Сброс пароля для river-stores.com",
+		fmt.Sprintf("Вы запросили сброс пароля на сайте river-stores.com\n\rПерейдите по ссылке https://river-stores.com/resetpwd?code=%s в течение часа с момента отправки запроса на сброс пароля.", user.RecoverCodeEmail()))
+
+	if err != nil {
+		HandleErr(w, 0, err)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+
+}
+
+func ResetPwd(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method != http.MethodPost {
+		HandleErr(w, http.StatusMethodNotAllowed, nil)
+		return
+	}
+
+	email := r.URL.Query().Get("email")
+	code := r.URL.Query().Get("code")
+	pwd := r.URL.Query().Get("pwd")
+	if email == "" || code == "" || pwd == "" {
+		HandleErr(w, http.StatusBadRequest, fmt.Errorf("email, code and pwd are required"))
+		return
+	}
+
+	users, _, err := DB.UserDef.SelectEntities(
+		[]*elorm.Filter{
+			elorm.AddFilterEQ(DB.UserDef.Email, email),
+			elorm.AddFilterEQ(DB.UserDef.RecoverCodeEmail, code),
+			elorm.AddFilterGT(DB.UserDef.RecoverCodeDeadline, time.Now()),
+		}, nil, 1, 1)
+	if err != nil {
+		HandleErr(w, 0, err)
+		return
+	}
+	if len(users) != 1 {
+		HandleErr(w, http.StatusNotFound, fmt.Errorf("user with this email and code not found or code expired"))
+		return
+	}
+	user := users[0]
+	passwordHash, err := HashPassword(pwd)
+	if err != nil {
+		HandleErr(w, 0, err)
+		return
+	}
+	user.SetPasswordHash(passwordHash)
+	user.SetRecoverCodeEmail("")
+	err = user.Save(r.Context())
+	if err != nil {
+		HandleErr(w, 0, err)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
 }
