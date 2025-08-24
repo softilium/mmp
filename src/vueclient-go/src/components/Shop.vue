@@ -18,8 +18,9 @@ const shopDescription = ref("");
 const tags = ref([{ tagRef: "", tagName: "", tagged: false, tagColor: "" }]);
 const goods = ref({ Data: [], PagesCount: 0 });
 const isOwner = ref(false);
+const showDeleted = ref(false);
 
-onMounted(async () => {
+const load = async () => {
   try {
     let res = await fetch(ctx.rbUrl() + "/api/shops?ref=" + route.params.id);
     if (res.ok) {
@@ -41,7 +42,7 @@ onMounted(async () => {
   }
 
   let gurl = `${ctx.rbUrl()}/api/goods?shopref=${route.params.id}`;
-  if (shop.value.CreatedBy.Ref == ctx.userInfo.id) {
+  if (shop.value.CreatedBy.Ref == ctx.userInfo.id && showDeleted.value) {
     gurl += "&showall=1";
   }
 
@@ -53,6 +54,10 @@ onMounted(async () => {
   } catch (err) {
     console.log(err);
   }
+};
+
+onMounted(async () => {
+  await load();
 });
 
 const DeleteShop = async () => {
@@ -93,6 +98,14 @@ const DeleteShop = async () => {
     <button class="btn btn-info btn-sm" v-if="isOwner" @click="DeleteShop()">
       Удалить витрину
     </button>
+    &nbsp;
+    <input
+      type="checkbox"
+      v-if="isOwner"
+      v-model="showDeleted"
+      @change="load()"
+    />
+    Показать удалённые товары
   </nav>
 
   <h1>{{ shop.Caption }}</h1>
