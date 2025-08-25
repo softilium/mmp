@@ -34,7 +34,7 @@ const load = async () => {
         good.value = await res.json();
         isOwner.value = good.value.CreatedBy.Ref == ctx.userInfo.id;
         good.value.Basked = null;
-        good.value.PriceWithDiscount = priceWithDiscount(good);
+        good.value.PriceWithDiscount = priceWithDiscount(good.value);
         basketQty.value = null;
         LoadBasket();
         LoadImages();
