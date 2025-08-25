@@ -5,7 +5,7 @@ go 1.24.5
 require (
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/joho/godotenv v1.5.1
-	github.com/softilium/elorm v0.12.1
+	github.com/softilium/elorm v0.12.2
 )
 
 require (
@@ -14,8 +14,6 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/ncruces/go-strftime v0.1.9 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
-	github.com/resend/resend-go/v2 v2.23.0 // indirect
-	github.com/wneessen/go-mail v0.6.2 // indirect
 	golang.org/x/exp v0.0.0-20250813145105-42675adae3e6 // indirect
 	golang.org/x/sys v0.35.0 // indirect
 	golang.org/x/text v0.28.0 // indirect
@@ -30,9 +28,11 @@ require (
 	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/lib/pq v1.10.9
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
+	github.com/resend/resend-go/v2 v2.23.0
 	github.com/telegram-mini-apps/init-data-golang v1.5.0
+	github.com/wneessen/go-mail v0.6.2
 	golang.org/x/crypto v0.41.0
 	modernc.org/sqlite v1.38.2
 )
 
-//replace github.com/softilium/elorm v0.11.0 => ../../../elorm
+replace github.com/softilium/elorm v0.12.2 => ../../../elorm

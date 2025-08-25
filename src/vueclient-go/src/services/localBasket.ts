@@ -3,9 +3,16 @@ const LOCAL_BASKET_KEY = "anonymous_basket";
 interface BasketItem {
   goodId: string;
   quantity: number;
-  price: number;
   senderId: string;
 }
+
+export const priceWithDiscount = (good) => {
+  let price = good.Price;
+  if (good.OwnerShop.DiscountPercent > 0) {
+    price = (price * (100 - good.OwnerShop.DiscountPercent)) / 100;
+  }
+  return price;
+};
 
 export class localBasket {
   public static getItems(): BasketItem[] {
@@ -22,11 +29,7 @@ export class localBasket {
       items.push({
         goodId: item.goodId,
         quantity: item.quantity,
-        price: item.price,
-        //title: item.title,
-        //shopTitle: item.shopTitle,
         senderId: item.senderId,
-        //shopId: item.shopId,
       });
     }
     localStorage.setItem(LOCAL_BASKET_KEY, JSON.stringify(items));

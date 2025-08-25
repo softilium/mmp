@@ -44,7 +44,6 @@ func initRouterBasket(router *http.ServeMux) {
 	router.HandleFunc("/api/basket/increase", increaseBasket)
 	router.HandleFunc("/api/basket/decrease", decreaseBasket)
 	router.HandleFunc("/api/basket/merge", mergeBasket)
-
 }
 
 func increaseBasket(w http.ResponseWriter, r *http.Request) {
@@ -204,7 +203,13 @@ func mergeBasket(w http.ResponseWriter, r *http.Request) {
 			if existItem.Good().RefString() == newItem.GoodId {
 				// Update existing item
 				existItem.SetQty(existItem.Qty() + newItem.Quantity)
-				existItem.SetSum(existItem.Qty() * existItem.Good().Price())
+
+				price := existItem.Good().Price()
+				if existItem.Good().OwnerShop().DiscountPercent() > 0 {
+					price = price * (100 - existItem.Good().OwnerShop().DiscountPercent()) / 100
+				}
+
+				existItem.SetSum(existItem.Qty() * price)
 				err = existItem.Save(dbCtx)
 				if err != nil {
 					HandleErr(w, 0, fmt.Errorf("error updating existing item: %w", err))
@@ -228,7 +233,13 @@ func mergeBasket(w http.ResponseWriter, r *http.Request) {
 			}
 			newLine.SetGood(good)
 			newLine.SetQty(newItem.Quantity)
-			newLine.SetSum(newItem.Quantity * good.Price())
+
+			price := good.Price()
+			if good.OwnerShop().DiscountPercent() > 0 {
+				price = price * (100 - good.OwnerShop().DiscountPercent()) / 100
+			}
+
+			newLine.SetSum(newItem.Quantity * price)
 			newLine.SetShop(good.OwnerShop())
 			newLine.SetCreatedBy(user)
 			err = newLine.Save(dbCtx)

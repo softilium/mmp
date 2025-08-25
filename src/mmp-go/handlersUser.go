@@ -375,7 +375,7 @@ func SendMessageToUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		for _, admin := range admins {
-			if admin.TelegramVerified() {
+			if admin.TelegramVerified() && Bot != nil {
 				_, _ = Bot.Send(tgbotapi.NewMessage(admin.TelegramChatId(), msg))
 			}
 		}
@@ -385,7 +385,7 @@ func SendMessageToUser(w http.ResponseWriter, r *http.Request) {
 			HandleErr(w, http.StatusNotFound, fmt.Errorf("user not found: %s", uref))
 			return
 		}
-		if user.TelegramVerified() {
+		if user.TelegramVerified() && Bot != nil {
 			_, _ = Bot.Send(tgbotapi.NewMessage(user.TelegramChatId(), msg))
 		} else {
 			HandleErr(w, http.StatusBadRequest, fmt.Errorf("user %s is not verified in Telegram", uref))

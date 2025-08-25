@@ -183,6 +183,12 @@
                     "Name": "DeliveryConditions",
                     "ColumnType": "string",
                     "Len": 300
+                },
+                {
+                    "Name": "DiscountPercent",
+                    "ColumnType": "numeric",
+                    "Precision": 4,
+                    "Scale": 1
                 }
             ]
         },
@@ -266,6 +272,12 @@
                     "Scale": 2
                 },
                 {
+                    "Name": "OrderDiscountSum",
+                    "ColumnType": "numeric",
+                    "Precision": 15,
+                    "Scale": 2
+                },
+                {
                     "Name": "SenderComment",
                     "ColumnType": "string",
                     "Len": 200
@@ -302,6 +314,12 @@
                 },
                 {
                     "Name": "Qty",
+                    "ColumnType": "numeric",
+                    "Precision": 15,
+                    "Scale": 2
+                },
+                {
+                    "Name": "LineDiscountSum",
                     "ColumnType": "numeric",
                     "Precision": 15,
                     "Scale": 2

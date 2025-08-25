@@ -4,10 +4,31 @@ import { useRouter } from "vue-router";
 import { ctx } from "./ctx.js";
 import ProfileLink from "./ProfileLink.vue";
 import { localBasket } from "../services/localBasket";
+import { priceWithDiscount } from "../services/localBasket";
 
 const router = useRouter();
 
 const basket = ref([]);
+
+interface Shop {
+  Ref: string;
+  DiscountPercent: number;
+}
+
+interface Good {
+  Ref: string;
+  OwnerShop: Shop;
+  Caption: string;
+  Price: number;
+  IsDeleted: boolean;
+}
+
+interface BasketLine {
+  Ref: string;
+  Good: Good;
+  Qty: number;
+  Sum: number;
+}
 
 onMounted(async () => {
   await Load();
@@ -34,7 +55,7 @@ const Load = async () => {
       senderMap.forEach((_, k) => {
         let senderRec = {
           senderID: k,
-          lines: [],
+          lines: Array<BasketLine>(),
           qtyTotal: 0,
           sumTotal: 0,
           customerComment: "",
@@ -42,13 +63,9 @@ const Load = async () => {
         };
         basket.value.push(senderRec);
         rj2.forEach((r) => {
-          r.good = {
-            id: r.Good.Ref,
-            caption: r.Good.Caption,
-            createdByInfo: r.Good.CreatedBy,
-          };
           if (r.Good.CreatedBy.Ref == k) {
             senderRec.lines.push(r);
+            r.Sum = r.Qty * priceWithDiscount(r.Good);
             senderRec.qtyTotal += r.Qty;
             senderRec.sumTotal += r.Sum;
             senderRec.senderInfo = r.Good.CreatedBy;
@@ -69,7 +86,7 @@ const Load = async () => {
         if (!senderRec) {
           senderRec = {
             senderID: item.senderId,
-            lines: [],
+            lines: Array<BasketLine>(),
             qtyTotal: 0,
             sumTotal: 0,
             customerComment: "",
@@ -77,16 +94,12 @@ const Load = async () => {
           basket.value.push(senderRec);
         }
         senderRec.lines.push({
-          good: {
-            id: good.Ref,
-            caption: good.Caption,
-            createdByInfo: good.CreatedBy,
-          },
-          qty: item.quantity,
-          sum: item.quantity * good.Price,
+          Good: good,
+          Qty: item.quantity,
+          Sum: item.quantity * priceWithDiscount(good),
         });
         senderRec.qtyTotal += item.quantity;
-        senderRec.sumTotal += item.quantity * good.Price;
+        senderRec.sumTotal += item.quantity * priceWithDiscount(good);
         senderRec.senderInfo = good.CreatedBy;
       }
     }
@@ -117,19 +130,9 @@ const Checkout = async (senderRec) => {
 const Inc = async (good) => {
   if (!ctx.userInfo.id) {
     localBasket.addItem({
-      goodId: good.id,
+      goodId: good.Ref,
       quantity: 1,
-      price: good.price,
-      //title: good.caption,
-      // shopTitle:
-      //   good.createdByInfo && good.createdByInfo.userName
-      //     ? good.createdByInfo.userName
-      //     : "",
-      senderId:
-        good.createdByInfo && good.createdByInfo.id
-          ? good.createdByInfo.id
-          : null,
-      // shopId: good.shopId || null,
+      senderId: good.CreatedBy.Ref,
     });
     await Load();
     await ctx.loadBasket();
@@ -151,13 +154,13 @@ const Inc = async (good) => {
 
 const Dec = async (good) => {
   if (!ctx.userInfo.id) {
-    localBasket.decItem(good.id);
+    localBasket.decItem(good.Ref);
     await Load();
     await ctx.loadBasket();
     return;
   }
   let res = await fetch(
-    ctx.rbUrl() + "/api/basket/decrease?goodref=" + good.id,
+    ctx.rbUrl() + "/api/basket/decrease?goodref=" + good.Ref,
     {
       method: "POST",
       headers: await ctx.authHeadersAppJson(),
@@ -188,32 +191,31 @@ const Dec = async (good) => {
       <tbody>
         <tr v-for="line in sender.lines" v-bind:key="line.id">
           <td class="col-8">
-            <span v-if="!line.good.IsDeleted">
-              <RouterLink :to="`/good/${line.good.id}`">{{
-                line.good.caption
+            <span v-if="!line.Good.IsDeleted">
+              <RouterLink :to="`/good/${line.Good.Ref}`">{{
+                line.Good.Caption
               }}</RouterLink>
             </span>
-            <span v-if="line.good.IsDeleted">
-              {{ line.good.caption }} [Удален]
+            <span v-if="line.Good.IsDeleted">
+              {{ line.Good.Caption }} [Удален]
             </span>
           </td>
           <td>
             &nbsp;<button
               class="btn btn-primary btn-sm"
-              @click="Inc(line.good)"
+              @click="Inc(line.Good)"
             >
               +
             </button>
             &nbsp;<button
               class="btn btn-primary btn-sm"
-              @click="Dec(line.good)"
+              @click="Dec(line.Good)"
             >
               -
             </button>
             {{ line.Qty }}
           </td>
           <td class="text-end">{{ line.Sum }}</td>
-          <td class="text-end">{{ line.sum }}</td>
         </tr>
       </tbody>
       <tfoot class="table-success">

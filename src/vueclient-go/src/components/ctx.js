@@ -3,6 +3,7 @@ import moment from "moment";
 import "moment/dist/locale/ru";
 import linkifyHtml from "linkify-html";
 import { localBasket } from "../services/localBasket";
+import { priceWithDiscount } from "../services/localBasket";
 
 function newUserInfo() {
   return { userName: null, shopManage: false, admin: false, id: "" };
@@ -21,8 +22,19 @@ export const ctx = reactive({
     if (!this.userInfo.id) {
       // Anonymous user: calculate sum from localBasket
       const items = localBasket.getItems();
-      items.forEach((item) => {
-        this.basket.sum += item.price * item.quantity;
+      items.forEach(async (item) => {
+        let req = await fetch(`${ctx.rbUrl()}/api/goods?Ref=${item.goodId}`);
+        if (!req.ok) {
+          console.error("Failed to fetch good info for basket item");
+          return;
+        }
+        let raw = await req.json();
+        let good = raw.Data[0];
+        if (!good) {
+          console.error("Good not found for basket item");
+          return;
+        }
+        this.basket.sum += item.quantity * priceWithDiscount(good);
       });
     } else {
       let res = await fetch(`${ctx.rbUrl()}/api/basket`, {
@@ -31,8 +43,19 @@ export const ctx = reactive({
       if (await this.CheckUnauth(res)) return;
       if (res.ok) {
         res = await res.json();
-        res.Data.forEach((_) => {
-          this.basket.sum += _.Sum;
+        res.Data.forEach(async (_) => {
+          let req = await fetch(`${ctx.rbUrl()}/api/goods?Ref=${_.Good.Ref}`);
+          if (!req.ok) {
+            console.error("Failed to fetch good info for basket item");
+            return;
+          }
+          let raw = await req.json();
+          let good = raw.Data[0];
+          if (!good) {
+            console.error("Good not found for basket item");
+            return;
+          }
+          this.basket.sum += _.Qty * priceWithDiscount(good);
         });
       }
     }

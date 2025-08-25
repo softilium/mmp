@@ -246,8 +246,9 @@ func handleGoodsByTag(w http.ResponseWriter, r *http.Request) {
 	rows, err := DB.Query(fmt.Sprintf(`
 		select gt.good
 		from goodtags gt
+		inner join goods g on gt.good=g.ref and g.isdeleted=0
 		where gt.tag='%s'
-		order by gt.ref
+		order by g.caption
 	`, tref))
 	if err != nil {
 		HandleErr(w, http.StatusInternalServerError, fmt.Errorf("error querying goods by tag: %v", err))

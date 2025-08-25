@@ -4,17 +4,19 @@ import { onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { ctx } from "./ctx.js";
 import { localBasket } from "../services/localBasket";
+import { priceWithDiscount } from "../services/localBasket";
 
 const route = useRoute();
 const router = useRouter();
 
 const good = ref({
-  OwnerShop: { Ref: "", Caption: "" },
+  OwnerShop: { Ref: "", Caption: "", DiscountPercent: 0 },
   Caption: "",
   Description: "",
   Basked: null,
   Ref: "",
   Price: 0,
+  PriceWithDiscount: 0,
   Article: "",
   Url: "",
   IsDeleted: false,
@@ -32,6 +34,7 @@ const load = async () => {
         good.value = await res.json();
         isOwner.value = good.value.CreatedBy.Ref == ctx.userInfo.id;
         good.value.Basked = null;
+        good.value.PriceWithDiscount = priceWithDiscount(good);
         basketQty.value = null;
         LoadBasket();
         LoadImages();
@@ -114,11 +117,7 @@ const Inc = async () => {
     localBasket.addItem({
       goodId: good.value.Ref,
       quantity: 1,
-      price: good.value.Price,
-      //title: good.value.Caption,
-      //shopTitle: good.value.OwnerShop ? good.value.OwnerShop.Caption : "",
       senderId: good.value.CreatedBy.Ref,
-      //shopId: good.value.OwnerShop ? good.value.OwnerShop.Ref : null,
     });
     await LoadBasket();
     await ctx.loadBasket();
@@ -239,7 +238,13 @@ const RecoverGood = async () => {
   </div>
   <div class="row">
     <div class="col-6 col-md-3">Цена</div>
-    <div class="col-6 col-md-9">{{ good.Price }}</div>
+    <div class="col-6 col-md-9">
+      <span v-if="good.Price === good.PriceWithDiscount">{{ good.Price }}</span>
+      <span v-if="good.Price !== good.PriceWithDiscount">
+        <del>{{ good.Price }}</del
+        >&nbsp;<strong>{{ good.PriceWithDiscount }}</strong></span
+      >
+    </div>
   </div>
   <div class="row mb-3">
     <div class="col-6 col-md-3">Артикул</div>

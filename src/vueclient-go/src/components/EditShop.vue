@@ -14,6 +14,7 @@ let shop = ref({
   Caption: "",
   Description: "",
   DeliveryConditions: "",
+  DiscountPercent: 0,
   CreatedBy: { Ref: "", Username: "", Description: "" },
 });
 
@@ -141,6 +142,19 @@ const removeImage = () => {
           v-model="shop.Description"
           rows="5"
           placeholder="Это описание будет показано вверху под заголовком витрины."
+        />
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-3">
+    <div class="form-group form-group-sm row">
+      <label class="col-3 form-label">Скидка, %</label>
+      <div class="col-7">
+        <input
+          type="number"
+          class="form-control"
+          v-model="shop.DiscountPercent"
         />
       </div>
     </div>

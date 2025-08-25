@@ -186,13 +186,26 @@ func checkoutHandler(w http.ResponseWriter, r *http.Request) {
 
 	for _, line := range newLines {
 		if line.Good().CreatedBy().RefString() == senderObj.RefString() {
+
+			shop, err := DB.LoadShop(line.Good().OwnerShop().RefString())
+			if err != nil {
+				HandleErr(w, 0, fmt.Errorf("error loading shop: %w", err))
+				return
+			}
+
+			sum := line.Qty() * line.Good().Price()
+			discount := sum / 100 * shop.DiscountPercent()
+			line.SetLineDiscountSum(discount)
+			line.SetSum(sum - line.LineDiscountSum())
+
 			line.SetCustomerOrder(newOrder)
-			err := line.Save(ctx)
+			err = line.Save(ctx)
 			if err != nil {
 				HandleErr(w, 0, fmt.Errorf("error saving order line: %w", err))
 				return
 			}
 			newOrder.SetQty(newOrder.Qty() + line.Qty())
+			newOrder.SetOrderDiscountSum(newOrder.OrderDiscountSum() + line.LineDiscountSum())
 			newOrder.SetSum(newOrder.Sum() + line.Sum())
 		}
 	}

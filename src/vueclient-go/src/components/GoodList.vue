@@ -2,11 +2,22 @@
 import { nextTick, watch } from "vue";
 import { ctx } from "./ctx.js";
 import { localBasket } from "../services/localBasket";
+import { priceWithDiscount } from "../services/localBasket";
+
+interface Shop {
+  Ref: string;
+  Caption: string;
+  Description: string;
+  DiscountPercent: number;
+  CreatedBy: { Ref: string; Username: string; Description: string };
+}
 
 interface Good {
   Ref: string;
+  OwnerShop: Shop;
   Caption: string;
   Price: number;
+  PriceWithDiscount: number;
   IsDeleted: boolean;
   thumb: string;
   basked?: number | null;
@@ -24,6 +35,7 @@ watch(
   async (newValue) => {
     if (newValue.length > 0) {
       props.goods.forEach(async (g) => {
+        g.PriceWithDiscount = priceWithDiscount(g);
         let res = await fetch(
           `${ctx.rbUrl()}/api/goods/thumbs?ref=${g.Ref}&n=0`,
           { method: "GET" }
@@ -94,7 +106,6 @@ const Inc = async (good) => {
     localBasket.addItem({
       goodId: good.Ref,
       quantity: 1,
-      price: good.Price,
       senderId: good.CreatedBy.Ref,
     });
     await ctx.loadBasket();
@@ -168,7 +179,15 @@ const Dec = async (good) => {
           <td class="col-3">
             <span v-if="good.IsDeleted" class="text-danger">(Удален)</span>
             <span v-if="!good.IsDeleted">
-              {{ good.Price }}<br />
+              <span v-if="good.Price === good.PriceWithDiscount">{{
+                good.Price
+              }}</span>
+              <span v-if="good.Price !== good.PriceWithDiscount">
+                <del>{{ good.Price }}</del> <br /><strong>{{
+                  good.PriceWithDiscount
+                }}</strong></span
+              >
+              <br />
               <button class="btn btn-primary btn-sm" @click="Inc(good)">
                 +</button
               >&nbsp;

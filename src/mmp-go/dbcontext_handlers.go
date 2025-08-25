@@ -60,8 +60,9 @@ func (dbc *DbContext) SetHandlers() error {
 	}
 
 	dbc.ShopDef.AutoExpandFieldsForJSON = map[*elorm.FieldDef]bool{
-		dbc.ShopDef.Ref:     true,
-		dbc.ShopDef.Caption: true,
+		dbc.ShopDef.Ref:             true,
+		dbc.ShopDef.Caption:         true,
+		dbc.ShopDef.DiscountPercent: true,
 	}
 
 	dbc.GoodDef.AutoExpandFieldsForJSON = map[*elorm.FieldDef]bool{
@@ -69,6 +70,8 @@ func (dbc *DbContext) SetHandlers() error {
 		dbc.GoodDef.Caption:   true,
 		dbc.GoodDef.CreatedBy: true,
 		dbc.GoodDef.IsDeleted: true,
+		dbc.GoodDef.OwnerShop: true,
+		dbc.GoodDef.Price:     true,
 	}
 
 	dbc.TagDef.AutoExpandFieldsForJSON = map[*elorm.FieldDef]bool{
@@ -172,19 +175,19 @@ func (dbc *DbContext) SetHandlers() error {
 		_ = cu // unused, but can be used for logging or other purposes
 
 		if order.IsNew() {
-			if order.Sender().TelegramVerified() {
+			if order.Sender().TelegramVerified() && Bot != nil {
 				_, _ = Bot.Send(
 					tgbotapi.NewMessage(order.Sender().TelegramChatId(),
 						fmt.Sprintf("Новый заказ для вашей обработки. Заказчик [%s, Заказ [%s].", order.CreatedBy().Username(), orderID)))
 			}
-			if order.CreatedBy().TelegramVerified() {
+			if order.CreatedBy().TelegramVerified() && Bot != nil {
 				_, _ = Bot.Send(
 					tgbotapi.NewMessage(order.CreatedBy().TelegramChatId(),
 						fmt.Sprintf("Заказ [%s] отправлен вледельцу витрины. Бот будет уведомлять вас о всех будущих изменениях.", orderID)))
 			}
 		} else {
 			if order.Status() != order.field_Status.Old() {
-				if order.CreatedBy().TelegramVerified() {
+				if order.CreatedBy().TelegramVerified() && Bot != nil {
 					_, _ = Bot.Send(
 						tgbotapi.NewMessage(order.CreatedBy().TelegramChatId(),
 							fmt.Sprintf("Статус заказа [%s] изменен владельцем [%s] с [%s] на [%s].",
@@ -196,21 +199,21 @@ func (dbc *DbContext) SetHandlers() error {
 				}
 			}
 			if order.CustomerComment() != order.field_CustomerComment.Old() {
-				if order.Sender().TelegramVerified() {
+				if order.Sender().TelegramVerified() && Bot != nil {
 					_, _ = Bot.Send(
 						tgbotapi.NewMessage(order.Sender().TelegramChatId(),
 							fmt.Sprintf("Заказчик указал примечание к заказу [%s]\n\r\n\r%s", orderID, order.CustomerComment())))
 				}
 			}
 			if order.SenderComment() != order.field_SenderComment.Old() {
-				if order.CreatedBy().TelegramVerified() {
+				if order.CreatedBy().TelegramVerified() && Bot != nil {
 					_, _ = Bot.Send(
 						tgbotapi.NewMessage(order.CreatedBy().TelegramChatId(),
 							fmt.Sprintf("Владелец витрины указал примечание к заказу [%s]\n\r\n\r%s", orderID, order.SenderComment())))
 				}
 			}
 			if order.ExpectedDeliveryDate() != order.field_ExpectedDeliveryDate.Old() {
-				if order.CreatedBy().TelegramVerified() {
+				if order.CreatedBy().TelegramVerified() && Bot != nil {
 					_, _ = Bot.Send(
 						tgbotapi.NewMessage(order.CreatedBy().TelegramChatId(),
 							fmt.Sprintf("Владелец витрины указал дату доставки к заказу [%s]\n\r\n\r%s", orderID, order.ExpectedDeliveryDate().Format(time.DateTime))))

@@ -23,6 +23,8 @@ type CustomerOrderDefStruct struct {
 
 	Sum *elorm.FieldDef
 
+	OrderDiscountSum *elorm.FieldDef
+
 	SenderComment *elorm.FieldDef
 
 	CustomerComment *elorm.FieldDef
@@ -70,6 +72,7 @@ type CustomerOrder struct {
 	field_Status               *elorm.FieldValueInt
 	field_Qty                  *elorm.FieldValueNumeric
 	field_Sum                  *elorm.FieldValueNumeric
+	field_OrderDiscountSum     *elorm.FieldValueNumeric
 	field_SenderComment        *elorm.FieldValueString
 	field_CustomerComment      *elorm.FieldValueString
 	field_ExpectedDeliveryDate *elorm.FieldValueDateTime
@@ -142,6 +145,20 @@ func (T *CustomerOrder) SetSum(newValue float64) {
 		T.field_Sum = T.Values["Sum"].(*elorm.FieldValueNumeric)
 	}
 	T.field_Sum.Set(newValue)
+}
+
+func (T *CustomerOrder) OrderDiscountSum() float64 {
+	if T.field_OrderDiscountSum == nil {
+		T.field_OrderDiscountSum = T.Values["OrderDiscountSum"].(*elorm.FieldValueNumeric)
+	}
+	return T.field_OrderDiscountSum.Get()
+}
+
+func (T *CustomerOrder) SetOrderDiscountSum(newValue float64) {
+	if T.field_OrderDiscountSum == nil {
+		T.field_OrderDiscountSum = T.Values["OrderDiscountSum"].(*elorm.FieldValueNumeric)
+	}
+	T.field_OrderDiscountSum.Set(newValue)
 }
 
 func (T *CustomerOrder) SenderComment() string {
@@ -677,6 +694,8 @@ type OrderLineDefStruct struct {
 
 	Qty *elorm.FieldDef
 
+	LineDiscountSum *elorm.FieldDef
+
 	Sum *elorm.FieldDef
 
 	CreatedBy *elorm.FieldDef
@@ -716,17 +735,18 @@ func (T *OrderLineDefStruct) SelectEntities(filters []*elorm.Filter, sorts []*el
 type OrderLine struct {
 	*elorm.Entity
 
-	field_Shop          *elorm.FieldValueRef
-	field_CustomerOrder *elorm.FieldValueRef
-	field_Good          *elorm.FieldValueRef
-	field_Qty           *elorm.FieldValueNumeric
-	field_Sum           *elorm.FieldValueNumeric
-	field_CreatedBy     *elorm.FieldValueRef
-	field_CreatedAt     *elorm.FieldValueDateTime
-	field_ModifiedBy    *elorm.FieldValueRef
-	field_ModifiedAt    *elorm.FieldValueDateTime
-	field_DeletedBy     *elorm.FieldValueRef
-	field_DeletedAt     *elorm.FieldValueDateTime
+	field_Shop            *elorm.FieldValueRef
+	field_CustomerOrder   *elorm.FieldValueRef
+	field_Good            *elorm.FieldValueRef
+	field_Qty             *elorm.FieldValueNumeric
+	field_LineDiscountSum *elorm.FieldValueNumeric
+	field_Sum             *elorm.FieldValueNumeric
+	field_CreatedBy       *elorm.FieldValueRef
+	field_CreatedAt       *elorm.FieldValueDateTime
+	field_ModifiedBy      *elorm.FieldValueRef
+	field_ModifiedAt      *elorm.FieldValueDateTime
+	field_DeletedBy       *elorm.FieldValueRef
+	field_DeletedAt       *elorm.FieldValueDateTime
 }
 
 func (T *OrderLine) Shop() *Shop {
@@ -804,6 +824,20 @@ func (T *OrderLine) SetQty(newValue float64) {
 		T.field_Qty = T.Values["Qty"].(*elorm.FieldValueNumeric)
 	}
 	T.field_Qty.Set(newValue)
+}
+
+func (T *OrderLine) LineDiscountSum() float64 {
+	if T.field_LineDiscountSum == nil {
+		T.field_LineDiscountSum = T.Values["LineDiscountSum"].(*elorm.FieldValueNumeric)
+	}
+	return T.field_LineDiscountSum.Get()
+}
+
+func (T *OrderLine) SetLineDiscountSum(newValue float64) {
+	if T.field_LineDiscountSum == nil {
+		T.field_LineDiscountSum = T.Values["LineDiscountSum"].(*elorm.FieldValueNumeric)
+	}
+	T.field_LineDiscountSum.Set(newValue)
 }
 
 func (T *OrderLine) Sum() float64 {
@@ -940,6 +974,8 @@ type ShopDefStruct struct {
 
 	DeliveryConditions *elorm.FieldDef
 
+	DiscountPercent *elorm.FieldDef
+
 	CreatedBy *elorm.FieldDef
 
 	CreatedAt *elorm.FieldDef
@@ -980,6 +1016,7 @@ type Shop struct {
 	field_Caption            *elorm.FieldValueString
 	field_Description        *elorm.FieldValueString
 	field_DeliveryConditions *elorm.FieldValueString
+	field_DiscountPercent    *elorm.FieldValueNumeric
 	field_CreatedBy          *elorm.FieldValueRef
 	field_CreatedAt          *elorm.FieldValueDateTime
 	field_ModifiedBy         *elorm.FieldValueRef
@@ -1028,6 +1065,20 @@ func (T *Shop) SetDeliveryConditions(newValue string) {
 		T.field_DeliveryConditions = T.Values["DeliveryConditions"].(*elorm.FieldValueString)
 	}
 	T.field_DeliveryConditions.Set(newValue)
+}
+
+func (T *Shop) DiscountPercent() float64 {
+	if T.field_DiscountPercent == nil {
+		T.field_DiscountPercent = T.Values["DiscountPercent"].(*elorm.FieldValueNumeric)
+	}
+	return T.field_DiscountPercent.Get()
+}
+
+func (T *Shop) SetDiscountPercent(newValue float64) {
+	if T.field_DiscountPercent == nil {
+		T.field_DiscountPercent = T.Values["DiscountPercent"].(*elorm.FieldValueNumeric)
+	}
+	T.field_DiscountPercent.Set(newValue)
 }
 
 func (T *Shop) CreatedBy() *User {
@@ -1739,6 +1790,7 @@ func CreateDbContext(dbDialect string, connectionString string) (*DbContext, err
 	r.CustomerOrderDef.Status, _ = r.CustomerOrderDef.AddIntFieldDef("Status")
 	r.CustomerOrderDef.Qty, _ = r.CustomerOrderDef.AddNumericFieldDef("Qty", 15, 2)
 	r.CustomerOrderDef.Sum, _ = r.CustomerOrderDef.AddNumericFieldDef("Sum", 15, 2)
+	r.CustomerOrderDef.OrderDiscountSum, _ = r.CustomerOrderDef.AddNumericFieldDef("OrderDiscountSum", 15, 2)
 	r.CustomerOrderDef.SenderComment, _ = r.CustomerOrderDef.AddStringFieldDef("SenderComment", 200)
 	r.CustomerOrderDef.CustomerComment, _ = r.CustomerOrderDef.AddStringFieldDef("CustomerComment", 200)
 	r.CustomerOrderDef.ExpectedDeliveryDate, _ = r.CustomerOrderDef.AddDateTimeFieldDef("ExpectedDeliveryDate")
@@ -1804,6 +1856,7 @@ func CreateDbContext(dbDialect string, connectionString string) (*DbContext, err
 	r.OrderLineDef.CustomerOrder, _ = r.OrderLineDef.AddRefFieldDef("CustomerOrder", r.CustomerOrderDef.EntityDef)
 	r.OrderLineDef.Good, _ = r.OrderLineDef.AddRefFieldDef("Good", r.GoodDef.EntityDef)
 	r.OrderLineDef.Qty, _ = r.OrderLineDef.AddNumericFieldDef("Qty", 15, 2)
+	r.OrderLineDef.LineDiscountSum, _ = r.OrderLineDef.AddNumericFieldDef("LineDiscountSum", 15, 2)
 	r.OrderLineDef.Sum, _ = r.OrderLineDef.AddNumericFieldDef("Sum", 15, 2)
 	r.OrderLineDef.CreatedBy, _ = r.OrderLineDef.AddRefFieldDef("CreatedBy", r.UserDef.EntityDef)
 	r.OrderLineDef.CreatedAt, _ = r.OrderLineDef.AddDateTimeFieldDef("CreatedAt")
@@ -1824,6 +1877,7 @@ func CreateDbContext(dbDialect string, connectionString string) (*DbContext, err
 	r.ShopDef.Caption, _ = r.ShopDef.AddStringFieldDef("Caption", 100)
 	r.ShopDef.Description, _ = r.ShopDef.AddStringFieldDef("Description", 300)
 	r.ShopDef.DeliveryConditions, _ = r.ShopDef.AddStringFieldDef("DeliveryConditions", 300)
+	r.ShopDef.DiscountPercent, _ = r.ShopDef.AddNumericFieldDef("DiscountPercent", 4, 1)
 	r.ShopDef.CreatedBy, _ = r.ShopDef.AddRefFieldDef("CreatedBy", r.UserDef.EntityDef)
 	r.ShopDef.CreatedAt, _ = r.ShopDef.AddDateTimeFieldDef("CreatedAt")
 	r.ShopDef.ModifiedBy, _ = r.ShopDef.AddRefFieldDef("ModifiedBy", r.UserDef.EntityDef)
