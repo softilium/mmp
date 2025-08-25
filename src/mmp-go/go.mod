@@ -5,7 +5,7 @@ go 1.24.5
 require (
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/joho/godotenv v1.5.1
-	github.com/softilium/elorm v0.12.2
+	github.com/softilium/elorm v0.12.3
 )
 
 require (
@@ -35,4 +35,4 @@ require (
 	modernc.org/sqlite v1.38.2
 )
 
-replace github.com/softilium/elorm v0.12.2 => ../../../elorm
+//replace github.com/softilium/elorm v0.12.2 => ../../../elorm

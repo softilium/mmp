@@ -105,7 +105,7 @@ const DeleteShop = async () => {
       v-model="showDeleted"
       @change="load()"
     />
-    Показать удалённые товары
+    <span v-if="isOwner">Показать удалённые товары</span>
   </nav>
 
   <h1>{{ shop.Caption }}</h1>
